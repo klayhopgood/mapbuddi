@@ -2,7 +2,7 @@
 
 import { db } from "@/db/db";
 import { Product, products } from "@/db/schema";
-import { currentUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 

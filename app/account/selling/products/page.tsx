@@ -5,7 +5,7 @@ import Link from "next/link";
 import { db } from "@/db/db";
 import { products } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { currentUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { secondLevelNestedRoutes } from "@/lib/routes";
 import { InfoCard } from "@/components/admin/info-card";
 import { DataTable } from "./data-table";

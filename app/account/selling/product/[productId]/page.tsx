@@ -6,7 +6,7 @@ import {
   deleteProduct,
   updateProduct,
 } from "@/server-actions/products";
-import { currentUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
 
 export default async function ProductDetailPage(props: {

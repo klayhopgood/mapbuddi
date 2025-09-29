@@ -1,6 +1,6 @@
 import { CreateNewStore } from "@/components/admin/create-new-store";
 import { createStore } from "@/server-actions/store";
-import { currentUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { PropsWithChildren } from "react";
 
 export default async function SellerLayout(props: PropsWithChildren) {

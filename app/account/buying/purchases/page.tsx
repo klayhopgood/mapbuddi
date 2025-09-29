@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 import { InfoCard } from "@/components/admin/info-card";
 import { Box } from "lucide-react";
 import { HeadingAndSubheading } from "@/components/admin/heading-and-subheading";
-import { currentUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 
 async function getData(): Promise<BuyersOrderTable[]> {
   const user = await currentUser();

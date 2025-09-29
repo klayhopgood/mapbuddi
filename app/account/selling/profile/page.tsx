@@ -2,7 +2,7 @@ import { HeadingAndSubheading } from "@/components/admin/heading-and-subheading"
 import { EditStoreFields } from "@/components/admin/edit-store-fields";
 import { db } from "@/db/db";
 import { stores } from "@/db/schema";
-import { currentUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { updateStore } from "@/server-actions/store";
 
