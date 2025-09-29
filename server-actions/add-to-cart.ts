@@ -3,21 +3,26 @@
 import { db } from "@/db/db";
 import { carts } from "@/db/schema";
 import { CartItem } from "@/lib/types";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { currentUser } from "@clerk/nextjs/server";
 
 export async function addToCart(newCartItem: CartItem) {
-  const cookieStore = cookies();
+  const user = await currentUser();
+  if (!user) throw new Error("User not authenticated");
 
+  const cookieStore = cookies();
   const cartId = cookieStore.get("cartId")?.value;
+  
+  // Check if cart exists and belongs to current user
   const cartDetails =
     cartId &&
     (await db
       .select()
       .from(carts)
-      .where(eq(carts.id, Number(cartId))));
-  const cartAvailableAndOpen = cartDetails && !cartDetails[0].isClosed;
+      .where(and(eq(carts.id, Number(cartId)), eq(carts.userId, user.id))));
+  const cartAvailableAndOpen = cartDetails && cartDetails.length > 0 && !cartDetails[0].isClosed;
 
   if (cartAvailableAndOpen) {
     const dbItems = await db
@@ -56,7 +61,10 @@ export async function addToCart(newCartItem: CartItem) {
   } else {
     const newCart = await db
       .insert(carts)
-      .values({ items: JSON.stringify([newCartItem]) })
+      .values({ 
+        items: JSON.stringify([newCartItem]),
+        userId: user.id 
+      })
       .returning();
     cookieStore.set("cartId", String(newCart[0].id));
     revalidatePath("/");

@@ -3,9 +3,13 @@
 import { db } from "@/db/db";
 import { carts, products, stores } from "@/db/schema";
 import { CartItem, CartLineItemDetails } from "@/lib/types";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, and } from "drizzle-orm";
+import { currentUser } from "@clerk/nextjs/server";
 
 export async function getCart(cartId: number) {
+  const user = await currentUser();
+  if (!user) return { cartItems: [], uniqueStoreIds: [], cartItemDetails: [] };
+
   const dbCartItemsObj = isNaN(Number(cartId))
     ? []
     : await db
@@ -14,7 +18,7 @@ export async function getCart(cartId: number) {
           items: carts.items,
         })
         .from(carts)
-        .where(eq(carts.id, Number(cartId)));
+        .where(and(eq(carts.id, Number(cartId)), eq(carts.userId, user.id)));
   const cartItems = dbCartItemsObj.length
     ? (JSON.parse(dbCartItemsObj[0].items as string) as CartItem[])
     : [];

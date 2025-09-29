@@ -48,6 +48,7 @@ export const carts = pgTable("carts", {
   paymentIntentId: text("payment_intent_id"),
   clientSecret: text("client_secret"),
   isClosed: boolean("is_closed").default(false),
+  userId: text("user_id"), // Clerk user ID
 });
 export type Cart = InferSelectModel<typeof carts>;
 
