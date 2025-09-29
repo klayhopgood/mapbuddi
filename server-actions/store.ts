@@ -26,10 +26,10 @@ export async function createStore(storeName: string) {
       return res;
     }
 
-    const [{ insertId: storeId }] = await db.insert(stores).values({
+    const [{ id: storeId }] = await db.insert(stores).values({
       name: storeName,
       slug: createSlug(storeName),
-    });
+    }).returning();
 
     const user = await currentUser();
     if (!user) {

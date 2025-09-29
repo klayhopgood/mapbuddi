@@ -56,9 +56,9 @@ export async function addToCart(newCartItem: CartItem) {
   } else {
     const newCart = await db
       .insert(carts)
-      .values({ items: JSON.stringify([newCartItem]) });
-    // @ts-ignore
-    cookieStore.set("cartId", String(newCart[0].insertId));
+      .values({ items: JSON.stringify([newCartItem]) })
+      .returning();
+    cookieStore.set("cartId", String(newCart[0].id));
     revalidatePath("/");
     return;
   }

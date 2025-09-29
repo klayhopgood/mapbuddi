@@ -35,13 +35,13 @@ export async function createProduct(
       storeId: Number(user?.privateMetadata.storeId),
     };
 
-    const dbRes = await db.insert(products).values(values);
+    const dbRes = await db.insert(products).values(values).returning();
 
     const res = {
       error: false,
       message: "Product created",
       action: "Success, your new product has been created",
-      productId: dbRes[0].insertId,
+      productId: dbRes[0].id,
     };
 
     return res;

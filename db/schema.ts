@@ -1,18 +1,18 @@
 // schema.ts
-import { InferModel } from "drizzle-orm";
+import { InferSelectModel } from "drizzle-orm";
 import {
   boolean,
   decimal,
-  int,
+  integer,
   json,
-  mysqlTable,
+  pgTable,
   serial,
   text,
   uniqueIndex,
   varchar,
-} from "drizzle-orm/mysql-core";
+} from "drizzle-orm/pg-core";
 
-export const stores = mysqlTable(
+export const stores = pgTable(
   "stores",
   {
     id: serial("id").primaryKey(),
@@ -29,53 +29,53 @@ export const stores = mysqlTable(
   }
 );
 
-export type Store = InferModel<typeof stores>;
+export type Store = InferSelectModel<typeof stores>;
 
-export const products = mysqlTable("products", {
+export const products = pgTable("products", {
   id: serial("id").primaryKey(),
   name: text("name"),
   price: decimal("price", { precision: 10, scale: 2 }).default("0"),
   description: text("description"),
   inventory: decimal("inventory").default("0"),
   images: json("images"),
-  storeId: int("store_id"),
+  storeId: integer("store_id"),
 });
-export type Product = InferModel<typeof products>;
+export type Product = InferSelectModel<typeof products>;
 
-export const carts = mysqlTable("carts", {
+export const carts = pgTable("carts", {
   id: serial("id").primaryKey(),
   items: json("items"),
   paymentIntentId: text("payment_intent_id"),
   clientSecret: text("client_secret"),
   isClosed: boolean("is_closed").default(false),
 });
-export type Cart = InferModel<typeof carts>;
+export type Cart = InferSelectModel<typeof carts>;
 
-export const payments = mysqlTable("payments", {
+export const payments = pgTable("payments", {
   id: serial("id").primaryKey(),
-  storeId: int("store_id"),
+  storeId: integer("store_id"),
   stripeAccountId: text("stripe_account_id"),
-  stripeAccountCreatedAt: int("stripe_account_created_at"),
-  stripeAccountExpiresAt: int("stripe_account_expires_at"),
+  stripeAccountCreatedAt: integer("stripe_account_created_at"),
+  stripeAccountExpiresAt: integer("stripe_account_expires_at"),
   details_submitted: boolean("details_submitted").default(false),
 });
 
-export type Payment = InferModel<typeof payments>;
+export type Payment = InferSelectModel<typeof payments>;
 
-export const orders = mysqlTable(
+export const orders = pgTable(
   "orders",
   {
     id: serial("id").primaryKey(),
-    prettyOrderId: int("pretty_order_id"),
-    storeId: int("store_id"),
+    prettyOrderId: integer("pretty_order_id"),
+    storeId: integer("store_id"),
     items: json("items"),
     total: decimal("total", { precision: 10, scale: 2 }).default("0"),
-    stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 256 }), // text field is valid for uniqueIndex in MySQL
+    stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 256 }),
     stripePaymentIntentStatus: text("stripe_payment_intent_status"),
     name: text("name"),
     email: text("email"),
-    createdAt: int("created_at"),
-    addressId: int("address"),
+    createdAt: integer("created_at"),
+    addressId: integer("address"),
   },
   (table) => {
     return {
@@ -86,9 +86,9 @@ export const orders = mysqlTable(
   }
 );
 
-export type Order = InferModel<typeof orders>;
+export type Order = InferSelectModel<typeof orders>;
 
-export const addresses = mysqlTable("addresses", {
+export const addresses = pgTable("addresses", {
   id: serial("id").primaryKey(),
   line1: text("line1"),
   line2: text("line2"),
@@ -98,4 +98,4 @@ export const addresses = mysqlTable("addresses", {
   country: text("country"),
 });
 
-export type Address = InferModel<typeof addresses>;
+export type Address = InferSelectModel<typeof addresses>;
