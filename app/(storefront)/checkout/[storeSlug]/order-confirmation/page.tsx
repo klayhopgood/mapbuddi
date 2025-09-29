@@ -9,6 +9,9 @@ import { Check } from "lucide-react";
 import { OrderLineItems } from "@/components/order-line-items";
 import { getDetailsOfProductsOrdered } from "@/server-actions/orders";
 import { currencyFormatter } from "@/lib/currency";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { routes } from "@/lib/routes";
 
 const getSellerName = async (storeSlug: string) => {
   return await db
@@ -72,6 +75,26 @@ export default async function OrderConfirmation({
             Your payment confirmation ID is #
             {searchParams.payment_intent.slice(3)}
           </p>
+          
+          {/* Navigation Links */}
+          <div className="flex flex-wrap gap-3 mt-6 mb-2">
+            <Link href="/">
+              <Button variant="default">
+                Continue Shopping
+              </Button>
+            </Link>
+            <Link href={routes.account.buying.purchases}>
+              <Button variant="outline">
+                View My Orders
+              </Button>
+            </Link>
+            <Link href={routes.products}>
+              <Button variant="outline">
+                Browse Products
+              </Button>
+            </Link>
+          </div>
+          
           <div className="flex flex-col gap-4 mt-8">
             <div className="p-6 bg-secondary border border-border rounded-md">
               <Heading size="h3">What&apos;s next?</Heading>
@@ -136,6 +159,21 @@ export default async function OrderConfirmation({
             Please enter your delivery postcode below to view your order
             details.
           </p>
+          
+          {/* Navigation Links for unverified users */}
+          <div className="flex flex-wrap gap-3 mt-4 mb-6">
+            <Link href="/">
+              <Button variant="default">
+                Continue Shopping
+              </Button>
+            </Link>
+            <Link href={routes.products}>
+              <Button variant="outline">
+                Browse Products
+              </Button>
+            </Link>
+          </div>
+          
           <Verification />
         </div>
       )}
