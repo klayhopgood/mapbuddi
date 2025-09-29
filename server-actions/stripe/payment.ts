@@ -53,18 +53,41 @@ export async function createPaymentIntent({
         .where(eq(carts.id, cartId));
 
       if (paymentIntent.length && paymentIntent[0]?.clientSecret && paymentIntent[0]?.paymentIntentId) {
-        await stripe.paymentIntents.update(
+        // Check if the PaymentIntent is still updateable (not completed/captured)
+        const existingPaymentIntent = await stripe.paymentIntents.retrieve(
           paymentIntent[0].paymentIntentId,
-          {
-            amount: orderTotal,
-            application_fee_amount: platformFee,
-            metadata,
-          },
           {
             stripeAccount: stripeAccountId,
           }
         );
-        return { clientSecret: paymentIntent[0].clientSecret };
+        
+        // Only update if PaymentIntent is still in a pending state
+        if (existingPaymentIntent.status === 'requires_payment_method' || 
+            existingPaymentIntent.status === 'requires_confirmation' ||
+            existingPaymentIntent.status === 'requires_action') {
+          await stripe.paymentIntents.update(
+            paymentIntent[0].paymentIntentId,
+            {
+              amount: orderTotal,
+              application_fee_amount: platformFee,
+              metadata,
+            },
+            {
+              stripeAccount: stripeAccountId,
+            }
+          );
+          return { clientSecret: paymentIntent[0].clientSecret };
+        } else {
+          // PaymentIntent is completed - clear it from cart and create new one
+          console.log("PaymentIntent already completed, creating new one. Status:", existingPaymentIntent.status);
+          await db
+            .update(carts)
+            .set({
+              paymentIntentId: null,
+              clientSecret: null,
+            })
+            .where(eq(carts.id, cartId));
+        }
       }
     }
 
