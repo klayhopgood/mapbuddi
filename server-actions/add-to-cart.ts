@@ -16,18 +16,21 @@ export async function addToCart(newCartItem: CartItem) {
   const cartId = cookieStore.get("cartId")?.value;
   
   // Check if cart exists and belongs to current user (or is an old cart without userId)
-  const cartDetails =
-    cartId &&
-    (await db
+  let userCart = null;
+  let cartAvailableAndOpen = false;
+  
+  if (cartId && !isNaN(Number(cartId))) {
+    const cartDetails = await db
       .select()
       .from(carts)
-      .where(eq(carts.id, Number(cartId))));
-  
-  const userCart = cartDetails?.find(cart => 
-    cart.userId === user.id || cart.userId === null
-  );
-  
-  const cartAvailableAndOpen = userCart && !userCart.isClosed;
+      .where(eq(carts.id, Number(cartId)));
+    
+    userCart = cartDetails.find(cart => 
+      cart.userId === user.id || cart.userId === null
+    ) || null;
+    
+    cartAvailableAndOpen = userCart && !userCart.isClosed;
+  }
 
   if (cartAvailableAndOpen) {
     let allItemsInCart: CartItem[] = [];
