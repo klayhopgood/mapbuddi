@@ -82,14 +82,12 @@ export async function createAccountLink() {
       stripeAccountId = id;
     }
 
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://staging.mapbuddi.com";
+    
     const accountLink = await stripe.accountLinks.create({
       account: stripeAccountId,
-      refresh_url:
-        process.env.NEXT_PUBLIC_APP_URL +
-        singleLevelNestedRoutes.account.payments,
-      return_url:
-        process.env.NEXT_PUBLIC_APP_URL +
-        singleLevelNestedRoutes.account.payments,
+      refresh_url: baseUrl + singleLevelNestedRoutes.account.payments,
+      return_url: baseUrl + singleLevelNestedRoutes.account.payments,
       type: "account_onboarding",
     });
 
@@ -112,7 +110,7 @@ export async function getStripeAccountDetails(storeId: number) {
       apiVersion: "2025-08-27.basil",
     });
 
-    if (!payment[0].stripeAccountId)
+    if (!payment.length || !payment[0]?.stripeAccountId)
       throw new Error("Stripe account not found");
 
     const account = await stripe.accounts.retrieve(payment[0].stripeAccountId);
