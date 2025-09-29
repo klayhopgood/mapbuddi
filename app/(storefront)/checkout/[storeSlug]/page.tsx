@@ -60,7 +60,7 @@ export default async function Page({
 
   if (
     !storeStripeAccountId ||
-    !(await hasConnectedStripeAccount(storeId, true))
+    !(await hasConnectedStripeAccount(storeId))
   ) {
     return (
       <InfoCard

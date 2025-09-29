@@ -27,11 +27,11 @@ export async function createPaymentIntent({
       .from(payments)
       .where(eq(payments.storeId, storeId));
 
-    const stripeAccountId = payment[0].stripeAccountId;
-
-    if (!stripeAccountId) {
+    if (!payment.length || !payment[0]?.stripeAccountId) {
       throw new Error("Stripe Account Id not found");
     }
+
+    const stripeAccountId = payment[0].stripeAccountId;
 
     const cartId = Number(cookies().get("cartId")?.value);
 
@@ -52,7 +52,7 @@ export async function createPaymentIntent({
         .from(carts)
         .where(eq(carts.id, cartId));
 
-      if (paymentIntent[0].clientSecret && paymentIntent[0].paymentIntentId) {
+      if (paymentIntent.length && paymentIntent[0]?.clientSecret && paymentIntent[0]?.paymentIntentId) {
         await stripe.paymentIntents.update(
           paymentIntent[0].paymentIntentId,
           {
