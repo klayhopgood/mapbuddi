@@ -11,7 +11,7 @@ import { getDetailsOfProductsOrdered } from "@/server-actions/orders";
 import { currencyFormatter } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { routes } from "@/lib/routes";
+import { routes, singleLevelNestedRoutes } from "@/lib/routes";
 
 const getSellerName = async (storeSlug: string) => {
   return await db
@@ -83,7 +83,7 @@ export default async function OrderConfirmation({
                 Continue Shopping
               </Button>
             </Link>
-            <Link href={routes.account.buying.purchases}>
+            <Link href={singleLevelNestedRoutes.account["your-purchases"]}>
               <Button variant="outline">
                 View My Orders
               </Button>
