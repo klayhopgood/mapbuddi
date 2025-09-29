@@ -77,7 +77,7 @@ export default function CheckoutForm() {
       elements,
       confirmParams: {
         // Make sure to change this to your payment completion page
-        return_url: `${process.env.NEXT_PUBLIC_APP_URL}/${routes.checkout}/${storeSlug}/${routes.orderConfirmation}`,
+        return_url: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/${routes.checkout}/${storeSlug}/${routes.orderConfirmation}`,
         receipt_email: email,
       },
     });
