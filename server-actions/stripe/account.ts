@@ -39,7 +39,7 @@ export async function createAccountLink() {
       throw new Error("Stripe account already exists");
     }
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: "2022-11-15",
+      apiVersion: "2025-08-27.basil",
     });
 
     const storeId = Number(await getStoreId());
@@ -109,7 +109,7 @@ export async function getStripeAccountDetails(storeId: number) {
       .where(eq(payments.storeId, storeId));
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: "2022-11-15",
+      apiVersion: "2025-08-27.basil",
     });
 
     if (!payment[0].stripeAccountId)

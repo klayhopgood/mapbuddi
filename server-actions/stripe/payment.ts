@@ -19,7 +19,7 @@ export async function createPaymentIntent({
   try {
     // This is your test secret API key.
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: "2022-11-15",
+      apiVersion: "2025-08-27.basil",
     });
 
     const payment = await db
@@ -118,7 +118,7 @@ export async function getPaymentIntents({
 }) {
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: "2022-11-15",
+      apiVersion: "2025-08-27.basil",
     });
 
     const storeId = Number(await getStoreId());
@@ -192,7 +192,7 @@ export async function getPaymentIntentDetails({
     const cartId = cookies().get("cartId")?.value;
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: "2022-11-15",
+      apiVersion: "2025-08-27.basil",
     });
 
     const store = await db

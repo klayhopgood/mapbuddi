@@ -20,7 +20,7 @@ async function getRawBody(readable: Readable): Promise<Buffer> {
 
 export async function POST(request: Request) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2022-11-15",
+    apiVersion: "2025-08-27.basil",
   });
 
   const rawBody = await getRawBody(request.body as unknown as Readable);
@@ -57,30 +57,12 @@ export async function POST(request: Request) {
       // Then define and call a function to handle the event payment_intent.succeeded
       // Mark cart as closed in DB
 
-      const stripeObject = event?.data?.object as {
-        id: string;
-        amount: string;
-        metadata: {
-          cartId: string;
-          items: string;
-        };
-        shipping: {
-          name: string;
-          address: {
-            line1: string;
-            line2: string;
-            city: string;
-            state: string;
-            postal_code: string;
-            country: string;
-          };
-        };
-        receipt_email: string;
-        status: string;
-      };
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
-      const paymentIntentId = stripeObject?.id;
-      const orderTotal = stripeObject?.amount;
+      const paymentIntentId = paymentIntent.id;
+      const orderTotal = paymentIntent.amount;
+      const cartId = paymentIntent.metadata.cartId;
+      const items = paymentIntent.metadata.items;
 
       try {
         if (!event.account) throw new Error("No account on event");
@@ -94,7 +76,7 @@ export async function POST(request: Request) {
         const storeId = store[0].storeId as number;
 
         // create new address in DB
-        const stripeAddress = stripeObject?.shipping?.address;
+        const stripeAddress = paymentIntent.shipping?.address;
 
         const newAddress = await db.insert(addresses).values({
           line1: stripeAddress?.line1,
@@ -117,12 +99,12 @@ export async function POST(request: Request) {
         const newOrder = await db.insert(orders).values({
           prettyOrderId: Number(storeOrderCount[0].count) + 1,
           storeId: storeId,
-          items: stripeObject.metadata?.items,
+          items: items,
           total: String(Number(orderTotal) / 100),
           stripePaymentIntentId: paymentIntentId,
-          stripePaymentIntentStatus: stripeObject?.status,
-          name: stripeObject?.shipping?.name,
-          email: stripeObject?.receipt_email,
+          stripePaymentIntentStatus: paymentIntent.status,
+          name: paymentIntent.shipping?.name,
+          email: paymentIntent.receipt_email,
           createdAt: event.created,
           addressId: Number(newAddress[0].insertId),
         });
@@ -134,7 +116,7 @@ export async function POST(request: Request) {
       // update inventory from DB
       // try {
       //   const orderedItems = JSON.parse(
-      //     stripeObject.metadata?.items
+      //     items
       //   ) as CheckoutItem[];
 
       //   for (let index in orderedItems) {
