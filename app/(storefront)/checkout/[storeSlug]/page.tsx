@@ -76,12 +76,24 @@ export default async function Page({
     );
   }
 
-  if (
-    !storeProducts.length ||
-    isNaN(storeId) ||
-    !detailsOfProductsInCart.length
-  )
+  if (!storeProducts.length || isNaN(storeId)) {
     throw new Error("Store not found");
+  }
+
+  if (!detailsOfProductsInCart.length) {
+    return (
+      <InfoCard
+        heading="No items from this store"
+        subheading="Your cart doesn't contain any items from this store. Add some products first!"
+        icon={<AlertCircle size={24} />}
+        button={
+          <Link href={routes.cart}>
+            <Button>Return to cart</Button>
+          </Link>
+        }
+      />
+    );
+  }
 
   const paymentIntent = createPaymentIntent({
     items: detailsOfProductsInCart,
