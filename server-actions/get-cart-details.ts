@@ -17,6 +17,7 @@ export async function getCart(cartId: number) {
           id: carts.id,
           items: carts.items,
           userId: carts.userId,
+          isClosed: carts.isClosed,
         })
         .from(carts)
         .where(eq(carts.id, Number(cartId)));
@@ -27,7 +28,8 @@ export async function getCart(cartId: number) {
   );
   
   let cartItems: CartItem[] = [];
-  if (userCart && userCart.items) {
+  // Don't show items if cart is closed (purchase completed)
+  if (userCart && userCart.items && !userCart.isClosed) {
     try {
       // Handle both string and already-parsed object cases
       if (typeof userCart.items === 'string') {

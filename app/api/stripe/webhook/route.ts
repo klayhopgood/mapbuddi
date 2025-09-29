@@ -35,6 +35,7 @@ export async function POST(request: Request) {
       endpointSecret as string
     );
   } catch (err: any) {
+    console.log("=== WEBHOOK SIGNATURE ERROR ===", err.message);
     return NextResponse.json(
       { error: `Webhook Error: ${err.message}` },
       { status: 400 }
@@ -108,7 +109,10 @@ export async function POST(request: Request) {
           createdAt: event.created,
           addressId: newAddress[0].id,
         });
-        console.log("ORDER CREATED", newOrder);
+        console.log("=== ORDER CREATED SUCCESSFULLY ===");
+        console.log("Order ID:", newOrder);
+        console.log("Email:", paymentIntent.receipt_email);
+        console.log("Cart ID:", cartId);
       } catch (err) {
         console.log("ORDER CREATION WEBHOOK ERROR", err);
       }
