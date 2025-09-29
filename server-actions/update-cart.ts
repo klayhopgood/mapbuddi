@@ -19,9 +19,20 @@ export async function updateCart(updateCartItem: CartItem) {
     .from(carts)
     .where(eq(carts.id, Number(cartId)));
 
-  const parsedCartItems = dbCartItemsObj
-    ? (JSON.parse(dbCartItemsObj[0].items as string) as CartItem[])
-    : [];
+  let parsedCartItems: CartItem[] = [];
+  if (dbCartItemsObj.length && dbCartItemsObj[0].items) {
+    try {
+      // Handle both string and already-parsed object cases
+      if (typeof dbCartItemsObj[0].items === 'string') {
+        parsedCartItems = JSON.parse(dbCartItemsObj[0].items) as CartItem[];
+      } else {
+        parsedCartItems = dbCartItemsObj[0].items as CartItem[];
+      }
+    } catch (error) {
+      console.error('Error parsing cart items:', error);
+      parsedCartItems = [];
+    }
+  }
 
   const cartItemsExcludingUpdateItem = parsedCartItems.filter(
     (item) => item.id !== updateCartItem.id
