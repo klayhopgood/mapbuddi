@@ -1,4 +1,4 @@
-## OneStopShop
+## MapBuddi
 
 > **Warning**
 > This app is a work in progress and shouldn't be considered production ready. It uses new technologies that are yet to be stable such as Server Actions and Drizzle ORM.
@@ -19,7 +19,7 @@ Key features:
 
 ## Demo
 
-To demo the checkout experience, checkout with a test card number such as `4242 4242 4242 4242` and use any future date for the expiry and any 3 digits for the CVC. You will only be able to checkout with products from sellers that have a Stripe account connected to their store (such as [Tim's Toys](https://onestopshop.jackblatch.com/products?seller=tims-toys)). You can also create your own seller account and connect it to Stripe for the full experience.
+To demo the checkout experience, checkout with a test card number such as `4242 4242 4242 4242` and use any future date for the expiry and any 3 digits for the CVC. You will only be able to checkout with products from sellers that have a Stripe account connected to their store (such as [Tim's Toys](https://mapbuddi.com/products?seller=tims-toys)). You can also create your own seller account and connect it to Stripe for the full experience.
 
 Home page
 ![Home page](/.github/images/home.jpeg?raw=0)

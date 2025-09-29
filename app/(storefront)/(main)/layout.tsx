@@ -5,7 +5,7 @@ import React from "react";
 import { FloatingStar } from "@/components/floating-star";
 
 export const metadata = {
-  title: "OneStopShop - Online marketplace",
+  title: "MapBuddi - Online marketplace",
   description: "Online marketplace",
 };
 

@@ -60,7 +60,7 @@ export const CreateNewStore = (props: { createStore: typeof createStore }) => {
         </div>
       </form>
       <div className="col-span-1">
-        <Heading size="h3">Why sell on One Stop Shop?</Heading>
+        <Heading size="h3">Why sell on MapBuddi?</Heading>
         <p className="mt-2">
           Thousands of visitors visit this site every day, searching for a whole
           range of products. Get the exposure your products deserve by creating

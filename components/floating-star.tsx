@@ -21,7 +21,7 @@ export const FloatingStar = () => {
 const GitHubLinkWrapper = (props: PropsWithChildren) => {
   return (
     <a
-      href="https://github.com/jackblatch/OneStopShop"
+      href="https://github.com/klayhopgood/mapbuddi"
       className="flex items-center justify-center gap-2 plausible-event-name=floating-star-outbound"
       target="_blank"
       rel="noopener noreferrer"
