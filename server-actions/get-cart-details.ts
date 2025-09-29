@@ -16,12 +16,30 @@ export async function getCart(cartId: number) {
         .select({
           id: carts.id,
           items: carts.items,
+          userId: carts.userId,
         })
         .from(carts)
-        .where(and(eq(carts.id, Number(cartId)), eq(carts.userId, user.id)));
-  const cartItems = dbCartItemsObj.length
-    ? (JSON.parse(dbCartItemsObj[0].items as string) as CartItem[])
-    : [];
+        .where(eq(carts.id, Number(cartId)));
+  
+  // Filter for current user or carts without userId (old carts)
+  const userCart = dbCartItemsObj.find(cart => 
+    cart.userId === user.id || cart.userId === null
+  );
+  
+  let cartItems: CartItem[] = [];
+  if (userCart && userCart.items) {
+    try {
+      // Handle both string and already-parsed object cases
+      if (typeof userCart.items === 'string') {
+        cartItems = JSON.parse(userCart.items) as CartItem[];
+      } else {
+        cartItems = userCart.items as CartItem[];
+      }
+    } catch (error) {
+      console.error('Error parsing cart items:', error);
+      cartItems = [];
+    }
+  }
 
   const cartItemDetails = !!cartItems
     ? await getCartItemDetails(cartId ? Number(cartId) : null, cartItems)

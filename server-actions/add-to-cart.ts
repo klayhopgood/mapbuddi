@@ -15,22 +15,34 @@ export async function addToCart(newCartItem: CartItem) {
   const cookieStore = cookies();
   const cartId = cookieStore.get("cartId")?.value;
   
-  // Check if cart exists and belongs to current user
+  // Check if cart exists and belongs to current user (or is an old cart without userId)
   const cartDetails =
     cartId &&
     (await db
       .select()
       .from(carts)
-      .where(and(eq(carts.id, Number(cartId)), eq(carts.userId, user.id))));
-  const cartAvailableAndOpen = cartDetails && cartDetails.length > 0 && !cartDetails[0].isClosed;
+      .where(eq(carts.id, Number(cartId))));
+  
+  const userCart = cartDetails?.find(cart => 
+    cart.userId === user.id || cart.userId === null
+  );
+  
+  const cartAvailableAndOpen = userCart && !userCart.isClosed;
 
   if (cartAvailableAndOpen) {
-    const dbItems = await db
-      .select()
-      .from(carts)
-      .where(eq(carts.id, Number(cartId)));
-
-    const allItemsInCart = JSON.parse(dbItems[0].items as string) as CartItem[];
+    let allItemsInCart: CartItem[] = [];
+    
+    try {
+      // Handle both string and already-parsed object cases
+      if (typeof userCart.items === 'string') {
+        allItemsInCart = JSON.parse(userCart.items) as CartItem[];
+      } else {
+        allItemsInCart = (userCart.items as CartItem[]) || [];
+      }
+    } catch (error) {
+      console.error('Error parsing cart items:', error);
+      allItemsInCart = [];
+    }
 
     const newCartItemInCart = allItemsInCart.find(
       (item) => item.id === newCartItem.id
@@ -54,6 +66,7 @@ export async function addToCart(newCartItem: CartItem) {
               },
             ])
           : JSON.stringify([newCartItem]),
+        userId: user.id, // Ensure userId is set for old carts
       })
       .where(eq(carts.id, Number(cartId)));
     revalidatePath("/");
