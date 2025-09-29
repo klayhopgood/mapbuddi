@@ -29,10 +29,10 @@ export async function addToCart(newCartItem: CartItem) {
       cart.userId === user.id || cart.userId === null
     ) || null;
     
-    cartAvailableAndOpen = userCart && !userCart.isClosed;
+    cartAvailableAndOpen = !!(userCart && (userCart.isClosed === false || userCart.isClosed === null));
   }
 
-  if (cartAvailableAndOpen) {
+  if (cartAvailableAndOpen && userCart) {
     let allItemsInCart: CartItem[] = [];
     
     try {
