@@ -8,18 +8,12 @@ import { getStoreId } from "../store-details";
 import { StripeAccount } from "@/lib/types";
 
 export async function hasConnectedStripeAccount(
-  providedStoreId?: number,
-  useProvidedStoreId?: boolean
+  providedStoreId?: number
 ) {
-  if (useProvidedStoreId && !providedStoreId) return;
-
   try {
-    const storeId =
-      useProvidedStoreId && providedStoreId
-        ? providedStoreId
-        : Number(await getStoreId());
+    const storeId = providedStoreId || Number(await getStoreId());
 
-    if (isNaN(storeId)) return;
+    if (isNaN(storeId)) return false;
 
     const payment = await db
       .select()
@@ -121,9 +115,9 @@ export async function getStripeAccountDetails(storeId: number) {
 }
 
 // change function name to be more descriptive
-export async function updateStripeAccountStatus() {
+export async function updateStripeAccountStatus(providedStoreId?: number) {
   try {
-    const storeId = Number(await getStoreId());
+    const storeId = providedStoreId || Number(await getStoreId());
 
     if (isNaN(storeId)) {
       throw new Error("Store ID not found");

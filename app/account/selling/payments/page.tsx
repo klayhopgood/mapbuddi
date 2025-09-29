@@ -12,9 +12,11 @@ import { getStoreId } from "@/server-actions/store-details";
 import { Button } from "@/components/ui/button";
 
 export default async function PaymentsPage() {
-  await updateStripeAccountStatus();
-  const connectedStripeAccount = await hasConnectedStripeAccount();
+  // Get storeId once to avoid multiple Clerk API calls
   const storeId = Number(await getStoreId());
+  
+  await updateStripeAccountStatus(storeId);
+  const connectedStripeAccount = await hasConnectedStripeAccount(storeId);
   const stripeAccountDetails = await getStripeAccountDetails(storeId);
 
   return (
