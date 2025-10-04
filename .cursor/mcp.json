@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "mapbuddi-supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase",
+        "--read-only",
+        "--project-ref=vdeqgobkdtqmoojxiupc",
+        "--access-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkZXFnb2JrZHRxbW9vanhpdXBjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTExNzM1OSwiZXhwIjoyMDc0NjkzMzU5fQ.AyIDFJyJfS18SGfpbBATlF9d9MHByvDDypHR71uWIc0"
+      ]
+    }
+  }
+}
