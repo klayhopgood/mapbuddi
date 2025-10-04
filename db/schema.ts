@@ -36,7 +36,6 @@ export const products = pgTable("products", {
   name: text("name"),
   price: decimal("price", { precision: 10, scale: 2 }).default("0"),
   description: text("description"),
-  inventory: decimal("inventory").default("0"),
   images: json("images"),
   storeId: integer("store_id"),
 });

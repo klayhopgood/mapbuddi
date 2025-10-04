@@ -13,7 +13,6 @@ export async function createProduct(
     name: z.string().nonempty(),
     description: z.string(),
     price: z.string().nullable(),
-    inventory: z.string().nullable(),
   });
 
   try {
@@ -28,9 +27,6 @@ export async function createProduct(
         isNaN(Number(productValues.price)) || Number(productValues.price) < 0
           ? "0"
           : String(productValues.price),
-      inventory: isNaN(Number(productValues.inventory))
-        ? "0"
-        : String(productValues.inventory),
       images: productValues.images,
       storeId: Number(user?.privateMetadata.storeId),
     };
@@ -62,7 +58,6 @@ export async function updateProduct(productValues: Omit<Product, "storeId">) {
     name: z.string().nonempty(),
     description: z.string(),
     price: z.string().nullable(),
-    inventory: z.string().nullable(),
     id: z.number(),
   });
 
@@ -78,9 +73,6 @@ export async function updateProduct(productValues: Omit<Product, "storeId">) {
         isNaN(Number(productValues.price)) || Number(productValues.price) < 0
           ? "0"
           : String(productValues.price),
-      inventory: isNaN(Number(productValues.inventory))
-        ? "0"
-        : String(productValues.inventory),
       images: productValues.images,
       storeId: Number(user?.privateMetadata.storeId),
     };

@@ -17,7 +17,6 @@ const defaultValues = {
   name: "",
   description: "",
   price: "",
-  inventory: "",
   images: [],
 };
 
@@ -164,17 +163,10 @@ export const ProductEditorElements = (props: {
               setImagesToDelete={setImagesToDelete}
             />
           )}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <TextInputWithLabel
               id="price"
               label="Price"
-              type="number"
-              state={formValues}
-              setState={setFormValues}
-            />
-            <TextInputWithLabel
-              id="inventory"
-              label="Quantity In Stock"
               type="number"
               state={formValues}
               setState={setFormValues}

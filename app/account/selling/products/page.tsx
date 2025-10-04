@@ -20,7 +20,6 @@ async function getData(): Promise<Product[]> {
           id: products.id,
           name: products.name,
           price: products.price,
-          inventory: products.inventory,
           images: products.images,
         })
         .from(products)

@@ -89,7 +89,6 @@ export default async function StorefrontProductDetails(props: {
           <ProductForm
             addToCartAction={addToCart}
             productName={product.name}
-            availableInventory={product.inventory}
             productId={product.id}
           />
           <FeatureIcons className="mt-8" />

@@ -15,6 +15,13 @@
       "when": 1759183551338,
       "tag": "0001_orange_mystique",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1759558676359,
+      "tag": "0002_remove_inventory_from_products",
+      "breakpoints": true
     }
   ]
 }

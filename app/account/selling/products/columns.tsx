@@ -18,7 +18,6 @@ export type Product = {
   id: string;
   name: string;
   price: number;
-  inventory: string;
   images: ProductImages[];
 };
 
@@ -65,21 +64,6 @@ export const columns: ColumnDef<Product>[] = [
     cell: ({ row }) => {
       const price = parseFloat(row.getValue("price"));
       return currencyFormatter(price);
-    },
-  },
-  {
-    accessorKey: "inventory",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="px-0"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Inventory
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
     },
   },
   {
