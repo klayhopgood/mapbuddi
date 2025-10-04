@@ -85,7 +85,7 @@ export default async function StripeOrdersDebugPage() {
   const data = await getDebugData();
 
   if (!data) {
-    return <div className="p-6">Unable to load debug data. Please make sure you're logged in and have a store.</div>;
+    return <div className="p-6">Unable to load debug data. Please make sure you&apos;re logged in and have a store.</div>;
   }
 
   return (
