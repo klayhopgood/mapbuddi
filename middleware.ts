@@ -4,7 +4,16 @@ const isProtectedRoute = createRouteMatcher([
   "/account(.*)",
 ]);
 
+const isPublicApiRoute = createRouteMatcher([
+  "/api/stripe/webhook",
+]);
+
 export default clerkMiddleware(async (auth, req) => {
+  // Skip authentication for public API routes (like webhooks)
+  if (isPublicApiRoute(req)) {
+    return;
+  }
+  
   if (isProtectedRoute(req)) {
     await auth.protect();
   }
