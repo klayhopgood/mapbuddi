@@ -1,2 +1,2 @@
-export const platformFeeDecimal = 0.01;
+export const platformFeeDecimal = 0.10;
 export const orderNumberPrefix = 100;
