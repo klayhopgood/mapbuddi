@@ -75,9 +75,6 @@ export default async function StorefrontProductQuickView(props: {
                   View Product
                 </Button>
               </Link>
-              {!product.inventory && (
-                <Text appearance="secondary">Sold out</Text>
-              )}
             </div>
             <ParagraphFormatter
               className="text-sm"

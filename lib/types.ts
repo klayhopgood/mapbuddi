@@ -21,7 +21,7 @@ export type CartLineItemDetails = Omit<Product, "description" | "images"> & {
 
 export type OrderItemDetails = Omit<
   Product,
-  "description" | "images" | "description" | "price" | "inventory"
+  "description" | "images" | "description" | "price"
 > & {
   images: ProductImages[];
 };

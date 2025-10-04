@@ -70,7 +70,6 @@ async function getCartItemDetails(
       id: products.id,
       name: products.name,
       price: products.price,
-      inventory: products.inventory,
       storeId: products.storeId,
       images: products.images,
       storeName: stores.name,

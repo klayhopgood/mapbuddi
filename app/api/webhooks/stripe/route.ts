@@ -117,23 +117,6 @@ export async function POST(request: Request) {
         console.log("ORDER CREATION WEBHOOK ERROR", err);
       }
 
-      // update inventory from DB
-      // try {
-      //   const orderedItems = JSON.parse(
-      //     items
-      //   ) as CheckoutItem[];
-
-      //   for (let index in orderedItems) {
-      //     orderedItems[index].id;
-      //   }
-
-      //   orderedItems.forEach((item) => item.id);
-
-      //   // UPDATE products SET inventory = inventory - 1 WHERE id = $1 or id = $2 or id = $3 or id = $4 or id = $5; --> [0, 1, 2, 3, 4]
-      // } catch (err) {
-      //   console.log("INVENTORY UPDATE WEBHOOK ERROR", err);
-      // }
-
       try {
         // Close cart and clear items
         dbUpdateCartResponse = await db
