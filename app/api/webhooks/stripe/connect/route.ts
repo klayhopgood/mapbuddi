@@ -135,16 +135,23 @@ export async function POST(request: Request) {
       }
 
       try {
-        // Close cart and clear items
+        // Close cart and clear items - find cart by payment intent ID
         console.log("Closing cart with payment intent:", paymentIntentId);
-        dbUpdateCartResponse = await db
+        const cartUpdateResult = await db
           .update(carts)
           .set({
             isClosed: true,
             items: JSON.stringify([]),
           })
-          .where(eq(carts.paymentIntentId, paymentIntentId));
-        console.log("Cart closed successfully");
+          .where(eq(carts.paymentIntentId, paymentIntentId))
+          .returning();
+        
+        console.log("Cart update result:", cartUpdateResult);
+        if (cartUpdateResult.length > 0) {
+          console.log("Cart closed successfully, cart ID:", cartUpdateResult[0].id);
+        } else {
+          console.log("WARNING: No cart found with payment intent:", paymentIntentId);
+        }
       } catch (err) {
         console.log("=== CART UPDATE WEBHOOK ERROR ===", err);
         return NextResponse.json(

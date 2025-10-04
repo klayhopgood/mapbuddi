@@ -13,21 +13,34 @@ async function getData(): Promise<BuyersOrderTable[]> {
   const user = await currentUser();
   const userEmailAddress = user?.emailAddresses[0].emailAddress;
   if (!userEmailAddress) return [];
-  const storeOrders = await db
-    .select({
-      id: orders.prettyOrderId,
-      sellerName: stores.name,
-      items: orders.items,
-      total: orders.total,
-      stripePaymentIntentStatus: orders.stripePaymentIntentStatus,
-      createdAt: orders.createdAt,
-    })
-    .from(orders)
-    .leftJoin(stores, eq(orders.storeId, stores.id))
-    .where(eq(orders.email, userEmailAddress));
-  return (storeOrders as BuyersOrderTable[]).sort(
-    (a, b) => b.createdAt - a.createdAt
-  );
+  
+  console.log("=== PURCHASE HISTORY DEBUG ===");
+  console.log("User email:", userEmailAddress);
+  
+  try {
+    const storeOrders = await db
+      .select({
+        id: orders.prettyOrderId,
+        sellerName: stores.name,
+        items: orders.items,
+        total: orders.total,
+        stripePaymentIntentStatus: orders.stripePaymentIntentStatus,
+        createdAt: orders.createdAt,
+      })
+      .from(orders)
+      .leftJoin(stores, eq(orders.storeId, stores.id))
+      .where(eq(orders.email, userEmailAddress));
+    
+    console.log("Raw orders found:", storeOrders.length);
+    console.log("Orders data:", JSON.stringify(storeOrders, null, 2));
+    
+    return (storeOrders as BuyersOrderTable[]).sort(
+      (a, b) => b.createdAt - a.createdAt
+    );
+  } catch (error) {
+    console.error("=== PURCHASE HISTORY ERROR ===", error);
+    return [];
+  }
 }
 
 export default async function OrdersPage() {
