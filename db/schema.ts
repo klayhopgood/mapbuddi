@@ -8,6 +8,7 @@ import {
   pgTable,
   serial,
   text,
+  timestamp,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -20,6 +21,8 @@ export const stores = pgTable(
     industry: text("industry"),
     description: text("description"),
     slug: varchar("slug", { length: 50 }),
+    userId: text("user_id"), // Clerk user ID
+    currency: varchar("currency", { length: 3 }).default("USD"), // ISO currency code
   },
   (table) => {
     return {
@@ -99,3 +102,86 @@ export const addresses = pgTable("addresses", {
 });
 
 export type Address = InferSelectModel<typeof addresses>;
+
+// Location Lists Tables
+export const locationLists = pgTable("location_lists", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  price: decimal("price", { precision: 10, scale: 2 }).default("0").notNull(),
+  currency: varchar("currency", { length: 3 }).default("USD"), // ISO currency code
+  coverImage: text("cover_image"),
+  storeId: integer("store_id").notNull(),
+  isActive: boolean("is_active").default(true),
+  totalPois: integer("total_pois").default(0),
+  avgRating: decimal("avg_rating", { precision: 3, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type LocationList = InferSelectModel<typeof locationLists>;
+
+export const listCategories = pgTable("list_categories", {
+  id: serial("id").primaryKey(),
+  listId: integer("list_id").notNull(),
+  name: varchar("name", { length: 50 }).notNull(),
+  emoji: varchar("emoji", { length: 10 }).notNull(), // Unicode emoji
+  iconColor: varchar("icon_color", { length: 7 }).default("#FF0000"), // Hex color
+  displayOrder: integer("display_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type ListCategory = InferSelectModel<typeof listCategories>;
+
+export const listPois = pgTable("list_pois", {
+  id: serial("id").primaryKey(),
+  categoryId: integer("category_id").notNull(),
+  name: varchar("name", { length: 200 }).notNull(),
+  description: text("description"),
+  sellerNotes: text("seller_notes"), // Custom notes from the seller
+  latitude: decimal("latitude", { precision: 10, scale: 7 }).notNull(),
+  longitude: decimal("longitude", { precision: 10, scale: 7 }).notNull(),
+  googlePlaceId: text("google_place_id"), // For POIs from Google Places API
+  address: text("address"),
+  displayOrder: integer("display_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type ListPoi = InferSelectModel<typeof listPois>;
+
+export const purchasedLists = pgTable("purchased_lists", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(), // Clerk user ID
+  listId: integer("list_id").notNull(),
+  orderId: integer("order_id"), // Link to orders table
+  purchaseDate: timestamp("purchase_date").defaultNow(),
+  lastSyncDate: timestamp("last_sync_date"),
+  syncStatus: varchar("sync_status", { length: 20 }).default("pending"), // pending, synced, failed
+  hasCustomModifications: boolean("has_custom_modifications").default(false),
+  googleMyMapId: text("google_my_map_id"), // Google My Maps ID for tracking
+});
+
+export type PurchasedList = InferSelectModel<typeof purchasedLists>;
+
+// List Reviews (for future implementation)
+export const listReviews = pgTable("list_reviews", {
+  id: serial("id").primaryKey(),
+  listId: integer("list_id").notNull(),
+  userId: text("user_id").notNull(), // Clerk user ID
+  rating: integer("rating").notNull(), // 1-5 stars
+  review: text("review"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type ListReview = InferSelectModel<typeof listReviews>;
+
+// User Preferences (for buyer currency settings)
+export const userPreferences = pgTable("user_preferences", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().unique(), // Clerk user ID
+  preferredCurrency: varchar("preferred_currency", { length: 3 }).default("USD"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type UserPreferences = InferSelectModel<typeof userPreferences>;

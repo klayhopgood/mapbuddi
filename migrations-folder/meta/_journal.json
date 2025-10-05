@@ -22,6 +22,20 @@
       "when": 1759558676359,
       "tag": "0002_remove_inventory_from_products",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1759702616078,
+      "tag": "0003_unique_leopardon",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1759702692515,
+      "tag": "0004_living_marauders",
+      "breakpoints": true
     }
   ]
 }

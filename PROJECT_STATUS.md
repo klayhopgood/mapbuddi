@@ -300,4 +300,102 @@ npx drizzle-kit generate && npx drizzle-kit push
 
 ---
 
+## 🗺️ **Location Lists Feature - Implementation Plan**
+
+### **Product Vision**
+Transform MapBuddi from a general digital marketplace to a location-based curated list platform where sellers create POI collections that buyers can sync directly into their Google Maps.
+
+### **Core Concept**
+- **Sellers** create curated location lists (e.g., "Best of Lisbon") with categorized POIs
+- **Buyers** purchase lists and sync them to their personal Google Maps via My Maps
+- **Categories** within lists have emoji identifiers and custom POI notes from sellers
+
+### **Technical Implementation Strategy**
+
+#### **Database Schema Extensions**
+```sql
+-- Location Lists (replaces general products)
+location_lists: id, name, description, price, coverImage, storeId, 
+                isActive, totalPois, avgRating, createdAt
+
+-- Categories within lists  
+list_categories: id, listId, name, emoji, iconColor, displayOrder
+
+-- Points of Interest
+list_pois: id, categoryId, name, description, sellerNotes, 
+           latitude, longitude, googlePlaceId, address, displayOrder
+
+-- Purchased Lists
+purchased_lists: id, userId, listId, purchaseDate, lastSyncDate, 
+                 syncStatus, hasCustomModifications
+
+-- List Reviews (future)
+list_reviews: id, listId, userId, rating, review, createdAt
+```
+
+#### **Google Maps Integration**
+- **Method**: KML file generation for Google My Maps import
+- **Authentication**: Google OAuth 2.0 for Drive/Maps access
+- **API Usage**: Google Places API for POI search and validation
+- **Cost Management**: ~$0.50/month per active seller in API costs
+
+#### **Seller Workflow**
+1. **Create List**: Name, description, cover image, price
+2. **Add Categories**: Name + emoji (🍽️ Restaurants, 🎭 Attractions, etc.)
+3. **Add POIs**: 
+   - Search Google Places API for existing locations
+   - Manual entry for custom spots (sunset viewpoints, hidden gems)
+   - Add seller notes and assign to categories
+4. **Preview & Publish**: Test KML generation, set pricing
+
+#### **Buyer Workflow**
+1. **Browse Lists**: See preview with category counts and sample map
+2. **Purchase**: Standard Stripe checkout flow
+3. **Google Auth**: One-time authentication for Maps access
+4. **Sync to Maps**: 
+   - Generate KML file with custom styling per category
+   - Auto-import to Google My Maps or provide download link
+   - Toggle sync on/off for purchased lists
+
+#### **MVP Feature Set**
+- ✅ List creation and management for sellers
+- ✅ POI search via Google Places API
+- ✅ Manual POI entry with coordinates
+- ✅ Category organization with emoji identifiers
+- ✅ List purchasing and order management
+- ✅ KML generation and Google Maps sync
+- ✅ Basic list previews for browsers
+
+#### **Phase 2 Features** (Post-MVP)
+- List reviews and ratings
+- Seller profile pages with all their lists
+- List update notifications and re-sync options
+- Buyer modifications to purchased lists
+- Advanced search and filtering
+- Apple Maps integration
+- Social sharing and list discovery
+
+### **Business Model Update**
+- **Sellers**: $30/month subscription + 10% of sales
+- **Buyers**: Individual list purchases ($5-50 typical range)
+- **Platform Costs**: Google API usage (~$0.50/seller/month)
+- **Revenue**: Subscription fees + sales commissions - API costs
+
+### **Development Priority**
+1. **Database Migration**: Add location lists schema
+2. **Google Integration**: Places API + OAuth setup  
+3. **Seller Interface**: List creation and POI management
+4. **KML Generation**: Export functionality for My Maps
+5. **Buyer Interface**: Browse, purchase, sync workflow
+6. **Testing**: End-to-end workflow validation
+
+### **Success Metrics**
+- Lists created per seller per month
+- Average POIs per list (target: 15-30)
+- Purchase conversion rate from preview views
+- Successful sync rate to Google Maps
+- Seller retention on subscription model
+
+---
+
 **This document should be updated whenever major changes are made to the platform.**
