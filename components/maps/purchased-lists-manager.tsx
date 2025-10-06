@@ -142,6 +142,25 @@ export function PurchasedListsManager({
                           </span>
                         )}
                       </div>
+                      {/* Action buttons for synced maps */}
+                      {syncStatus?.googleMapsSynced && syncStatus?.googleMapsMapId && (
+                        <div className="flex gap-2 mt-2">
+                          <Link 
+                            href={`https://drive.google.com/file/d/${syncStatus.googleMapsMapId}/view`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
+                            <Button variant="outline" size="sm" className="text-xs">View in Drive</Button>
+                          </Link>
+                          <Link 
+                            href={`https://drive.google.com/uc?export=download&id=${syncStatus.googleMapsMapId}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
+                            <Button variant="outline" size="sm" className="text-xs">Download KML</Button>
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   </div>
                   

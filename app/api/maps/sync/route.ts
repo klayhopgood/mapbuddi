@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { syncListToGoogleMaps, processAllPendingSyncs } from '@/lib/google-maps-sync';
+import { syncListToGoogleMaps, processAllPendingSyncs, deleteKmlFromDrive } from '@/lib/google-maps-sync';
 import { currentUser } from '@clerk/nextjs/server';
 
 export async function POST(request: NextRequest) {
@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { action, listId, orderId } = await request.json();
+    const { action, listId, orderId, mapId } = await request.json();
 
     if (action === 'sync_list') {
       if (!listId || !orderId) {
@@ -38,6 +38,28 @@ export async function POST(request: NextRequest) {
       // This could be called by a cron job or admin
       await processAllPendingSyncs();
       return NextResponse.json({ success: true, message: 'Processed all pending syncs' });
+    }
+
+    if (action === 'cleanup_file') {
+      if (!mapId) {
+        return NextResponse.json({ error: 'Missing mapId' }, { status: 400 });
+      }
+
+      console.log(`API: Cleaning up map ${mapId} for user ${user.id}`);
+      
+      const result = await deleteKmlFromDrive(user.id, mapId);
+      
+      if (result.success) {
+        return NextResponse.json({ 
+          success: true, 
+          message: result.message
+        });
+      } else {
+        return NextResponse.json({ 
+          success: false, 
+          message: result.message 
+        }, { status: 400 });
+      }
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });

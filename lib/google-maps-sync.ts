@@ -247,6 +247,92 @@ async function createGoogleMyMap(
   }
 }
 
+export async function deleteKmlFromDrive(
+  userId: string, 
+  mapId: string
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    console.log("=== DELETING KML FROM DRIVE ===");
+    console.log("User ID:", userId);
+    console.log("Map ID:", mapId);
+
+    // Get user's Google tokens
+    const integration = await db
+      .select()
+      .from(userMapsIntegration)
+      .where(eq(userMapsIntegration.userId, userId));
+
+    if (!integration.length || !integration[0].googleMapsConnected) {
+      return { success: false, message: "Google Maps not connected" };
+    }
+
+    let accessToken = integration[0].googleAccessToken;
+
+    // Check if token needs refresh
+    if (integration[0].googleTokenExpiry && new Date() >= integration[0].googleTokenExpiry) {
+      console.log("Access token expired, refreshing...");
+      const refreshResult = await refreshGoogleToken(userId);
+      if (!refreshResult.success) {
+        return { success: false, message: "Failed to refresh Google token" };
+      }
+      
+      // Get updated token
+      const updatedIntegration = await db
+        .select()
+        .from(userMapsIntegration)
+        .where(eq(userMapsIntegration.userId, userId));
+      
+      accessToken = updatedIntegration[0].googleAccessToken;
+    }
+
+    if (!accessToken) {
+      return { success: false, message: "No valid access token" };
+    }
+
+    // Delete the file from Google Drive
+    const deleteResponse = await fetch(`https://www.googleapis.com/drive/v3/files/${mapId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    console.log("Delete response status:", deleteResponse.status);
+
+    if (!deleteResponse.ok) {
+      const errorText = await deleteResponse.text();
+      console.error("Failed to delete KML file:", errorText);
+      
+      try {
+        const errorJson = JSON.parse(errorText);
+        console.error("Parsed delete error:", errorJson);
+        return { 
+          success: false, 
+          message: `Delete error: ${errorJson.error?.message || errorText}` 
+        };
+      } catch {
+        return { 
+          success: false, 
+          message: `Failed to delete KML file. Status: ${deleteResponse.status}. Response: ${errorText}` 
+        };
+      }
+    }
+
+    console.log("Successfully deleted KML file from Google Drive");
+    return { 
+      success: true, 
+      message: "KML file deleted from Google Drive" 
+    };
+
+  } catch (error) {
+    console.error("Delete KML error:", error);
+    return { 
+      success: false, 
+      message: error instanceof Error ? error.message : "Unknown error deleting KML file" 
+    };
+  }
+}
+
 export async function processAllPendingSyncs(): Promise<void> {
   try {
     console.log("=== PROCESSING ALL PENDING SYNCS ===");

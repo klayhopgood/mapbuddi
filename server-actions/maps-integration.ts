@@ -146,37 +146,45 @@ export async function toggleListSync(
 
     const now = new Date();
 
-    if (existingSync.length > 0) {
-      // Toggle existing sync
-      const currentStatus = existingSync[0].googleMapsSyncEnabled;
-      
-      if (!currentStatus) {
-        // Enabling sync - trigger immediate sync
-        await db
-          .update(purchasedListSync)
-          .set({
-            googleMapsSyncEnabled: true,
-            googleMapsSynced: false, // Reset sync status
-            updatedAt: now,
-          })
-          .where(eq(purchasedListSync.id, existingSync[0].id));
+           if (existingSync.length > 0) {
+             // Toggle existing sync
+             const currentStatus = existingSync[0].googleMapsSyncEnabled;
+             
+             if (!currentStatus) {
+               // Enabling sync - trigger immediate sync
+               await db
+                 .update(purchasedListSync)
+                 .set({
+                   googleMapsSyncEnabled: true,
+                   googleMapsSynced: false, // Reset sync status
+                   updatedAt: now,
+                 })
+                 .where(eq(purchasedListSync.id, existingSync[0].id));
 
-        // Trigger sync in background
-        triggerBackgroundSync(userId, listId, orderId);
-        
-        return { success: true, message: "Sync enabled - processing..." };
-      } else {
-        // Disabling sync
-        await db
-          .update(purchasedListSync)
-          .set({
-            googleMapsSyncEnabled: false,
-            updatedAt: now,
-          })
-          .where(eq(purchasedListSync.id, existingSync[0].id));
+               // Trigger sync in background
+               triggerBackgroundSync(userId, listId, orderId);
+               
+               return { success: true, message: "Sync enabled - processing..." };
+             } else {
+               // Disabling sync - delete the KML file from Google Drive
+               const mapId = existingSync[0].googleMapsMapId;
+               if (mapId) {
+                 // Trigger cleanup in background
+                 triggerBackgroundCleanup(userId, mapId);
+               }
 
-        return { success: true, message: "Sync disabled" };
-      }
+               await db
+                 .update(purchasedListSync)
+                 .set({
+                   googleMapsSyncEnabled: false,
+                   googleMapsSynced: false,
+                   googleMapsMapId: null,
+                   updatedAt: now,
+                 })
+                 .where(eq(purchasedListSync.id, existingSync[0].id));
+
+               return { success: true, message: "Sync disabled - removing from Drive..." };
+             }
     } else {
       // Create new sync record and enable
       await db
@@ -222,6 +230,30 @@ async function triggerBackgroundSync(userId: string, listId: number, orderId: nu
     });
   } catch (error) {
     console.error("Failed to trigger background sync:", error);
+  }
+}
+
+// Helper function to trigger cleanup without blocking the UI
+async function triggerBackgroundCleanup(userId: string, mapId: string) {
+  try {
+    // Call our cleanup API endpoint
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    
+    fetch(`${baseUrl}/api/maps/sync`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        action: 'cleanup_file',
+        mapId,
+        userId,
+      }),
+    }).catch(error => {
+      console.error("Background cleanup trigger failed:", error);
+    });
+  } catch (error) {
+    console.error("Failed to trigger background cleanup:", error);
   }
 }
 
