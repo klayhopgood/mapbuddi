@@ -150,12 +150,12 @@ export function PurchasedListsManager({
                         <div className="flex flex-col gap-2 mt-2">
                           <div className="flex gap-2">
                             <Link 
-                              href="https://mymaps.google.com/maps/d/create" 
+                              href="https://mymaps.google.com/" 
                               target="_blank" 
                               rel="noopener noreferrer"
                             >
                               <Button variant="default" size="sm" className="text-xs bg-blue-600 hover:bg-blue-700">
-                                🗺️ Import to My Maps
+                                🗺️ Open My Maps
                               </Button>
                             </Link>
                             <Link 
@@ -167,7 +167,7 @@ export function PurchasedListsManager({
                             </Link>
                           </div>
                           <div className="text-xs text-muted-foreground bg-blue-50 p-2 rounded">
-                            💡 Click &quot;Import to My Maps&quot; → Click &quot;Import&quot; → Select your KML file from Drive
+                            💡 Click &quot;Open My Maps&quot; → Click &quot;Create a New Map&quot; → Click &quot;Import&quot; → Select your KML file from Drive
                           </div>
                         </div>
                       )}
