@@ -289,24 +289,6 @@ async function createGoogleMyMap(
       console.log("File sharing error (non-critical):", shareError);
     }
 
-    // Step 4: Update database to mark as synced
-    console.log("Updating database sync status...");
-    await db
-      .update(purchasedListSync)
-      .set({
-        googleMapsSynced: true,
-        googleMapsMapId: fileData.id,
-        googleMapsLastSync: new Date(),
-        updatedAt: new Date(),
-      })
-      .where(and(
-        eq(purchasedListSync.userId, userId),
-        eq(purchasedListSync.listId, listId),
-        eq(purchasedListSync.orderId, orderId)
-      ));
-
-    console.log("Database updated successfully");
-
     return { 
       success: true, 
       mapId: fileData.id,
