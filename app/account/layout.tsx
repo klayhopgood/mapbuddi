@@ -54,11 +54,6 @@ const menuItems: MenuItems = [
     group: "selling",
   },
   {
-    name: "Products",
-    href: singleLevelNestedRoutes.account.products,
-    group: "selling",
-  },
-  {
     name: "Location Lists",
     href: "/account/selling/lists",
     group: "selling",

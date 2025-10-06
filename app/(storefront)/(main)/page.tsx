@@ -3,11 +3,10 @@ import { SlideShow } from "@/components/slideshow";
 import { Heading } from "@/components/ui/heading";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { db } from "@/db/db";
-import { products, stores } from "@/db/schema";
+import { locationLists, stores } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { PropsWithChildren } from "react";
-import { ProductAndStore } from "./products/page";
-import { ProductCard } from "@/components/storefront/product-card";
+import { LocationListCard } from "@/components/storefront/location-list-card";
 import { Button } from "@/components/ui/button";
 import { routes } from "@/lib/routes";
 import Link from "next/link";
@@ -20,23 +19,32 @@ import {
   Truck,
   User,
   Wind,
+  MapPin,
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { TextInputWithLabel } from "@/components/text-input-with-label";
+
+export type LocationListAndStore = {
+  locationList: typeof locationLists.$inferSelect;
+  store: {
+    id: number;
+    name: string | null;
+    slug: string | null;
+  };
+};
 
 export default async function Home() {
-  const storeAndProduct = (await db
+  const storeAndLocationList = (await db
     .select({
-      product: products,
+      locationList: locationLists,
       store: {
         id: stores.id,
         name: stores.name,
         slug: stores.slug,
       },
     })
-    .from(products)
-    .leftJoin(stores, eq(products.storeId, stores.id))
-    .limit(8)) as ProductAndStore[];
+    .from(locationLists)
+    .leftJoin(stores, eq(locationLists.storeId, stores.id))
+    .where(eq(locationLists.isActive, true))
+    .limit(8)) as LocationListAndStore[];
 
   return (
     <div>
@@ -54,7 +62,7 @@ export default async function Home() {
               heading={<Heading size="h1">Sell online with ease.</Heading>}
               subheading={
                 <Heading size="h2">
-                  Access our global marketplace and sell your <br /> products to
+                  Access our global marketplace and sell your <br /> location lists to
                   over 1 million visitors.
                 </Heading>
               }
@@ -88,23 +96,23 @@ export default async function Home() {
               heading={<Heading size="h1">Online shopping made easy.</Heading>}
               subheading={
                 <Heading size="h2">
-                  Shop hundreds of products from sellers worldwide.
+                  Shop hundreds of curated location lists from sellers worldwide.
                 </Heading>
               }
             >
-              <Heading size="h3">Top Picks</Heading>
+              <Heading size="h3">Featured Location Lists</Heading>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-auto mt-4">
-                {storeAndProduct.map((item) => (
-                  <ProductCard
-                    key={item.product.id}
-                    storeAndProduct={item}
+                {storeAndLocationList.map((item) => (
+                  <LocationListCard
+                    key={item.locationList.id}
+                    storeAndLocationList={item}
                     hideButtonActions={true}
                   />
                 ))}
               </div>
               <div className="mt-12 grid place-content-center">
-                <Link href={routes.products}>
-                  <Button variant="default">View All Products</Button>
+                <Link href="/lists">
+                  <Button variant="default">View All Location Lists</Button>
                 </Link>
               </div>
               <div className="bg-blue-900 text-white w-full p-12 rounded-md mt-12 flex items-center flex-col gap-2 justify-center text-center">
