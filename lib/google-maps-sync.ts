@@ -110,6 +110,59 @@ export async function syncListToGoogleMaps(
   }
 }
 
+// Helper function to get or create MapBuddi folder
+async function getOrCreateMapBuddiFolderId(accessToken: string): Promise<string | null> {
+  try {
+    console.log("=== GETTING OR CREATING MAPBUDDI FOLDER ===");
+    
+    // First, check if MapBuddi folder already exists
+    const searchResponse = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=name='MapBuddi' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (searchResponse.ok) {
+      const searchData = await searchResponse.json();
+      if (searchData.files && searchData.files.length > 0) {
+        console.log("Found existing MapBuddi folder:", searchData.files[0].id);
+        return searchData.files[0].id;
+      }
+    }
+
+    // Create MapBuddi folder if it doesn't exist
+    console.log("Creating new MapBuddi folder...");
+    const createResponse = await fetch('https://www.googleapis.com/drive/v3/files', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: 'MapBuddi',
+        mimeType: 'application/vnd.google-apps.folder',
+      }),
+    });
+
+    if (createResponse.ok) {
+      const folderData = await createResponse.json();
+      console.log("Created MapBuddi folder:", folderData.id);
+      return folderData.id;
+    } else {
+      const errorText = await createResponse.text();
+      console.error("Failed to create MapBuddi folder:", errorText);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error managing MapBuddi folder:", error);
+    return null;
+  }
+}
+
 async function createGoogleMyMap(
   accessToken: string, 
   mapName: string, 
@@ -124,9 +177,12 @@ async function createGoogleMyMap(
     // Google My Maps doesn't have a direct API, so let's create a KML file in Google Drive
     // The user can then import this KML into Google My Maps manually or we can provide instructions
     
+    // Get or create MapBuddi folder
+    const folderId = await getOrCreateMapBuddiFolderId(accessToken);
+    
     const createPayload = {
       name: `${mapName} (MapBuddi).kml`,
-      parents: [], // Root folder
+      parents: folderId ? [folderId] : [], // Put in MapBuddi folder if available, otherwise root
     };
     
     console.log("Creating KML file with payload:", createPayload);

@@ -52,7 +52,7 @@ export function MapsConnectionStatus({ userId, mapsIntegration }: MapsConnection
               Google Maps
             </CardTitle>
             <CardDescription>
-              Sync your lists to Google My Maps for easy navigation
+              Sync your lists to Google My Maps for easy navigation. Files are organized in a "MapBuddi" folder in your Drive.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

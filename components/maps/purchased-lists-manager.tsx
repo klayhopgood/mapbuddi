@@ -153,7 +153,14 @@ export function PurchasedListsManager({
                             target="_blank" 
                             rel="noopener noreferrer"
                           >
-                            <Button variant="outline" size="sm" className="text-xs">View in Drive</Button>
+                            <Button variant="outline" size="sm" className="text-xs">View File</Button>
+                          </Link>
+                          <Link 
+                            href="https://drive.google.com/drive/folders?q=name:MapBuddi" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
+                            <Button variant="outline" size="sm" className="text-xs">📁 MapBuddi Folder</Button>
                           </Link>
                         </div>
                       )}
