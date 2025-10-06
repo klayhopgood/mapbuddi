@@ -12,19 +12,32 @@ export async function addToCart(newCartItem: CartItem) {
   const user = await currentUser();
   if (!user) throw new Error("User not authenticated");
 
+  console.log("=== ADD TO CART DEBUG ===");
+  console.log("Current user ID:", user.id);
+  console.log("Current user email:", user.emailAddresses[0]?.emailAddress);
+  console.log("Trying to add list ID:", newCartItem.id);
+
   // ✅ Prevent users from adding their own products to cart
   const listDetails = await db
     .select({
       storeId: locationLists.storeId,
       storeOwnerId: stores.userId,
+      listName: locationLists.name,
+      storeName: stores.name,
     })
     .from(locationLists)
     .leftJoin(stores, eq(locationLists.storeId, stores.id))
     .where(eq(locationLists.id, newCartItem.id));
 
+  console.log("List details:", listDetails);
+
   if (listDetails.length && listDetails[0].storeOwnerId === user.id) {
+    console.log("BLOCKED: User trying to add their own list");
     throw new Error("You cannot add your own location lists to the cart");
   }
+
+  console.log("ALLOWED: Different user, proceeding with add to cart");
+  console.log("=== END ADD TO CART DEBUG ===");
 
   const cookieStore = cookies();
   const cartId = cookieStore.get("cartId")?.value;
