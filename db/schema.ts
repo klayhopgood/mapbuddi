@@ -195,22 +195,52 @@ export const sellerPayouts = pgTable("seller_payouts", {
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(), // Amount to pay seller (after fees)
   platformFee: decimal("platform_fee", { precision: 10, scale: 2 }).notNull(), // Platform fee taken
   stripeFee: decimal("stripe_fee", { precision: 10, scale: 2 }).notNull(), // Stripe fee
-  paypalEmail: text("paypal_email"), // Seller's PayPal email
+  payoutMethod: varchar("payout_method", { length: 20 }).notNull(), // paypal, bank_us, bank_uk, bank_eu, bank_au
+  payoutDetails: text("payout_details"), // JSON with payout-specific details
   status: varchar("status", { length: 20 }).default("pending"), // pending, paid, failed
   payoutDate: timestamp("payout_date"),
-  paypalTransactionId: text("paypal_transaction_id"), // PayPal payout ID
+  transactionId: text("transaction_id"), // PayPal/Stripe transfer ID
+  failureReason: text("failure_reason"), // If payout fails
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export type SellerPayout = InferSelectModel<typeof sellerPayouts>;
 
-// Add PayPal email to stores table
-export const storePaymentSettings = pgTable("store_payment_settings", {
+// Seller payout methods (replaces storePaymentSettings)
+export const sellerPayoutMethods = pgTable("seller_payout_methods", {
   id: serial("id").primaryKey(),
   storeId: integer("store_id").notNull().unique(),
-  paypalEmail: text("paypal_email"), // Seller's PayPal email for payouts
+  sellerId: text("seller_id").notNull(), // Clerk user ID
+  
+  // PayPal (available worldwide)
+  paypalEmail: text("paypal_email"),
+  
+  // US Banking
+  usRoutingNumber: text("us_routing_number"), // 9 digits
+  usAccountNumber: text("us_account_number"),
+  usAccountType: varchar("us_account_type", { length: 10 }), // checking, savings
+  
+  // UK Banking  
+  ukSortCode: text("uk_sort_code"), // 6 digits (XX-XX-XX)
+  ukAccountNumber: text("uk_account_number"), // 8 digits
+  
+  // European Banking (IBAN)
+  euIban: text("eu_iban"), // Up to 34 characters
+  euBic: text("eu_bic"), // 8-11 characters (optional for SEPA)
+  
+  // Australian Banking
+  auBsb: text("au_bsb"), // 6 digits (XXX-XXX)
+  auAccountNumber: text("au_account_number"),
+  
+  // Account holder details (required for all banking)
+  accountHolderName: text("account_holder_name"),
+  accountHolderAddress: text("account_holder_address"), // JSON with address
+  
+  // Preferred method
+  preferredMethod: varchar("preferred_method", { length: 20 }).default("paypal"), // paypal, bank_us, bank_uk, bank_eu, bank_au
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export type StorePaymentSettings = InferSelectModel<typeof storePaymentSettings>;
+export type SellerPayoutMethods = InferSelectModel<typeof sellerPayoutMethods>;
