@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { syncListToGoogleMaps, processAllPendingSyncs, deleteKmlFromDrive } from '@/lib/google-maps-sync';
+import { syncListToGoogleMaps, processAllPendingSyncs, deleteKmlFromDrive, verifyKmlFileExists } from '@/lib/google-maps-sync';
 import { currentUser } from '@clerk/nextjs/server';
 
 export async function POST(request: NextRequest) {
@@ -60,6 +60,21 @@ export async function POST(request: NextRequest) {
           message: result.message 
         }, { status: 400 });
       }
+    }
+
+    if (action === 'verify_file') {
+      if (!mapId) {
+        return NextResponse.json({ error: 'Missing mapId' }, { status: 400 });
+      }
+
+      console.log(`API: Verifying map ${mapId} for user ${user.id}`);
+      
+      const result = await verifyKmlFileExists(user.id, mapId);
+      
+      return NextResponse.json({ 
+        exists: result.exists, 
+        message: result.message
+      });
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });

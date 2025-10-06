@@ -10,6 +10,9 @@ import { UserMapsIntegration, PurchasedListSync } from "@/db/schema";
 import { toggleListSync } from "@/server-actions/maps-integration";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { currencyFormatter } from "@/lib/currency";
 
 interface PurchasedList {
   id: number;

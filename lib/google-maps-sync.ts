@@ -247,6 +247,84 @@ async function createGoogleMyMap(
   }
 }
 
+export async function verifyKmlFileExists(
+  userId: string, 
+  mapId: string
+): Promise<{ exists: boolean; message?: string }> {
+  try {
+    console.log("=== VERIFYING KML FILE EXISTS ===");
+    console.log("User ID:", userId);
+    console.log("Map ID:", mapId);
+
+    // Get user's Google tokens
+    const integration = await db
+      .select()
+      .from(userMapsIntegration)
+      .where(eq(userMapsIntegration.userId, userId));
+
+    if (!integration.length || !integration[0].googleMapsConnected) {
+      return { exists: false, message: "Google Maps not connected" };
+    }
+
+    let accessToken = integration[0].googleAccessToken;
+
+    // Check if token needs refresh
+    if (integration[0].googleTokenExpiry && new Date() >= integration[0].googleTokenExpiry) {
+      console.log("Access token expired, refreshing...");
+      const refreshResult = await refreshGoogleToken(userId);
+      if (!refreshResult.success) {
+        return { exists: false, message: "Failed to refresh Google token" };
+      }
+      
+      // Get updated token
+      const updatedIntegration = await db
+        .select()
+        .from(userMapsIntegration)
+        .where(eq(userMapsIntegration.userId, userId));
+      
+      accessToken = updatedIntegration[0].googleAccessToken;
+    }
+
+    if (!accessToken) {
+      return { exists: false, message: "No valid access token" };
+    }
+
+    // Check if the file exists in Google Drive
+    const response = await fetch(`https://www.googleapis.com/drive/v3/files/${mapId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    console.log("File verification response status:", response.status);
+
+    if (response.status === 404) {
+      console.log("File not found in Google Drive");
+      return { exists: false, message: "File not found in Google Drive" };
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Failed to verify file:", errorText);
+      return { exists: false, message: "Failed to verify file existence" };
+    }
+
+    const fileData = await response.json();
+    console.log("File exists:", fileData.name);
+    
+    // Note: Moving files within Drive doesn't change the file ID, so the file will still be accessible
+    return { exists: true, message: "File exists in Google Drive" };
+
+  } catch (error) {
+    console.error("File verification error:", error);
+    return { 
+      exists: false, 
+      message: error instanceof Error ? error.message : "Unknown error verifying file" 
+    };
+  }
+}
+
 export async function deleteKmlFromDrive(
   userId: string, 
   mapId: string
