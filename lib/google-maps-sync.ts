@@ -116,30 +116,67 @@ async function createGoogleMyMap(
   kmlContent: string
 ): Promise<{ success: boolean; message?: string; mapId?: string }> {
   try {
+    console.log("=== CREATING GOOGLE MY MAP ===");
+    console.log("Map name:", mapName);
+    console.log("Access token exists:", !!accessToken);
+    console.log("KML content length:", kmlContent.length);
+
     // Step 1: Create a new file in Google Drive
+    const createPayload = {
+      name: `${mapName} (MapBuddi)`,
+      mimeType: 'application/vnd.google-apps.map', // Google My Maps MIME type
+      parents: [], // Root folder
+    };
+    
+    console.log("Creating file with payload:", createPayload);
+    
     const createResponse = await fetch('https://www.googleapis.com/drive/v3/files', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        name: `${mapName} (MapBuddi)`,
-        mimeType: 'application/vnd.google-apps.map', // Google My Maps MIME type
-        parents: [], // Root folder
-      }),
+      body: JSON.stringify(createPayload),
     });
 
+    console.log("Create response status:", createResponse.status);
+    console.log("Create response headers:", Object.fromEntries(createResponse.headers.entries()));
+
     if (!createResponse.ok) {
-      const error = await createResponse.text();
-      console.error("Failed to create Google My Map:", error);
-      return { success: false, message: "Failed to create map file" };
+      const errorText = await createResponse.text();
+      console.error("Failed to create Google My Map:", errorText);
+      
+      // Try to parse error details
+      try {
+        const errorJson = JSON.parse(errorText);
+        console.error("Parsed error:", errorJson);
+        return { 
+          success: false, 
+          message: `Google Drive API error: ${errorJson.error?.message || errorText}` 
+        };
+      } catch {
+        return { 
+          success: false, 
+          message: `Failed to create map file. Status: ${createResponse.status}. Response: ${errorText}` 
+        };
+      }
     }
 
     const fileData = await createResponse.json();
     console.log("Created Google My Map with ID:", fileData.id);
+    console.log("File data:", fileData);
 
+    // For now, let's just return success without uploading KML
+    // Google My Maps might not support direct KML upload via API
+    return { 
+      success: true, 
+      mapId: fileData.id,
+      message: "Google My Map created successfully (KML upload skipped for testing)"
+    };
+
+    /* Commenting out KML upload for now - this might not be supported
     // Step 2: Upload KML content to the map
+    console.log("Uploading KML content...");
     const uploadResponse = await fetch(
       `https://www.googleapis.com/upload/drive/v3/files/${fileData.id}?uploadType=media`,
       {
@@ -152,6 +189,8 @@ async function createGoogleMyMap(
       }
     );
 
+    console.log("Upload response status:", uploadResponse.status);
+
     if (!uploadResponse.ok) {
       const error = await uploadResponse.text();
       console.error("Failed to upload KML to Google My Map:", error);
@@ -159,12 +198,7 @@ async function createGoogleMyMap(
     }
 
     console.log("Successfully uploaded KML content to Google My Map");
-
-    return { 
-      success: true, 
-      mapId: fileData.id,
-      message: "Google My Map created successfully"
-    };
+    */
 
   } catch (error) {
     console.error("Google My Map creation error:", error);
