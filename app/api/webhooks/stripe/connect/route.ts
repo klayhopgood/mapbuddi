@@ -51,7 +51,22 @@ export async function POST(request: Request) {
   switch (event.type) {
     case "payment_intent.payment_failed":
       const paymentIntentPaymentFailed = event.data.object;
+      console.log("=== PAYMENT FAILED DEBUG ===");
       console.log("Payment failed:", paymentIntentPaymentFailed.id);
+      console.log("Status:", paymentIntentPaymentFailed.status);
+      console.log("Amount:", paymentIntentPaymentFailed.amount);
+      console.log("Currency:", paymentIntentPaymentFailed.currency);
+      console.log("Last Payment Error:", JSON.stringify(paymentIntentPaymentFailed.last_payment_error, null, 2));
+      console.log("Metadata:", JSON.stringify(paymentIntentPaymentFailed.metadata, null, 2));
+      console.log("Application Fee Amount:", paymentIntentPaymentFailed.application_fee_amount);
+      console.log("Charges:", paymentIntentPaymentFailed.charges?.data?.map((charge: any) => ({
+        id: charge.id,
+        status: charge.status,
+        failure_code: charge.failure_code,
+        failure_message: charge.failure_message,
+        outcome: charge.outcome
+      })));
+      console.log("=== END PAYMENT FAILED DEBUG ===");
       break;
     case "payment_intent.processing":
       const paymentIntentProcessing = event.data.object;
