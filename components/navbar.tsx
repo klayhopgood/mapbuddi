@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { MobileNavigation } from "./mobile-navigation";
 import { ShoppingCartHeader } from "./shopping-cart-header";
 import { ProductSearch } from "./storefront/product-search";
+import { CurrencySelector } from "./currency-selector";
 
 export const NavBar = ({
   showSecondAnnouncementBar,
@@ -24,6 +25,7 @@ export const NavBar = ({
         description="Free shipping on all orders over $50"
       >
         <div className="items-center justify-end gap-6 hidden sm:flex">
+          <CurrencySelector />
           <Link
             href={routes.account}
             className="uppercase text-secondary text-sm"

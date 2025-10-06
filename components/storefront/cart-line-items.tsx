@@ -6,19 +6,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { currencyFormatter } from "@/lib/currency";
 import { routes } from "@/lib/routes";
 import { CartItem, CartLineItemDetails } from "@/lib/types";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { ProductImage } from "../product-image";
 import { EditCartLineItem } from "./edit-cart-line-item";
+import { useCurrency } from "@/hooks/use-currency";
 
 export const CartLineItems = (props: {
   cartItems: CartItem[];
   lists: CartLineItemDetails[];
   variant: "cart" | "checkout";
 }) => {
+  const { formatDisplayPrice } = useCurrency();
+  
   return (
     <Table>
       <TableHeader>
@@ -74,7 +76,7 @@ export const CartLineItems = (props: {
               {props.variant === "cart" ? (
                 <>
                   <TableCell>
-                    {currencyFormatter(Number(list.price))}
+                    {formatDisplayPrice(Number(list.price))}
                   </TableCell>
                   <TableCell>{currentListInCart?.qty}</TableCell>
                 </>
@@ -82,13 +84,13 @@ export const CartLineItems = (props: {
                 <>
                   <TableCell>{currentListInCart?.qty}</TableCell>
                   <TableCell className="text-right">
-                    {currencyFormatter(Number(list.price))}
+                    {formatDisplayPrice(Number(list.price))}
                   </TableCell>
                 </>
               )}
               {props.variant === "cart" ? (
                 <TableCell>
-                  {currencyFormatter(
+                  {formatDisplayPrice(
                     Number(currentListInCart?.qty) * Number(list.price)
                   )}
                 </TableCell>

@@ -2,15 +2,16 @@ import Image from "next/image";
 import { Text } from "../ui/text";
 import { MapPin, Star } from "lucide-react";
 import Link from "next/link";
-import { formatPrice } from "@/lib/currency";
 import { Button } from "../ui/button";
 import { LocationListAndStore } from "@/lib/collection-types";
 import { Badge } from "../ui/badge";
+import { useCurrency } from "@/hooks/use-currency";
 
 export const LocationListCard = (props: {
   storeAndLocationList: LocationListAndStore;
   hideButtonActions?: boolean;
 }) => {
+  const { formatDisplayPrice } = useCurrency();
   const listPageLink = `/list/${props.storeAndLocationList.locationList.id}`;
 
   return (
@@ -40,10 +41,7 @@ export const LocationListCard = (props: {
         
         <div className="flex items-center justify-between mt-2">
           <Text className="font-bold text-lg">
-            {formatPrice(
-              Number(props.storeAndLocationList.locationList.price), 
-              props.storeAndLocationList.locationList.currency || "USD"
-            )}
+            {formatDisplayPrice(Number(props.storeAndLocationList.locationList.price))}
           </Text>
           
           <div className="flex items-center space-x-2">
