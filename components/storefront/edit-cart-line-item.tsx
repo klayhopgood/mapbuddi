@@ -38,7 +38,7 @@ export const EditCartLineItem = (props: {
           <AlertDialogHeader>
             <AlertDialogTitle>Remove from Cart</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to remove "{props.list.name}" from your cart?
+              Are you sure you want to remove &quot;{props.list.name}&quot; from your cart?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
