@@ -38,20 +38,21 @@ export default async function Page({
   const storeOwnerId = store[0].userId;
   const storeStripeAccountId = store[0].stripeAccountId;
 
-  // ✅ Prevent users from buying their own products
+  // ✅ Prevent users from buying their own products - TEMPORARILY DISABLED FOR TESTING
   if (user && user.id === storeOwnerId) {
-    return (
-      <InfoCard
-        heading="Cannot purchase your own lists"
-        subheading="You cannot purchase location lists from your own store. These lists are already available in your seller dashboard."
-        icon={<AlertCircle size={24} />}
-        button={
-          <Link href={routes.cart}>
-            <Button>Return to cart</Button>
-          </Link>
-        }
-      />
-    );
+    console.log("CHECKOUT: Would normally block self-purchase, but allowing for testing");
+    // return (
+    //   <InfoCard
+    //     heading="Cannot purchase your own lists"
+    //     subheading="You cannot purchase location lists from your own store. These lists are already available in your seller dashboard."
+    //     icon={<AlertCircle size={24} />}
+    //     button={
+    //       <Link href={routes.cart}>
+    //         <Button>Return to cart</Button>
+    //       </Link>
+    //     }
+    //   />
+    // );
   }
 
   const storeLists = await db
