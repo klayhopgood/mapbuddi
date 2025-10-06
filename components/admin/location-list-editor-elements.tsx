@@ -70,19 +70,25 @@ export const LocationListEditorElements = (props: {
   );
 
   const [categories, setCategories] = useState<ListCategory[]>(
-    props.initialCategories ?? defaultCategories
+    props.initialCategories?.map(cat => ({
+      id: cat.id || Math.random(),
+      name: cat.name,
+      emoji: cat.emoji,
+      iconColor: cat.iconColor || "#4ECDC4",
+      displayOrder: cat.displayOrder || 0
+    })) ?? defaultCategories
   );
   const [pois, setPois] = useState<ListPOI[]>(
     props.initialPois?.map(poi => ({
       id: poi.id,
       categoryId: poi.categoryId,
       name: poi.name,
-      description: poi.description,
-      sellerNotes: poi.sellerNotes,
+      description: poi.description || "",
+      sellerNotes: poi.sellerNotes || "",
       latitude: parseFloat(poi.latitude),
       longitude: parseFloat(poi.longitude),
-      googlePlaceId: poi.googlePlaceId,
-      address: poi.address
+      googlePlaceId: poi.googlePlaceId || undefined,
+      address: poi.address || ""
     })) ?? []
   );
   const [activeTab, setActiveTab] = useState("basic");

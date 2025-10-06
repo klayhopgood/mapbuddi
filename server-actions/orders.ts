@@ -8,12 +8,18 @@ import { inArray } from "drizzle-orm";
 export const getDetailsOfListsOrdered = async (
   checkoutItems: CheckoutItem[]
 ) => {
-  return (await db
+  const results = await db
     .select({
       id: locationLists.id,
       name: locationLists.name,
       coverImage: locationLists.coverImage,
       storeId: locationLists.storeId,
+      currency: locationLists.currency,
+      isActive: locationLists.isActive,
+      totalPois: locationLists.totalPois,
+      avgRating: locationLists.avgRating,
+      createdAt: locationLists.createdAt,
+      updatedAt: locationLists.updatedAt,
     })
     .from(locationLists)
     .where(
@@ -21,5 +27,12 @@ export const getDetailsOfListsOrdered = async (
         locationLists.id,
         checkoutItems.map((item) => item.id)
       )
-    )) as OrderItemDetails[];
+    );
+
+  return results.map((result) => ({
+    ...result,
+    coverImage: typeof result.coverImage === 'string' 
+      ? JSON.parse(result.coverImage) 
+      : result.coverImage || []
+  })) as OrderItemDetails[];
 };

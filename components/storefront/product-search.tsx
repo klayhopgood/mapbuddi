@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import Image from "next/image";
-import { ProductImages } from "@/lib/types";
+import { ListImages } from "@/lib/types";
 import { ImageOff } from "lucide-react";
 import { currencyFormatter } from "@/lib/currency";
 import { LoadingSkeleton } from "../ui/loading-skeleton";
@@ -24,7 +24,7 @@ import { ProductImage } from "../product-image";
 export function ProductSearch() {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<
-    (Pick<Product, "id" | "name" | "price"> & { images: ProductImages[] })[]
+    (Pick<Product, "id" | "name" | "price"> & { images: ListImages[] })[]
   >([]);
   const [isLoadingResults, setIsLoadingResults] = useState(false);
   const [confirmedHasNoResults, setConfirmedHasNoResults] = useState(false);
@@ -53,7 +53,7 @@ export function ProductSearch() {
           .then((res) => {
             if (!res.length) setConfirmedHasNoResults(true);
             return res as unknown as (Pick<Product, "id" | "name" | "price"> & {
-              images: ProductImages[];
+              images: ListImages[];
             })[];
           })
           .finally(() => setIsLoadingResults(false))

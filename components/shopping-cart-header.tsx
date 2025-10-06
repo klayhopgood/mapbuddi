@@ -73,7 +73,7 @@ export const ShoppingCartHeader = async () => {
               <CartLineItems
                 variant="cart"
                 cartItems={cartItems}
-                products={
+                lists={
                   cartItemDetails?.filter((item) => item.storeId === storeId) ??
                   []
                 }

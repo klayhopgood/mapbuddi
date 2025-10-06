@@ -6,7 +6,7 @@ import type { FileWithPath } from "react-dropzone";
 import { useUploadThing } from "@/lib/uploadthing-generate-react-helpers";
 import { useCallback, useState } from "react";
 import { Product } from "@/db/schema";
-import { ProductImages } from "@/lib/types";
+import { ListImages } from "@/lib/types";
 import { generateClientDropzoneAccept } from "uploadthing/client";
 import { Label } from "@radix-ui/react-label";
 import Image from "next/image";
@@ -15,11 +15,11 @@ import { Button } from "../ui/button";
 import { toast } from "../ui/use-toast";
 
 export function ProductImageUploader(props: {
-  product: Omit<Product, "images"> & { images: ProductImages[] };
-  newImages: ProductImages[];
-  setNewImages: React.Dispatch<React.SetStateAction<ProductImages[]>>;
-  imagesToDelete: ProductImages[];
-  setImagesToDelete: React.Dispatch<React.SetStateAction<ProductImages[]>>;
+  product: Omit<Product, "images"> & { images: ListImages[] };
+  newImages: ListImages[];
+  setNewImages: React.Dispatch<React.SetStateAction<ListImages[]>>;
+  imagesToDelete: ListImages[];
+  setImagesToDelete: React.Dispatch<React.SetStateAction<ListImages[]>>;
 }) {
   const [files, setFiles] = useState<File[]>([]);
   const onDrop = useCallback((acceptedFiles: FileWithPath[]) => {

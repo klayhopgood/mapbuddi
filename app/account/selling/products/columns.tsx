@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { currencyFormatter } from "@/lib/currency";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { routes, secondLevelNestedRoutes } from "@/lib/routes";
-import { ProductImages } from "@/lib/types";
+import { ListImages } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import {
@@ -18,7 +18,7 @@ export type Product = {
   id: string;
   name: string;
   price: number;
-  images: ProductImages[];
+  images: ListImages[];
 };
 
 export const columns: ColumnDef<Product>[] = [
@@ -70,7 +70,7 @@ export const columns: ColumnDef<Product>[] = [
     accessorKey: "images",
     header: "Images",
     cell: ({ row }) => {
-      const images = row.getValue("images") as ProductImages[];
+      const images = row.getValue("images") as ListImages[];
       return images.length;
     },
   },

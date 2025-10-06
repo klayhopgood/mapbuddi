@@ -110,7 +110,7 @@ export default async function Page({
         <CartLineItems
           variant="checkout"
           cartItems={cartItems}
-          products={
+          lists={
             cartItemDetails?.filter((item) => item.storeId === storeId) ?? []
           }
         />

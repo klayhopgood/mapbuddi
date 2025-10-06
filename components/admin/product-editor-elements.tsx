@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 import { secondLevelNestedRoutes, singleLevelNestedRoutes } from "@/lib/routes";
 import { toast } from "../ui/use-toast";
 import { HeadingAndSubheading } from "./heading-and-subheading";
-import { ProductImages } from "@/lib/types";
+import { ListImages } from "@/lib/types";
 import { ProductImageUploader } from "./product-image-uploader";
 import type { deleteProduct, updateProduct } from "@/server-actions/products";
 import { Loader2 } from "lucide-react";
@@ -31,8 +31,8 @@ export const ProductEditorElements = (props: {
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [imagesToDelete, setImagesToDelete] = useState([] as ProductImages[]);
-  const [newImages, setNewImages] = useState([] as ProductImages[]);
+  const [imagesToDelete, setImagesToDelete] = useState([] as ListImages[]);
+  const [newImages, setNewImages] = useState([] as ListImages[]);
 
   const [formValues, setFormValues] = useState<Omit<Product, "id" | "storeId">>(
     props.initialValues ?? defaultValues
@@ -154,7 +154,7 @@ export const ProductEditorElements = (props: {
             <ProductImageUploader
               product={
                 props.initialValues as Omit<Product, "images"> & {
-                  images: ProductImages[];
+                  images: ListImages[];
                 }
               }
               newImages={newImages}

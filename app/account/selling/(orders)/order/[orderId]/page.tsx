@@ -12,7 +12,7 @@ import {
   formatOrderNumber,
   removeOrderNumberFormatting,
 } from "@/lib/utils";
-import { getDetailsOfProductsOrdered } from "@/server-actions/orders";
+import { getDetailsOfListsOrdered } from "@/server-actions/orders";
 import { getStoreId } from "@/server-actions/store-details";
 import { and, eq } from "drizzle-orm";
 
@@ -44,7 +44,7 @@ export default async function OrderDetailPage(context: {
   const checkoutItems = JSON.parse(
     (record.order.items as string) ?? "[]"
   ) as CheckoutItem[];
-  const products = await getDetailsOfProductsOrdered(checkoutItems);
+  const products = await getDetailsOfListsOrdered(checkoutItems);
   const totalItems = checkoutItems.reduce((acc, curr) => acc + curr.qty, 0);
 
   return (

@@ -34,8 +34,8 @@ export const OrderLineItems = (props: {
             <TableRow key={product.id}>
               <TableCell className="font-medium">
                 <ProductImage
-                  src={product.images[0]?.url}
-                  alt={product.images[0]?.alt}
+                  src={product.coverImage[0]?.url}
+                  alt={product.coverImage[0]?.alt}
                   sizes="50px"
                   height="h-[50px]"
                   width="w-[50px]"

@@ -88,5 +88,10 @@ async function getCartItemDetails(
         eq(locationLists.isActive, true)
       )
     );
-  return vals as CartLineItemDetails[];
+  return vals.map((val) => ({
+    ...val,
+    coverImage: typeof val.coverImage === 'string' 
+      ? JSON.parse(val.coverImage) 
+      : val.coverImage || []
+  })) as CartLineItemDetails[];
 }

@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 import { CheckoutItem, OrderItemDetails } from "@/lib/types";
 import { Check } from "lucide-react";
 import { OrderLineItems } from "@/components/order-line-items";
-import { getDetailsOfProductsOrdered } from "@/server-actions/orders";
+import { getDetailsOfListsOrdered } from "@/server-actions/orders";
 import { currencyFormatter } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -50,7 +50,7 @@ export default async function OrderConfirmation({
   let sellerDetails;
   if (isVerified) {
     sellerDetails = (await getSellerName(params.storeSlug))[0];
-    products = await getDetailsOfProductsOrdered(checkoutItems);
+    products = await getDetailsOfListsOrdered(checkoutItems);
   }
 
   return (
