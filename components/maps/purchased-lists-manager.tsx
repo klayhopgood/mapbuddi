@@ -167,7 +167,7 @@ export function PurchasedListsManager({
                             </Link>
                           </div>
                           <div className="text-xs text-muted-foreground bg-blue-50 p-2 rounded">
-                            💡 Click "Import to My Maps" → Click "Import" → Select your KML file from Drive
+                            💡 Click &quot;Import to My Maps&quot; → Click &quot;Import&quot; → Select your KML file from Drive
                           </div>
                         </div>
                       )}
