@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,15 +8,19 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
 
 interface PayoutMethodsProps {
   storeId: number;
   currentMethods?: any; // Current payout methods from database
-  onSave: (methods: any) => void;
+  onSave: (methods: any) => Promise<{ success: boolean; message: string }>;
 }
 
 export default function PayoutMethodsManager({ storeId, currentMethods, onSave }: PayoutMethodsProps) {
   const [selectedMethod, setSelectedMethod] = useState(currentMethods?.preferredMethod || "paypal");
+  const [isPending, startTransition] = useTransition();
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const router = useRouter();
   const [formData, setFormData] = useState({
     // PayPal
     paypalEmail: currentMethods?.paypalEmail || "",
@@ -48,10 +52,26 @@ export default function PayoutMethodsManager({ storeId, currentMethods, onSave }
   };
 
   const handleSave = () => {
-    onSave({
-      ...formData,
-      preferredMethod: selectedMethod,
-      storeId,
+    startTransition(async () => {
+      try {
+        const result = await onSave({
+          ...formData,
+          preferredMethod: selectedMethod,
+          storeId,
+        });
+        
+        if (result.success) {
+          setMessage({ type: 'success', text: result.message });
+          router.refresh(); // Refresh the page to show updated data
+        } else {
+          setMessage({ type: 'error', text: result.message });
+        }
+      } catch (error) {
+        setMessage({ 
+          type: 'error', 
+          text: error instanceof Error ? error.message : 'Failed to save payout methods' 
+        });
+      }
     });
   };
 
@@ -276,9 +296,24 @@ export default function PayoutMethodsManager({ storeId, currentMethods, onSave }
             </div>
           )}
 
+          {/* Success/Error Message */}
+          {message && (
+            <div className={`mt-4 p-3 rounded-lg ${
+              message.type === 'success' 
+                ? 'bg-green-50 border border-green-200 text-green-800' 
+                : 'bg-red-50 border border-red-200 text-red-800'
+            }`}>
+              {message.text}
+            </div>
+          )}
+
           <div className="mt-6">
-            <Button onClick={handleSave} className="w-full">
-              Save Payout Method
+            <Button 
+              onClick={handleSave} 
+              className="w-full" 
+              disabled={isPending}
+            >
+              {isPending ? "Saving..." : "Save Payout Method"}
             </Button>
           </div>
         </CardContent>

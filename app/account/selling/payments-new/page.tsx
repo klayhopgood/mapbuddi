@@ -52,10 +52,7 @@ export default async function PaymentsPage() {
     .orderBy(sellerPayouts.createdAt)
     .limit(5);
 
-  const handleSavePayoutMethods = async (data: any) => {
-    "use server";
-    return await savePayoutMethods(data);
-  };
+  // Server actions need to be imported, not defined inline
 
   return (
     <div className="space-y-8">
@@ -128,7 +125,7 @@ export default async function PaymentsPage() {
       <PayoutMethodsManager 
         storeId={storeId}
         currentMethods={payoutMethods}
-        onSave={handleSavePayoutMethods}
+        onSave={savePayoutMethods}
       />
 
       {/* Recent Payouts */}
