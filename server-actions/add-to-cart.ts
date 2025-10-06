@@ -32,8 +32,8 @@ export async function addToCart(newCartItem: CartItem) {
   console.log("List details:", listDetails);
 
   if (listDetails.length && listDetails[0].storeOwnerId === user.id) {
-    console.log("BLOCKED: User trying to add their own list - TEMPORARILY DISABLED FOR TESTING");
-    // throw new Error("You cannot add your own location lists to the cart");
+    console.log("BLOCKED: User trying to add their own list");
+    throw new Error("You cannot add your own location lists to the cart");
   }
 
   console.log("ALLOWED: Different user, proceeding with add to cart");
