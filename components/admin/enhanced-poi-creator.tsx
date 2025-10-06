@@ -181,7 +181,7 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
     initMap();
   }, [categories, pois, pendingPOI]);
 
-  // Update map markers when POIs change
+  // Update map markers when POIs change (optimized to prevent reloads)
   useEffect(() => {
     if (!isMapLoaded || !mapInstanceRef.current || !(window as any).google) return;
 
@@ -233,7 +233,7 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
 
       markersRef.current.push(pendingMarker);
     }
-  }, [pois, categories, isMapLoaded, pendingPOI]);
+  }, [pois.length, categories.length, isMapLoaded, pendingPOI?.latitude, pendingPOI?.longitude]); // Optimized dependencies
 
   // Search for places
   const searchPlaces = async (query: string) => {
