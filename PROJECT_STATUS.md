@@ -1,14 +1,14 @@
 # MapBuddi Project Status
 
-**Last Updated:** October 5, 2025  
-**Current Version:** Production v2.0  
+**Last Updated:** December 29, 2025  
+**Current Version:** Location Lists v1.0  
 **Environment:** Staging + Production deployed
 
 ---
 
 ## 🚀 **Current State Overview**
 
-MapBuddi is a **multi-vendor digital marketplace** built with Next.js, featuring Stripe Connect payments, Supabase PostgreSQL database, and comprehensive seller analytics. The platform is fully functional for digital product sales with a 10% platform fee structure.
+MapBuddi has been **successfully transformed** into a **location-based digital marketplace** where sellers create curated POI lists that buyers can purchase and sync to their Google Maps. The platform now specializes in location lists instead of general digital products, with a simplified USD-only backend and multi-currency display for buyers.
 
 ---
 
@@ -20,13 +20,15 @@ MapBuddi is a **multi-vendor digital marketplace** built with Next.js, featuring
 - **Authentication:** Clerk (latest clerkMiddleware)
 - **File Uploads:** UploadThing
 - **Icons:** Lucide React
+- **Currency:** Multi-currency display with real-time conversion
 
 ### **Backend**
 - **Database:** Supabase PostgreSQL (migrated from MySQL)
 - **ORM:** Drizzle ORM v0.44.5
-- **Payments:** Stripe Connect (Express accounts)
+- **Payments:** Stripe Connect (Express accounts) - USD only
 - **API Version:** Stripe 2025-08-27.basil
 - **Webhooks:** Configured for both main and Connect accounts
+- **Google APIs:** Places API for POI search and validation
 
 ### **Deployment**
 - **Hosting:** Vercel
@@ -35,367 +37,295 @@ MapBuddi is a **multi-vendor digital marketplace** built with Next.js, featuring
 
 ---
 
-## 📊 **Database Schema**
+## 📊 **Database Schema - Location Lists System**
 
-### **Core Tables**
+### **Core Tables (Updated)**
 ```sql
--- Products (Digital only - no inventory)
-products: id, name, price, description, images, storeId
+-- Location Lists (replaces products)
+location_lists: id, name, description, price, currency, coverImage, 
+                storeId, isActive, totalPois, avgRating, createdAt, updatedAt
 
--- Orders (with Stripe integration)
+-- Categories within lists  
+list_categories: id, listId, name, emoji, iconColor, displayOrder, createdAt
+
+-- Points of Interest
+list_pois: id, categoryId, name, description, sellerNotes, 
+           latitude, longitude, googlePlaceId, address, displayOrder, createdAt
+
+-- Purchased Lists (buyer orders)
+purchased_lists: id, userId, listId, orderId, purchaseDate, lastSyncDate, 
+                 syncStatus, hasCustomModifications, googleMyMapId
+
+-- List Reviews
+list_reviews: id, listId, userId, rating, review, createdAt
+
+-- User Preferences (currency selection)
+user_preferences: id, userId, preferredCurrency, createdAt, updatedAt
+
+-- Stores (updated with currency support)
+stores: id, name, slug, description, userId, currency
+
+-- Orders (unchanged - handles location list purchases)
 orders: id, prettyOrderId, storeId, items, total, stripePaymentIntentId, 
         stripePaymentIntentStatus, name, email, createdAt, addressId
 
--- Carts (User-associated)
+-- Carts (unchanged)
 carts: id, items, paymentIntentId, clientSecret, isClosed, userId
-
--- Payments (Stripe Connect accounts)
-payments: id, storeId, stripeAccountId
-
--- Stores (Seller accounts)
-stores: id, name, slug, description, userId
-
--- Addresses (Order shipping)
-addresses: id, line1, line2, city, state, postal_code, country
 ```
 
 ---
 
-## 💳 **Payment System**
+## 💳 **Payment System - Simplified USD**
+
+### **Currency Architecture**
+- **Backend Storage:** All prices stored in USD only
+- **Stripe Processing:** All payments in USD (prevents conversion issues)
+- **Frontend Display:** 24+ currencies with real-time conversion
+- **User Experience:** Currency selector in top navigation
 
 ### **Stripe Configuration**
 - **Main Account:** Platform account (receives 10% fees)
 - **Connect Accounts:** Express accounts for sellers
-- **Webhook Endpoints:**
-  - `https://mapbuddi.com/api/webhooks/stripe` (main account)
-  - `https://mapbuddi.com/api/webhooks/stripe/connect` (Connect accounts)
+- **Currency:** USD only for all transactions
+- **Fee Structure:** 10% of all sales (collected via `application_fee_amount`)
 
-### **Fee Structure**
-- **Platform Fee:** 10% of all sales (collected via `application_fee_amount`)
-- **Calculation:** Applied to PaymentIntents during creation/update
-- **Constant:** `platformFeeDecimal = 0.10` in `lib/application-constants.tsx`
-
----
-
-## 🔐 **Authentication & Authorization**
-
-### **Clerk Setup**
-- **Middleware:** `clerkMiddleware()` (latest version)
-- **Public Routes:** Webhooks, storefront pages
-- **Protected Routes:** All `/account/*` pages
-- **User Association:** Carts and stores linked to Clerk user IDs
+### **Exchange Rates (Current)**
+```javascript
+USD: 1.00, EUR: 0.92, GBP: 0.79, JPY: 149.5, AUD: 1.514, 
+CAD: 1.37, CHF: 0.88, CNY: 7.24, SEK: 10.85, NOK: 10.95
+// + 14 more currencies with real market rates
+```
 
 ---
 
-## 📈 **Seller Analytics Dashboard**
+## 🗺️ **Location Lists Feature - IMPLEMENTED**
 
-### **Orders Page** (`/account/selling/orders`)
-**Summary Cards:**
-- Total Sales Value (lifetime)
-- Net Earnings (after 10% platform fee)
-- Total Orders count
-- Average Order Value
-- Last 30 Days Sales & Orders
-- Platform Fees Paid
+### **✅ Completed Features**
 
-**Analytics Sections:**
-- Product Performance (top 5 by revenue)
-- Monthly Sales Breakdown (last 6 months)
-- Recent Orders List (last 10)
+#### **Seller Interface**
+- **List Creation:** Name, description, price (USD), cover image
+- **Category Management:** Custom categories with emoji identifiers
+- **POI Management:** Add locations via Google Places API or manual entry
+- **List Editor:** Comprehensive form with tabs for details, categories, POIs
+- **List Status:** Draft/Live toggle for publishing
 
-### **Payments Page** (`/account/selling/payments`)
-- Available Balance (ready for payout)
-- Pending Balance (processing)
-- Recent Payouts (last 5 with status)
-- Stripe Account Details
+#### **Google Places Integration**
+- **Search API:** Find existing POIs by name/location
+- **Place Details:** Fetch coordinates, address, place ID
+- **Manual Entry:** Custom locations with coordinates
+- **Validation:** Ensure POI data integrity
+
+#### **Buyer Experience**
+- **Browse Lists:** Dedicated `/lists` page with filtering
+- **List Details:** Individual list pages with POI previews
+- **Purchase Flow:** Simplified checkout (no quantities)
+- **Cart System:** Single-purchase model (qty always 1)
+- **Currency Display:** Prices shown in user's preferred currency
+
+#### **Database & Backend**
+- **Schema Migration:** All location lists tables created
+- **API Routes:** CRUD operations for lists, categories, POIs
+- **Data Validation:** Proper handling of coordinates, images
+- **Error Handling:** Fixed database type mismatches
+
+#### **UI/UX Improvements**
+- **No Quantity System:** Location lists purchased once only
+- **Currency Selector:** Visible dropdown in top navigation
+- **Simplified Cart:** Cover | List Name | Price | Remove
+- **Clean Navigation:** "Location Lists" instead of "Products"
+- **Responsive Design:** Works on mobile and desktop
 
 ---
 
-## 🛒 **E-commerce Features**
+## 🛒 **E-commerce Features - Updated**
 
-### **Digital Products**
-- ✅ No inventory tracking (removed completely)
-- ✅ Unlimited availability
-- ✅ Image uploads via UploadThing
+### **Location Lists (Digital Products)**
+- ✅ No inventory tracking (one-time digital purchases)
+- ✅ Unlimited availability per list
+- ✅ Cover image uploads via UploadThing
 - ✅ Multi-vendor support
+- ✅ Category-based organization
+- ✅ POI management with coordinates
 
-### **Shopping Cart**
+### **Shopping Cart - Simplified**
 - ✅ User-associated carts
 - ✅ Session persistence
 - ✅ Multi-vendor checkout support
-- ✅ Stripe PaymentIntent integration
+- ✅ No quantity selectors (always qty: 1)
+- ✅ Remove-only cart editing
+- ✅ Currency-aware totals
 
 ### **Order Management**
 - ✅ Webhook-driven order creation
-- ✅ Email notifications
-- ✅ Order history for buyers and sellers
+- ✅ Email notifications to user's account email
+- ✅ Order history shows purchased location lists
 - ✅ Pretty order IDs (sequential per store)
 
 ---
 
-## 🌐 **Deployment & Environments**
+## 🌐 **User Flows - Location Lists**
 
-### **Environment Variables Required**
-```bash
-# Database
-DATABASE_URL=postgresql://postgres:[PASSWORD]@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres
+### **Seller Workflow**
+1. **Create Account** → Connect Stripe → Create Store
+2. **New List** → Add name, description, price (USD), cover image
+3. **Add Categories** → Name + emoji (🍽️ Restaurants, 🎭 Attractions)
+4. **Add POIs** → Search Google Places or enter manually with coordinates
+5. **Organize** → Assign POIs to categories, add seller notes
+6. **Publish** → Set list as "Live" to make available for purchase
 
-# Clerk Authentication
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
-CLERK_SECRET_KEY=sk_...
+### **Buyer Workflow**
+1. **Browse Lists** → Visit `/lists` page, filter by seller
+2. **Select Currency** → Choose display currency from top navigation
+3. **View Details** → See list preview, categories, POI count
+4. **Add to Cart** → Single click (no quantity selection)
+5. **Checkout** → Automatic email from signed-in account
+6. **Purchase** → Payment processed in USD, list appears in order history
 
-# Stripe
-STRIPE_SECRET_KEY=sk_...
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-STRIPE_CONNECT_WEBHOOK_SECRET=whsec_...
-
-# UploadThing
-UPLOADTHING_SECRET=sk_...
-UPLOADTHING_APP_ID=...
-
-# App URL
-NEXT_PUBLIC_APP_URL=https://mapbuddi.com
-```
-
-### **Vercel Configuration**
-- **Production:** `main` branch → `https://mapbuddi.com`
-- **Staging:** `staging` branch → `https://staging.mapbuddi.com`
-- **Protection:** Disabled for webhook endpoints
-- **Build Command:** `pnpm run build`
+### **Currency Experience**
+1. **Default Display** → USD for all users initially
+2. **Currency Selection** → Globe icon in top navigation
+3. **Real-time Conversion** → All prices update immediately
+4. **Persistent Choice** → Currency preference saved in localStorage
+5. **Accurate Rates** → USD $10 = AUD $15.14 (current market rates)
 
 ---
 
-## 🔧 **Key File Locations**
-
-### **Core Configuration**
-- `db/schema.ts` - Database schema definitions
-- `db/db.ts` - Database connection (Supabase)
-- `drizzle.config.ts` - ORM configuration
-- `middleware.ts` - Clerk authentication middleware
-
-### **Payment Logic**
-- `server-actions/stripe/payment.ts` - PaymentIntent creation/updates
-- `server-actions/stripe/account.ts` - Stripe Connect management
-- `app/api/webhooks/stripe/route.ts` - Main webhook handler
-- `app/api/webhooks/stripe/connect/route.ts` - Connect webhook handler
-
-### **UI Components**
-- `components/admin/` - Seller dashboard components
-- `components/storefront/` - Buyer-facing components
-- `components/ui/` - Reusable UI components (Radix-based)
-
-### **Analytics**
-- `app/account/selling/(orders)/orders/page.tsx` - Seller analytics dashboard
-- `app/account/selling/payments/page.tsx` - Payout management
-
----
-
-## 🐛 **Known Issues & Solutions**
-
-### **Resolved Issues**
-- ✅ **Cart Persistence:** Fixed user association
-- ✅ **Webhook Delivery:** Both main and Connect webhooks working
-- ✅ **PaymentIntent Reuse:** Proper status checking implemented
-- ✅ **Inventory Removal:** All references cleaned up
-- ✅ **Platform Fees:** 10% fee collection working
-
-### **Test Data**
-- **Staging Balance Discrepancy:** $1,361.06 pending includes $590 in test payments from development (intentionally left as-is)
-- **Debug Tool:** `/debug/stripe-orders` available for troubleshooting
-
----
-
-## 📋 **Recent Major Changes**
-
-### **Database Migration** (Sept 29, 2025)
-- Migrated from MySQL to Supabase PostgreSQL
-- Updated all Drizzle ORM configurations
-- Fixed connection pooling issues
-
-### **Stripe Updates** (Sept 29, 2025)
-- Updated to latest Stripe API version (2025-08-27.basil)
-- Switched to Express Connect accounts
-- Implemented proper webhook handling
-
-### **Digital Products** (Oct 5, 2025)
-- Removed all inventory-related functionality
-- Updated UI components and database schema
-- Simplified product management
-
-### **Analytics Dashboard** (Oct 5, 2025)
-- Added comprehensive seller analytics
-- Implemented payout tracking
-- Created performance metrics
-
----
-
-## 🎯 **Current Capabilities**
+## 🎯 **Current Capabilities - Location Lists Platform**
 
 ### **For Sellers**
-- ✅ Create and manage digital products
-- ✅ Connect Stripe Express accounts
-- ✅ View comprehensive sales analytics
-- ✅ Track earnings and payouts
-- ✅ Manage orders and customers
+- ✅ Create and manage location lists with POIs
+- ✅ Organize POIs into emoji-categorized groups
+- ✅ Use Google Places API for POI discovery
+- ✅ Add custom locations with coordinates
+- ✅ Set USD pricing with global currency display
+- ✅ Track sales and earnings in seller dashboard
+- ✅ Manage orders and customer communications
 
 ### **For Buyers**
-- ✅ Browse multi-vendor marketplace
-- ✅ Add products to cart from multiple sellers
-- ✅ Secure checkout with Stripe
-- ✅ View purchase history
-- ✅ Receive email confirmations
+- ✅ Browse curated location lists from multiple sellers
+- ✅ View prices in 24+ currencies with real exchange rates
+- ✅ Purchase lists with simplified checkout (no quantities)
+- ✅ See purchase history with location list details
+- ✅ Experience clean, location-focused interface
 
 ### **For Platform (MapBuddi)**
-- ✅ Collect 10% fees automatically
-- ✅ Support unlimited sellers
-- ✅ Process payments via Stripe Connect
-- ✅ Handle webhooks reliably
+- ✅ Collect 10% fees automatically on all list sales
+- ✅ Support unlimited location list creators
+- ✅ Process payments in USD via Stripe Connect
+- ✅ Handle multi-currency display without conversion complexity
+- ✅ Provide location-specific marketplace experience
 
 ---
 
-## 🔮 **Architecture Notes**
+## 🔧 **Key File Locations - Updated**
 
-### **Multi-Vendor Checkout**
-- Each store has separate checkout flows (`/checkout/[storeSlug]`)
-- PaymentIntents created per store's Stripe Connect account
-- Platform fees applied via `application_fee_amount`
+### **Location Lists Core**
+- `db/schema.ts` - Location lists, categories, POIs tables
+- `app/api/location-lists/` - CRUD API routes for lists
+- `components/admin/location-list-editor*` - List creation interface
+- `app/account/selling/lists/` - Seller list management pages
 
-### **User Flow**
-1. **Seller:** Sign up → Create store → Connect Stripe → Add products
-2. **Buyer:** Browse → Add to cart → Checkout → Receive products
-3. **Platform:** Collect fees → Process payouts → Provide analytics
+### **Currency System**
+- `hooks/use-currency.ts` - Currency conversion and formatting
+- `components/currency-selector.tsx` - Top navigation currency picker
+- `lib/currency.ts` - Currency utilities and supported currencies
 
-### **Data Flow**
-1. **Payment:** Stripe PaymentIntent created with platform fee
-2. **Webhook:** Order created in database upon payment success
-3. **Cart:** Closed and cleared after successful payment
-4. **Analytics:** Real-time calculations from order data
+### **Google Integration**
+- `lib/google-places.ts` - Google Places API integration
+- `app/api/places/` - Places search and details endpoints
+
+### **Updated Storefront**
+- `app/(storefront)/(main)/lists/` - Location lists browsing
+- `app/(storefront)/(main)/list/[listId]/` - Individual list pages
+- `components/storefront/location-list-card.tsx` - List display component
+
+---
+
+## 🐛 **Recent Fixes & Issues Resolved**
+
+### **✅ Major Issues Fixed**
+- **Server-Side Rendering:** Fixed `useCurrency` hook in client components
+- **Currency Conversion:** Updated to real exchange rates (USD $10 = AUD $15.14)
+- **Quantity System:** Completely removed - lists purchased once only
+- **Cart Interface:** Simplified to Cover | Name | Price | Remove
+- **Navigation:** Fixed "Location Lists" link to go to `/lists` page
+- **Database Types:** Fixed coordinate storage (decimal vs string)
+- **List Updates:** Fixed API errors when updating existing lists
+- **Checkout Email:** Automatically uses signed-in user's email
+- **Build Errors:** Fixed all TypeScript and ESLint issues
+
+### **✅ UX Improvements**
+- **Currency Selector:** Now visible with proper styling in top nav
+- **Purchase Flow:** No confusing quantity selectors
+- **Cart Editing:** Simple trash icon for removal
+- **Price Display:** Consistent currency symbols throughout
+- **List Creation:** Streamlined seller interface
+
+---
+
+## 📋 **Recent Major Changes - Location Lists Transformation**
+
+### **Platform Transformation** (December 2025)
+- **Complete Migration:** From general digital products to location lists
+- **Database Schema:** Added 5 new tables for location list system
+- **Google Integration:** Places API for POI search and validation
+- **Currency System:** USD backend with multi-currency display
+- **UI Overhaul:** Location-focused interface throughout
+
+### **Payment Simplification** (December 2025)
+- **USD-Only Backend:** All prices stored and processed in USD
+- **Multi-Currency Display:** 24+ currencies with real exchange rates
+- **No Quantity System:** One-time purchases only
+- **Improved Checkout:** Automatic email from signed-in accounts
+
+### **User Experience** (December 2025)
+- **Simplified Cart:** No quantity confusion
+- **Currency Selection:** Prominent in top navigation
+- **Location Focus:** All UI text updated for location lists
+- **Mobile Responsive:** Currency selector and list browsing
+
+---
+
+## 🔮 **Next Phase - Google Maps Sync**
+
+### **🚧 Still To Implement**
+- **KML Generation:** Export purchased lists to Google My Maps format
+- **Google OAuth:** Authentication for Maps/Drive access
+- **One-Click Sync:** Direct import to user's Google My Maps
+- **Sync Management:** Toggle sync on/off for purchased lists
+- **List Previews:** Map view of POIs without revealing specific locations
+
+### **Technical Requirements**
+- **Google APIs:** Drive API, My Maps API
+- **OAuth Scopes:** `https://www.googleapis.com/auth/drive.file`
+- **KML Structure:** Categories as folders, POIs with custom icons
+- **Error Handling:** Graceful fallback to manual KML download
 
 ---
 
 ## 📞 **For Future Development**
 
-### **Quick Reference Commands**
+### **Current Status Commands**
 ```bash
-# Switch to staging for development
+# Work on location lists features
 git checkout staging
 
-# Deploy to production
-git checkout main && git merge staging && git push origin main
+# Test currency conversion
+# Visit: /lists and change currency in top nav
 
-# Database migrations
-npx drizzle-kit generate && npx drizzle-kit push
+# Test list creation
+# Visit: /account/selling/lists/new
 
-# Debug payments
-# Visit: /debug/stripe-orders
+# Debug location lists
+# Check database: location_lists, list_categories, list_pois tables
 ```
 
-### **Common Tasks**
-- **Add new features:** Work in `staging` branch
-- **Update environment variables:** Vercel dashboard
-- **Check webhooks:** Stripe dashboard → Webhooks
-- **Database queries:** Use Supabase dashboard or MCP tools
-- **Debug payments:** Use `/debug/stripe-orders` page
+### **Ready for Google Maps Integration**
+- **Database:** All location data properly stored with coordinates
+- **UI:** List creation and management interfaces complete  
+- **Purchase Flow:** Buyers can successfully purchase location lists
+- **Next Step:** Implement KML generation and Google OAuth flow
 
 ---
 
-## 🗺️ **Location Lists Feature - Implementation Plan**
-
-### **Product Vision**
-Transform MapBuddi from a general digital marketplace to a location-based curated list platform where sellers create POI collections that buyers can sync directly into their Google Maps.
-
-### **Core Concept**
-- **Sellers** create curated location lists (e.g., "Best of Lisbon") with categorized POIs
-- **Buyers** purchase lists and sync them to their personal Google Maps via My Maps
-- **Categories** within lists have emoji identifiers and custom POI notes from sellers
-
-### **Technical Implementation Strategy**
-
-#### **Database Schema Extensions**
-```sql
--- Location Lists (replaces general products)
-location_lists: id, name, description, price, coverImage, storeId, 
-                isActive, totalPois, avgRating, createdAt
-
--- Categories within lists  
-list_categories: id, listId, name, emoji, iconColor, displayOrder
-
--- Points of Interest
-list_pois: id, categoryId, name, description, sellerNotes, 
-           latitude, longitude, googlePlaceId, address, displayOrder
-
--- Purchased Lists
-purchased_lists: id, userId, listId, purchaseDate, lastSyncDate, 
-                 syncStatus, hasCustomModifications
-
--- List Reviews (future)
-list_reviews: id, listId, userId, rating, review, createdAt
-```
-
-#### **Google Maps Integration**
-- **Method**: KML file generation for Google My Maps import
-- **Authentication**: Google OAuth 2.0 for Drive/Maps access
-- **API Usage**: Google Places API for POI search and validation
-- **Cost Management**: ~$0.50/month per active seller in API costs
-
-#### **Seller Workflow**
-1. **Create List**: Name, description, cover image, price
-2. **Add Categories**: Name + emoji (🍽️ Restaurants, 🎭 Attractions, etc.)
-3. **Add POIs**: 
-   - Search Google Places API for existing locations
-   - Manual entry for custom spots (sunset viewpoints, hidden gems)
-   - Add seller notes and assign to categories
-4. **Preview & Publish**: Test KML generation, set pricing
-
-#### **Buyer Workflow**
-1. **Browse Lists**: See preview with category counts and sample map
-2. **Purchase**: Standard Stripe checkout flow
-3. **Google Auth**: One-time authentication for Maps access
-4. **Sync to Maps**: 
-   - Generate KML file with custom styling per category
-   - Auto-import to Google My Maps or provide download link
-   - Toggle sync on/off for purchased lists
-
-#### **MVP Feature Set**
-- ✅ List creation and management for sellers
-- ✅ POI search via Google Places API
-- ✅ Manual POI entry with coordinates
-- ✅ Category organization with emoji identifiers
-- ✅ List purchasing and order management
-- ✅ KML generation and Google Maps sync
-- ✅ Basic list previews for browsers
-
-#### **Phase 2 Features** (Post-MVP)
-- List reviews and ratings
-- Seller profile pages with all their lists
-- List update notifications and re-sync options
-- Buyer modifications to purchased lists
-- Advanced search and filtering
-- Apple Maps integration
-- Social sharing and list discovery
-
-### **Business Model Update**
-- **Sellers**: $30/month subscription + 10% of sales
-- **Buyers**: Individual list purchases ($5-50 typical range)
-- **Platform Costs**: Google API usage (~$0.50/seller/month)
-- **Revenue**: Subscription fees + sales commissions - API costs
-
-### **Development Priority**
-1. **Database Migration**: Add location lists schema
-2. **Google Integration**: Places API + OAuth setup  
-3. **Seller Interface**: List creation and POI management
-4. **KML Generation**: Export functionality for My Maps
-5. **Buyer Interface**: Browse, purchase, sync workflow
-6. **Testing**: End-to-end workflow validation
-
-### **Success Metrics**
-- Lists created per seller per month
-- Average POIs per list (target: 15-30)
-- Purchase conversion rate from preview views
-- Successful sync rate to Google Maps
-- Seller retention on subscription model
-
----
-
-**This document should be updated whenever major changes are made to the platform.**
+**This document reflects the successful transformation of MapBuddi into a location lists marketplace with simplified currency handling and improved user experience. The platform is ready for the final Google Maps sync implementation.**
