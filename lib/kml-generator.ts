@@ -115,7 +115,23 @@ function generateStyles(pois: POIData[]): string {
     const emoji = poi?.category.emoji || '📍';
     
     // Convert emoji to a usable icon URL using Twemoji
-    const emojiCode = emoji.codePointAt(0)?.toString(16).padStart(4, '0');
+    const emojiCodePoint = emoji.codePointAt(0);
+    let emojiCode = '';
+    
+    if (emojiCodePoint) {
+      // Handle both basic and extended Unicode characters
+      if (emojiCodePoint >= 0x10000) {
+        // For emojis with surrogates, we need both code points
+        const high = Math.floor((emojiCodePoint - 0x10000) / 0x400) + 0xD800;
+        const low = ((emojiCodePoint - 0x10000) % 0x400) + 0xDC00;
+        emojiCode = emojiCodePoint.toString(16);
+      } else {
+        emojiCode = emojiCodePoint.toString(16);
+      }
+    } else {
+      emojiCode = '1f4cd'; // Default pin emoji
+    }
+    
     const iconUrl = `https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/${emojiCode}.png`;
     
     return `

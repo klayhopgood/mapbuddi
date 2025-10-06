@@ -186,6 +186,7 @@ async function createGoogleMyMap(
     };
     
     console.log("Creating KML file with payload:", createPayload);
+    console.log("Folder ID being used:", folderId || "root folder");
     
     // Step 1: Create metadata for the file
     const createResponse = await fetch('https://www.googleapis.com/drive/v3/files', {
