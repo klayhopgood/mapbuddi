@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { Text } from "../ui/text";
 import { MapPin, Star } from "lucide-react";

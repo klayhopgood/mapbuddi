@@ -12,84 +12,56 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "../ui/button";
 import { CartItem, CartLineItemDetails } from "@/lib/types";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
 import { updateCart } from "@/server-actions/update-cart";
 import { useState } from "react";
-import { handleInputQuantity } from "@/lib/utils";
 import { toast } from "../ui/use-toast";
+import { Trash2 } from "lucide-react";
 
 export const EditCartLineItem = (props: {
   listInCart: CartItem | undefined;
   list: CartLineItemDetails;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [quantity, setQuantity] = useState<string | number>(
-    props.listInCart?.qty ?? 1
-  );
 
   return (
     <>
       <AlertDialog open={isOpen}>
-        <Button onClick={() => setIsOpen((prev) => !prev)} variant="outline">
-          Edit
+        <Button 
+          onClick={() => setIsOpen(true)} 
+          variant="outline" 
+          size="sm"
+          className="text-red-600 hover:text-red-700"
+        >
+          <Trash2 size={16} />
         </Button>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Edit {props.list.name}</AlertDialogTitle>
+            <AlertDialogTitle>Remove from Cart</AlertDialogTitle>
             <AlertDialogDescription>
-              Change the quantity or remove this location list from your cart.
+              Are you sure you want to remove "{props.list.name}" from your cart?
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="mb-6">
-            <Label className="my-2 block">Quantity</Label>
-            <Input
-              type="number"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              onBlur={(e) => handleInputQuantity(e, setQuantity, 0)}
-            />
-          </div>
-          <AlertDialogFooter className="flex items-center justify-between">
-            <Button
-              variant="destructiveOutline"
-              className="mr-auto"
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
               onClick={() => {
-                setIsOpen((prev) => !prev);
+                setIsOpen(false);
                 if (props.listInCart) {
                   void updateCart({
                     ...props.listInCart,
                     qty: 0,
                   });
                   toast({
-                    title: "Cart updated",
+                    title: "Removed from cart",
                     description: `${props.list.name} has been removed from your cart.`,
                   });
                 }
               }}
+              className="bg-red-600 hover:bg-red-700"
             >
-              Remove from cart
-            </Button>
-            <AlertDialogCancel onClick={() => setIsOpen((prev) => !prev)}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              disabled={!props.listInCart}
-              onClick={() => {
-                setIsOpen((prev) => !prev);
-                if (props.listInCart) {
-                  void updateCart({
-                    ...props.listInCart,
-                    qty: Number(quantity),
-                  });
-                  toast({
-                    title: "Cart updated",
-                    description: `${props.list.name} has been updated in your cart.`,
-                  });
-                }
-              }}
-            >
-              Update
+              Remove
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

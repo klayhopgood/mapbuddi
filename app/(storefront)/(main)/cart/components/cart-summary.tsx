@@ -33,10 +33,8 @@ export function CartSummary({ uniqueStoreIds, cartItems, cartItemDetails }: Cart
               cartItemDetails
                 .filter((item) => item.storeId === storeId)
                 .reduce((accum, curr) => {
-                  const quantityInCart = cartItems.find(
-                    (item) => item.id === curr.id
-                  )?.qty;
-                  return accum + Number(curr.price) * (quantityInCart ?? 0);
+                  // Each list can only be purchased once, so no quantity multiplication
+                  return accum + Number(curr.price);
                 }, 0)
             )}
           </p>

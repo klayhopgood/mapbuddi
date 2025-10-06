@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Table,
   TableBody,
@@ -27,18 +29,8 @@ export const CartLineItems = (props: {
         <TableRow>
           <TableHead className="w-[100px]">Cover</TableHead>
           <TableHead>List Name</TableHead>
-          {props.variant === "cart" ? (
-            <>
-              <TableHead>Price</TableHead>
-              <TableHead>Quantity</TableHead>
-            </>
-          ) : (
-            <>
-              <TableHead>Quantity</TableHead>
-              <TableHead className="text-right">Price</TableHead>
-            </>
-          )}
-          {props.variant === "cart" ? <TableHead>Total</TableHead> : null}
+          <TableHead className="text-right">Price</TableHead>
+          {props.variant === "cart" ? <TableHead></TableHead> : null}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -73,28 +65,9 @@ export const CartLineItems = (props: {
                   </Button>
                 )}
               </TableCell>
-              {props.variant === "cart" ? (
-                <>
-                  <TableCell>
-                    {formatDisplayPrice(Number(list.price))}
-                  </TableCell>
-                  <TableCell>{currentListInCart?.qty}</TableCell>
-                </>
-              ) : (
-                <>
-                  <TableCell>{currentListInCart?.qty}</TableCell>
-                  <TableCell className="text-right">
-                    {formatDisplayPrice(Number(list.price))}
-                  </TableCell>
-                </>
-              )}
-              {props.variant === "cart" ? (
-                <TableCell>
-                  {formatDisplayPrice(
-                    Number(currentListInCart?.qty) * Number(list.price)
-                  )}
-                </TableCell>
-              ) : null}
+              <TableCell className="text-right">
+                {formatDisplayPrice(Number(list.price))}
+              </TableCell>
               {props.variant === "cart" ? (
                 <TableCell className="text-right">
                   <EditCartLineItem
