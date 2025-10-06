@@ -34,11 +34,16 @@ export async function PUT(
 
     // Start transaction
     const result = await db.transaction(async (tx) => {
-      // Update the location list
+      // Update the location list - only include safe fields
       const [updatedList] = await tx
         .update(locationLists)
         .set({
-          ...list,
+          name: list.name,
+          description: list.description,
+          price: list.price,
+          currency: list.currency,
+          coverImage: list.coverImage,
+          isActive: list.isActive,
           totalPois: pois.length,
           updatedAt: new Date(),
         })
@@ -87,8 +92,8 @@ export async function PUT(
             name: poi.name,
             description: poi.description,
             sellerNotes: poi.sellerNotes,
-            latitude: poi.latitude.toString(),
-            longitude: poi.longitude.toString(),
+            latitude: poi.latitude,
+            longitude: poi.longitude,
             googlePlaceId: poi.googlePlaceId,
             address: poi.address,
             displayOrder: 0,

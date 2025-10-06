@@ -28,11 +28,16 @@ export async function POST(request: NextRequest) {
 
     // Start transaction
     const result = await db.transaction(async (tx) => {
-      // Create the location list
+      // Create the location list - only include safe fields
       const [newList] = await tx
         .insert(locationLists)
         .values({
-          ...list,
+          name: list.name,
+          description: list.description,
+          price: list.price,
+          currency: list.currency,
+          coverImage: list.coverImage,
+          isActive: list.isActive,
           storeId,
           totalPois: pois.length,
         })
@@ -64,8 +69,8 @@ export async function POST(request: NextRequest) {
             name: poi.name,
             description: poi.description,
             sellerNotes: poi.sellerNotes,
-            latitude: poi.latitude.toString(),
-            longitude: poi.longitude.toString(),
+            latitude: poi.latitude,
+            longitude: poi.longitude,
             googlePlaceId: poi.googlePlaceId,
             address: poi.address,
             displayOrder: 0,
