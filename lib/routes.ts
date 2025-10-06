@@ -27,7 +27,7 @@ export const singleLevelNestedRoutes = {
     products: routes.account + "/selling/products",
     orders: routes.account + "/selling/orders",
     "abandoned-carts": routes.account + "/selling/abandoned-carts",
-    payments: routes.account + "/selling/payments-new", // Updated to new payments page
+    payments: routes.account + "/selling/payments",
     "your-purchases": routes.account + "/buying/purchases",
   },
 };

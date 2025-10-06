@@ -8,7 +8,6 @@ import SignInWrapper from "@/components/sign-in";
 import { singleLevelNestedRoutes } from "@/lib/routes";
 import { MenuItems, SecondaryMenu } from "@/components/secondary-menu";
 import { Line } from "@/components/line";
-import { PaymentConnectionStatus } from "@/components/admin/payment-connection-status";
 
 export default async function AdminLayout({ children }: PropsWithChildren) {
   return (
@@ -27,7 +26,6 @@ export default async function AdminLayout({ children }: PropsWithChildren) {
         <div>
           <ContentWrapper className="w-full py-2 flex items-center justify-between">
             <SecondaryMenu menuItems={menuItems} />
-            <PaymentConnectionStatus />
           </ContentWrapper>
         </div>
         <Line />
