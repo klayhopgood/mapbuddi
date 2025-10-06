@@ -10,6 +10,16 @@ import { createSlug } from "@/lib/createSlug";
 
 export async function createStore(storeName: string) {
   try {
+    const user = await currentUser();
+    if (!user) {
+      const res = {
+        error: true,
+        message: "Unauthenticated",
+        action: "User is not authenticated",
+      };
+      return res;
+    }
+
     const existingStore = await db
       .select()
       .from(stores)
@@ -29,18 +39,8 @@ export async function createStore(storeName: string) {
     const [{ id: storeId }] = await db.insert(stores).values({
       name: storeName,
       slug: createSlug(storeName),
+      userId: user.id, // ✅ Fix: Set the user_id when creating store
     }).returning();
-
-    const user = await currentUser();
-    if (!user) {
-      const res = {
-        error: false,
-        message: "Unauthenticated",
-        action: "User is not authenticated",
-      };
-
-      return res;
-    }
 
     if (user?.privateMetadata.storeId) {
       const res = {
