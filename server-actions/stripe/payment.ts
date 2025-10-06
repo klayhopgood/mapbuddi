@@ -103,7 +103,8 @@ export async function createPaymentIntent({
     
     return { clientSecret: paymentIntent.client_secret };
   } catch (err) {
-    console.log(err);
+    console.error("Error creating payment intent:", err);
+    throw new Error(`Failed to create payment intent: ${err instanceof Error ? err.message : 'Unknown error'}`);
   }
 }
 

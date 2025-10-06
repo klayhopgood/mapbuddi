@@ -32,22 +32,31 @@ export default function CheckoutWrapper(props: {
   useEffect(() => {
     console.log("=== CHECKOUT WRAPPER DEBUG ===");
     setLoading(true);
-    props.paymentIntent.then((data) => {
-      console.log("Payment intent data:", data);
-      if (!data || !data.clientSecret) {
-        console.error("No client secret found in payment intent data");
-        setError("Failed to initialize payment. Please try again.");
+    
+    // Handle the payment intent promise properly
+    const handlePaymentIntent = async () => {
+      try {
+        const data = await props.paymentIntent;
+        console.log("Payment intent data:", data);
+        
+        if (!data || !data.clientSecret) {
+          console.error("No client secret found in payment intent data");
+          setError("Failed to initialize payment. Please try again.");
+          setLoading(false);
+          return;
+        }
+        
+        console.log("Setting client secret:", data.clientSecret);
+        setClientSecret(data.clientSecret);
         setLoading(false);
-        return;
+      } catch (error) {
+        console.error("Error in payment intent:", error);
+        setError(`Payment initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        setLoading(false);
       }
-      console.log("Setting client secret:", data.clientSecret);
-      setClientSecret(data.clientSecret);
-      setLoading(false);
-    }).catch((error) => {
-      console.error("Error in payment intent:", error);
-      setError(`Payment initialization failed: ${error.message}`);
-      setLoading(false);
-    });
+    };
+    
+    handlePaymentIntent();
   }, [props.paymentIntent]);
 
   const options = {
