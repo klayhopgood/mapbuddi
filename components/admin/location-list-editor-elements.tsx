@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { LocationList } from "@/db/schema";
+import { LocationList, ListCategory, ListPoi } from "@/db/schema";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { toast } from "../ui/use-toast";
@@ -56,6 +56,8 @@ export const LocationListEditorElements = (props: {
   displayType?: "page" | "modal";
   listStatus: "new-list" | "existing-list";
   initialValues?: LocationList;
+  initialCategories?: ListCategory[];
+  initialPois?: ListPoi[];
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -67,8 +69,22 @@ export const LocationListEditorElements = (props: {
     props.initialValues ?? defaultValues
   );
 
-  const [categories, setCategories] = useState<ListCategory[]>(defaultCategories);
-  const [pois, setPois] = useState<ListPOI[]>([]);
+  const [categories, setCategories] = useState<ListCategory[]>(
+    props.initialCategories ?? defaultCategories
+  );
+  const [pois, setPois] = useState<ListPOI[]>(
+    props.initialPois?.map(poi => ({
+      id: poi.id,
+      categoryId: poi.categoryId,
+      name: poi.name,
+      description: poi.description,
+      sellerNotes: poi.sellerNotes,
+      latitude: parseFloat(poi.latitude),
+      longitude: parseFloat(poi.longitude),
+      googlePlaceId: poi.googlePlaceId,
+      address: poi.address
+    })) ?? []
+  );
   const [activeTab, setActiveTab] = useState("basic");
 
   const dismissModal = useCallback(() => {
@@ -183,8 +199,13 @@ export const LocationListEditorElements = (props: {
         totalPois: pois.length,
       };
 
-      const response = await fetch("/api/location-lists", {
-        method: "POST",
+      const method = props.listStatus === "existing-list" ? "PUT" : "POST";
+      const url = props.listStatus === "existing-list" 
+        ? `/api/location-lists/${props.initialValues?.id}` 
+        : "/api/location-lists";
+
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           list: listData,
@@ -198,13 +219,15 @@ export const LocationListEditorElements = (props: {
       if (data.error) {
         toast({
           title: "Error",
-          description: data.message || "Failed to create location list",
+          description: data.message || "Failed to save location list",
           variant: "destructive",
         });
       } else {
         toast({
           title: "Success",
-          description: "Location list created successfully!",
+          description: props.listStatus === "existing-list" 
+            ? "Location list updated successfully!" 
+            : "Location list created successfully!",
         });
         router.push("/account/selling/lists");
         router.refresh();
@@ -212,7 +235,7 @@ export const LocationListEditorElements = (props: {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to create location list",
+        description: "Failed to save location list",
         variant: "destructive",
       });
     } finally {
