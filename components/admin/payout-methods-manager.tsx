@@ -120,9 +120,18 @@ export default function PayoutMethodsManager({ storeId, currentMethods, onSave }
                   {currentMethods.preferredMethod === "bank_au" && `****${currentMethods.auAccountNumber?.slice(-4)}`}
                 </p>
               </div>
-              <Badge variant="secondary" className="bg-green-100 text-green-800">
-                Active
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                  Active
+                </Badge>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setSelectedMethod(currentMethods.preferredMethod)}
+                >
+                  Change Method
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -363,7 +372,10 @@ export default function PayoutMethodsManager({ storeId, currentMethods, onSave }
               className="w-full" 
               disabled={isPending}
             >
-              {isPending ? "Saving..." : "Save Payout Method"}
+              {isPending 
+                ? (currentMethods ? "Updating..." : "Saving...") 
+                : (currentMethods ? "Update Payout Method" : "Save Payout Method")
+              }
             </Button>
           </div>
         </CardContent>
