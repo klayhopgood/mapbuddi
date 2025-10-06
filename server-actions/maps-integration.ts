@@ -150,20 +150,35 @@ export async function toggleListSync(
       // Toggle existing sync
       const currentStatus = existingSync[0].googleMapsSyncEnabled;
       
-      await db
-        .update(purchasedListSync)
-        .set({
-          googleMapsSyncEnabled: !currentStatus,
-          updatedAt: now,
-        })
-        .where(eq(purchasedListSync.id, existingSync[0].id));
+      if (!currentStatus) {
+        // Enabling sync - trigger immediate sync
+        await db
+          .update(purchasedListSync)
+          .set({
+            googleMapsSyncEnabled: true,
+            googleMapsSynced: false, // Reset sync status
+            updatedAt: now,
+          })
+          .where(eq(purchasedListSync.id, existingSync[0].id));
 
-      return { 
-        success: true, 
-        message: !currentStatus ? "Sync enabled" : "Sync disabled"
-      };
+        // Trigger sync in background
+        triggerBackgroundSync(userId, listId, orderId);
+        
+        return { success: true, message: "Sync enabled - processing..." };
+      } else {
+        // Disabling sync
+        await db
+          .update(purchasedListSync)
+          .set({
+            googleMapsSyncEnabled: false,
+            updatedAt: now,
+          })
+          .where(eq(purchasedListSync.id, existingSync[0].id));
+
+        return { success: true, message: "Sync disabled" };
+      }
     } else {
-      // Create new sync record
+      // Create new sync record and enable
       await db
         .insert(purchasedListSync)
         .values({
@@ -171,13 +186,42 @@ export async function toggleListSync(
           orderId,
           listId,
           googleMapsSyncEnabled: true,
+          googleMapsSynced: false,
         });
 
-      return { success: true, message: "Sync enabled" };
+      // Trigger sync in background
+      triggerBackgroundSync(userId, listId, orderId);
+
+      return { success: true, message: "Sync enabled - processing..." };
     }
   } catch (error) {
     console.error("Toggle sync error:", error);
     return { success: false, message: "Failed to update sync status" };
+  }
+}
+
+// Helper function to trigger sync without blocking the UI
+async function triggerBackgroundSync(userId: string, listId: number, orderId: number) {
+  try {
+    // Call our sync API endpoint
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    
+    fetch(`${baseUrl}/api/maps/sync`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        action: 'sync_list',
+        listId,
+        orderId,
+        userId, // Pass userId for internal API call
+      }),
+    }).catch(error => {
+      console.error("Background sync trigger failed:", error);
+    });
+  } catch (error) {
+    console.error("Failed to trigger background sync:", error);
   }
 }
 
