@@ -214,6 +214,7 @@ export const sellerPayoutMethods = pgTable("seller_payout_methods", {
   
   // PayPal (available worldwide)
   paypalEmail: text("paypal_email"),
+  paypalVerified: boolean("paypal_verified").default(false), // Track if PayPal email is verified
   
   // US Banking
   usRoutingNumber: text("us_routing_number"), // 9 digits

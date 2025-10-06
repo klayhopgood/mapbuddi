@@ -139,9 +139,26 @@ export default function PayoutMethodsManager({ storeId, currentMethods, onSave }
                   value={formData.paypalEmail}
                   onChange={(e) => handleInputChange("paypalEmail", e.target.value)}
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  Must be a verified PayPal account
-                </p>
+                <div className="mt-2 space-y-2">
+                  <p className="text-xs text-gray-500">
+                    Must be a verified PayPal account that can receive business payments
+                  </p>
+                  {formData.paypalEmail && (
+                    <div className="p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+                      <strong>⚠️ Important:</strong> We'll verify this email when processing your first payout. 
+                      If the account isn't verified or can't receive business payments, the payout will fail.
+                      <br />
+                      <a 
+                        href={`https://www.paypal.com/verified/pal=${formData.paypalEmail}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline mt-1 inline-block"
+                      >
+                        Check if this email is verified →
+                      </a>
+                    </div>
+                  )}
+                </div>
               </div>
             </TabsContent>
 
