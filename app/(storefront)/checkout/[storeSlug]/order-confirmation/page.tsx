@@ -1,6 +1,5 @@
 import { Heading } from "@/components/ui/heading";
 import { getPaymentIntentDetails } from "@/server-actions/stripe/payment";
-import { Verification } from "./components/verification";
 import { db } from "@/db/db";
 import { stores } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -39,7 +38,7 @@ export default async function OrderConfirmation({
   const { paymentDetails, isVerified } = await getPaymentIntentDetails({
     paymentIntentId: searchParams.payment_intent,
     storeSlug: params.storeSlug,
-    deliveryPostalCode: searchParams.delivery_postal_code,
+    deliveryPostalCode: "DIGITAL", // Digital products don't need postcode verification
   });
 
   const checkoutItems = JSON.parse(
@@ -173,8 +172,10 @@ export default async function OrderConfirmation({
               </Button>
             </Link>
           </div>
-          
-          <Verification />
+        </div>
+      ) : (
+        <div className="text-center">
+          <p>Processing your order...</p>
         </div>
       )}
     </div>

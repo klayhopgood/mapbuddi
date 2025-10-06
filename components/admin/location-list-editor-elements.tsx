@@ -43,7 +43,7 @@ const defaultValues = {
   price: "0",
   currency: "USD",
   coverImage: null,
-  isActive: false,
+  isActive: true, // New lists should be active by default
 };
 
 const defaultCategories: ListCategory[] = [
