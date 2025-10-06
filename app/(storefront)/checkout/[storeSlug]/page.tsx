@@ -3,7 +3,7 @@ import CheckoutWrapper from "../components/checkout-wrapper";
 import { cookies } from "next/headers";
 import { getCart } from "@/server-actions/get-cart-details";
 import { db } from "@/db/db";
-import { payments, products, stores } from "@/db/schema";
+import { payments, locationLists, stores } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { CheckoutItem } from "@/lib/types";
 import { CartLineItems } from "@/components/storefront/cart-line-items";
@@ -34,22 +34,21 @@ export default async function Page({
   const storeId = Number(store[0].storeId);
   const storeStripeAccountId = store[0].stripeAccountId;
 
-  const storeProducts = await db
+  const storeLists = await db
     .select({
-      id: products.id,
-      price: products.price,
+      id: locationLists.id,
+      price: locationLists.price,
     })
-    .from(products)
-    .leftJoin(stores, eq(products.storeId, stores.id))
+    .from(locationLists)
+    .leftJoin(stores, eq(locationLists.storeId, stores.id))
     .where(eq(stores.id, storeId));
 
-  // @TODO: check if items from this store are in the cart
-
-  const detailsOfProductsInCart = cartItems
+  // Check if items from this store are in the cart
+  const detailsOfListsInCart = cartItems
     .map((item) => {
-      const product = storeProducts.find((p) => p.id === item.id);
-      const priceAsNumber = Number(product?.price);
-      if (!product || isNaN(priceAsNumber)) return undefined;
+      const list = storeLists.find((l) => l.id === item.id);
+      const priceAsNumber = Number(list?.price);
+      if (!list || isNaN(priceAsNumber)) return undefined;
       return {
         id: item.id,
         price: priceAsNumber,
@@ -76,15 +75,15 @@ export default async function Page({
     );
   }
 
-  if (!storeProducts.length || isNaN(storeId)) {
+  if (!storeLists.length || isNaN(storeId)) {
     throw new Error("Store not found");
   }
 
-  if (!detailsOfProductsInCart.length) {
+  if (!detailsOfListsInCart.length) {
     return (
       <InfoCard
         heading="No items from this store"
-        subheading="Your cart doesn't contain any items from this store. Add some products first!"
+        subheading="Your cart doesn't contain any location lists from this store. Add some lists first!"
         icon={<AlertCircle size={24} />}
         button={
           <Link href={routes.cart}>
@@ -96,14 +95,13 @@ export default async function Page({
   }
 
   const paymentIntent = createPaymentIntent({
-    items: detailsOfProductsInCart,
+    items: detailsOfListsInCart,
     storeId,
   });
 
-  // providing the paymntIntent to the CheckoutWrapper to work around Nextjs bug with authentication not passed to server actions when called in client component
   return (
     <CheckoutWrapper
-      detailsOfProductsInCart={detailsOfProductsInCart}
+      detailsOfProductsInCart={detailsOfListsInCart}
       paymentIntent={paymentIntent}
       storeStripeAccountId={storeStripeAccountId}
       cartLineItems={
