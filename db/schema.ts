@@ -143,6 +143,10 @@ export const listPois = pgTable("list_pois", {
   longitude: decimal("longitude", { precision: 10, scale: 7 }).notNull(),
   googlePlaceId: text("google_place_id"), // For POIs from Google Places API
   address: text("address"),
+  rating: decimal("rating", { precision: 2, scale: 1 }), // Google Places rating (e.g., 4.5)
+  website: text("website"), // Google Places website URL
+  phoneNumber: text("phone_number"), // Google Places phone number
+  photos: json("photos"), // Array of Google Places photo URLs
   displayOrder: integer("display_order").default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });

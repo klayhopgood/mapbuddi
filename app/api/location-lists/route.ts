@@ -73,6 +73,10 @@ export async function POST(request: NextRequest) {
             longitude: poi.longitude,
             googlePlaceId: poi.googlePlaceId,
             address: poi.address,
+            rating: poi.rating,
+            website: poi.website,
+            phoneNumber: poi.phoneNumber,
+            photos: poi.photos,
             displayOrder: 0,
           });
         }

@@ -182,6 +182,11 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
       googlePlaceId: place.place_id,
       address: place.formatted_address,
       rating: place.rating,
+      website: place.website,
+      phoneNumber: place.formatted_phone_number,
+      photos: place.photos?.slice(0, 3).map(photo => 
+        `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}`
+      ),
       categoryId: 0, // Default to first category
     };
 

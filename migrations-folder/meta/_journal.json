@@ -36,6 +36,13 @@
       "when": 1759702692515,
       "tag": "0004_living_marauders",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1759731545663,
+      "tag": "0005_add_enhanced_poi_fields",
+      "breakpoints": true
     }
   ]
 }
