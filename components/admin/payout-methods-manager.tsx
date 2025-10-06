@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
+import { CheckCircle } from "lucide-react";
 
 interface PayoutMethodsProps {
   storeId: number;
@@ -92,11 +93,49 @@ export default function PayoutMethodsManager({ storeId, currentMethods, onSave }
 
   return (
     <div className="space-y-6">
+      {/* Current Active Method Status */}
+      {currentMethods && (
+        <Card className="border-green-200 bg-green-50">
+          <CardHeader>
+            <CardTitle className="text-green-800 flex items-center gap-2">
+              <CheckCircle size={20} />
+              Active Payout Method
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">
+                  {currentMethods.preferredMethod === "paypal" && "PayPal"}
+                  {currentMethods.preferredMethod === "bank_us" && "US Bank Account"}
+                  {currentMethods.preferredMethod === "bank_uk" && "UK Bank Account"}
+                  {currentMethods.preferredMethod === "bank_eu" && "European Bank Account"}
+                  {currentMethods.preferredMethod === "bank_au" && "Australian Bank Account"}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {currentMethods.preferredMethod === "paypal" && currentMethods.paypalEmail}
+                  {currentMethods.preferredMethod === "bank_us" && `****${currentMethods.usAccountNumber?.slice(-4)}`}
+                  {currentMethods.preferredMethod === "bank_uk" && `****${currentMethods.ukAccountNumber?.slice(-4)}`}
+                  {currentMethods.preferredMethod === "bank_eu" && `${currentMethods.euIban?.slice(0, 4)}****${currentMethods.euIban?.slice(-4)}`}
+                  {currentMethods.preferredMethod === "bank_au" && `****${currentMethods.auAccountNumber?.slice(-4)}`}
+                </p>
+              </div>
+              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                Active
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
-          <CardTitle>Payout Methods</CardTitle>
+          <CardTitle>Manage Payout Methods</CardTitle>
           <p className="text-sm text-gray-600">
-            Choose how you&apos;d like to receive payments from your sales.
+            {currentMethods 
+              ? "Update your payout details or switch to a different method." 
+              : "Choose how you'd like to receive payments from your sales."
+            }
           </p>
         </CardHeader>
         <CardContent>

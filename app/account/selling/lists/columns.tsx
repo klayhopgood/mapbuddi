@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Star } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { DeleteListButton } from "@/components/admin/delete-list-button";
 
 export type LocationListData = {
   id: number;
@@ -108,6 +109,10 @@ export const columns: ColumnDef<LocationListData>[] = [
               Edit
             </Button>
           </Link>
+          <DeleteListButton 
+            listId={row.original.id}
+            listName={row.original.name}
+          />
         </div>
       );
     },

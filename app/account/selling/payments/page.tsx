@@ -1,196 +1,206 @@
 import { HeadingAndSubheading } from "@/components/admin/heading-and-subheading";
 import { InfoCard } from "@/components/admin/info-card";
-import { CreditCard, DollarSign, Clock, CheckCircle } from "lucide-react";
-import { CreateConnectedAccount } from "./components/create-connected-account";
-import {
-  createAccountLink,
-  getStripeAccountDetails,
-  hasConnectedStripeAccount,
-  updateStripeAccountStatus,
-} from "@/server-actions/stripe/account";
+import { DollarSign, Clock, CheckCircle, AlertCircle } from "lucide-react";
 import { getStoreId } from "@/server-actions/store-details";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import PayoutMethodsManager from "@/components/admin/payout-methods-manager";
+import { getPayoutMethods, savePayoutMethods } from "@/server-actions/payout-methods";
 import { db } from "@/db/db";
-import { payments } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import Stripe from "stripe";
+import { sellerPayouts } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
 import { currencyFormatter } from "@/lib/currency";
 
-interface PayoutInfo {
-  availableBalance: number;
-  pendingBalance: number;
-  recentPayouts: Array<{
-    id: string;
-    amount: number;
-    status: string;
-    arrivalDate: number;
-    currency: string;
-  }>;
-}
-
-async function getPayoutInfo(storeId: number): Promise<PayoutInfo | null> {
-  try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: "2025-08-27.basil",
-    });
-
-    const payment = await db
-      .select()
-      .from(payments)
-      .where(eq(payments.storeId, storeId));
-
-    if (!payment.length || !payment[0]?.stripeAccountId) {
-      return null;
-    }
-
-    const stripeAccountId = payment[0].stripeAccountId;
-
-    // Get account balance
-    const balance = await stripe.balance.retrieve({
-      stripeAccount: stripeAccountId,
-    });
-
-    // Get recent payouts
-    const payouts = await stripe.payouts.list(
-      { limit: 5 },
-      { stripeAccount: stripeAccountId }
-    );
-
-    const availableBalance = balance.available.reduce((sum, bal) => sum + bal.amount, 0) / 100;
-    const pendingBalance = balance.pending.reduce((sum, bal) => sum + bal.amount, 0) / 100;
-
-    const recentPayouts = payouts.data.map(payout => ({
-      id: payout.id,
-      amount: payout.amount / 100,
-      status: payout.status,
-      arrivalDate: payout.arrival_date,
-      currency: payout.currency,
-    }));
-
-    return {
-      availableBalance,
-      pendingBalance,
-      recentPayouts,
-    };
-  } catch (error) {
-    console.error("Error fetching payout info:", error);
-    return null;
-  }
-}
-
 export default async function PaymentsPage() {
-  // Get storeId once to avoid multiple Clerk API calls
   const storeId = Number(await getStoreId());
   
-  await updateStripeAccountStatus(storeId);
-  const connectedStripeAccount = await hasConnectedStripeAccount(storeId);
-  const stripeAccountDetails = await getStripeAccountDetails(storeId);
-  const payoutInfo = connectedStripeAccount ? await getPayoutInfo(storeId) : null;
+  if (isNaN(storeId)) {
+    return (
+      <InfoCard
+        heading="No store found"
+        subheading="You need to create a store first before setting up payments."
+        icon={<AlertCircle size={24} />}
+        button={
+          <Button>Create Store</Button>
+        }
+      />
+    );
+  }
+
+  // Get current payout methods
+  const payoutMethods = await getPayoutMethods(storeId);
+  
+  // Get pending payouts
+  const pendingPayouts = await db
+    .select()
+    .from(sellerPayouts)
+    .where(and(
+      eq(sellerPayouts.storeId, storeId),
+      eq(sellerPayouts.status, "pending")
+    ));
+
+  const totalPending = pendingPayouts.reduce((sum, payout) => 
+    sum + parseFloat(payout.amount), 0
+  );
+
+  // Get recent payouts
+  const recentPayouts = await db
+    .select()
+    .from(sellerPayouts)
+    .where(eq(sellerPayouts.storeId, storeId))
+    .orderBy(sellerPayouts.createdAt)
+    .limit(5);
+
+  // Server actions need to be imported, not defined inline
 
   return (
-    <>
+    <div className="space-y-8">
       <HeadingAndSubheading
-        heading="Payments"
-        subheading="View your payouts and manage your payment settings"
+        heading="Payments & Payouts"
+        subheading="Manage how you receive payments from your location list sales"
       />
-      {connectedStripeAccount ? (
-        <div className="space-y-6">
-          {/* Payout Information */}
-          {payoutInfo && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 border rounded-lg bg-white">
-                <div className="flex items-center gap-2 mb-2">
-                  <DollarSign className="h-5 w-5 text-green-600" />
-                  <h3 className="font-semibold text-sm text-gray-600">Available Balance</h3>
-                </div>
-                <p className="text-2xl font-bold text-green-600">
-                  {currencyFormatter(payoutInfo.availableBalance)}
-                </p>
-                <p className="text-xs text-gray-500">Ready for payout</p>
-              </div>
 
-              <div className="p-4 border rounded-lg bg-white">
-                <div className="flex items-center gap-2 mb-2">
-                  <Clock className="h-5 w-5 text-orange-600" />
-                  <h3 className="font-semibold text-sm text-gray-600">Pending Balance</h3>
-                </div>
-                <p className="text-2xl font-bold text-orange-600">
-                  {currencyFormatter(payoutInfo.pendingBalance)}
-                </p>
-                <p className="text-xs text-gray-500">Processing</p>
-              </div>
+      {/* Payout Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pending Payouts</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{currencyFormatter(totalPending)}</div>
+            <p className="text-xs text-muted-foreground">
+              {pendingPayouts.length} pending payout{pendingPayouts.length !== 1 ? 's' : ''}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Payout Method</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {payoutMethods?.preferredMethod ? (
+                <Badge variant="secondary">
+                  {payoutMethods.preferredMethod === "paypal" && "PayPal"}
+                  {payoutMethods.preferredMethod === "bank_us" && "US Bank"}
+                  {payoutMethods.preferredMethod === "bank_uk" && "UK Bank"}
+                  {payoutMethods.preferredMethod === "bank_eu" && "EU Bank"}
+                  {payoutMethods.preferredMethod === "bank_au" && "AU Bank"}
+                </Badge>
+              ) : (
+                <span className="text-sm text-gray-500">Not set</span>
+              )}
             </div>
-          )}
+            <p className="text-xs text-muted-foreground">
+              {payoutMethods ? "Configured" : "Setup required"}
+            </p>
+          </CardContent>
+        </Card>
 
-          {/* Recent Payouts */}
-          {payoutInfo && payoutInfo.recentPayouts.length > 0 && (
-            <div className="bg-white border rounded-lg p-6">
-              <h3 className="font-semibold text-lg mb-4">Recent Payouts</h3>
-              <div className="space-y-3">
-                {payoutInfo.recentPayouts.map((payout) => (
-                  <div key={payout.id} className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                    <div className="flex items-center gap-3">
-                      <CheckCircle className={`h-5 w-5 ${
-                        payout.status === 'paid' ? 'text-green-600' : 
-                        payout.status === 'pending' ? 'text-orange-600' : 'text-gray-600'
-                      }`} />
-                      <div>
-                        <p className="font-medium">{currencyFormatter(payout.amount)}</p>
-                        <p className="text-sm text-gray-600">
-                          {payout.status === 'paid' ? 'Completed' : 
-                           payout.status === 'pending' ? 'Processing' : 
-                           payout.status}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-600">
-                        {new Date(payout.arrivalDate * 1000).toLocaleDateString()}
-                      </p>
-                    </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Paid Out</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {currencyFormatter(
+                recentPayouts
+                  .filter(p => p.status === "paid")
+                  .reduce((sum, payout) => sum + parseFloat(payout.amount), 0)
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              All time earnings
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Payout Methods Setup */}
+      <PayoutMethodsManager 
+        storeId={storeId}
+        currentMethods={payoutMethods}
+        onSave={savePayoutMethods}
+      />
+
+      {/* Recent Payouts */}
+      {recentPayouts.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Payouts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentPayouts.map((payout) => (
+                <div key={payout.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <p className="font-medium">{currencyFormatter(parseFloat(payout.amount))}</p>
+                    <p className="text-sm text-gray-500">
+                      Order #{payout.orderId} • {payout.createdAt ? new Date(payout.createdAt).toLocaleDateString() : 'Unknown date'}
+                    </p>
                   </div>
-                ))}
-              </div>
+                  <Badge 
+                    variant={
+                      payout.status === "paid" ? "default" : 
+                      payout.status === "pending" ? "secondary" : 
+                      "destructive"
+                    }
+                  >
+                    {payout.status}
+                  </Badge>
+                </div>
+              ))}
             </div>
-          )}
+          </CardContent>
+        </Card>
+      )}
 
-          {/* Stripe Account Details */}
-          <div>
-            <div className="p-2 px-4 border bg-secondary border-border text-gray-700 rounded-md">
-              <span className="font-semibold">Payment status:</span> Stripe
-              account connected
+      {/* Fee Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Fee Structure</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 bg-blue-50 rounded-lg">
+              <h3 className="font-medium text-blue-900">Platform Fee</h3>
+              <p className="text-2xl font-bold text-blue-900">10%</p>
+              <p className="text-sm text-blue-700">Deducted from each sale</p>
             </div>
-            <div className="border border-border p-4 rounded-md mt-4">
-              <p className="font-semibold text-gray-700">Stripe Details</p>
-              <p>
-                Currency: {stripeAccountDetails?.default_currency.toUpperCase()}
-              </p>
-              <p>Country: {stripeAccountDetails?.country}</p>
-              <p>Account Email: {stripeAccountDetails?.email}</p>
-              <a
-                href="https://www.stripe.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button size="sm" className="mt-4">
-                  Update in Stripe
-                </Button>
-              </a>
+            <div className="p-4 bg-green-50 rounded-lg">
+              <h3 className="font-medium text-green-900">Processing Fee</h3>
+              <p className="text-2xl font-bold text-green-900">2.9% + $0.30</p>
+              <p className="text-sm text-green-700">Stripe payment processing</p>
             </div>
           </div>
-        </div>
-      ) : (
-        <InfoCard
-          heading="Payments aren't setup yet"
-          subheading="Link your stripe account to start accepting orders"
-          icon={<CreditCard size={36} className="text-gray-600" />}
-          button={
-            // pass server action from server component to client component - work around for nextjs/server actions bug with clerk.
-            // calling the server action inside the client component causes a clerk error of "Error: Clerk: auth() and currentUser() are only supported in App Router (/app directory)"
-            <CreateConnectedAccount createAccountLink={createAccountLink} />
-          }
-        />
-      )}
-    </>
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <h3 className="font-medium">Example: $10.00 Sale</h3>
+            <div className="text-sm space-y-1 mt-2">
+              <div className="flex justify-between">
+                <span>Sale amount:</span>
+                <span>$10.00</span>
+              </div>
+              <div className="flex justify-between text-red-600">
+                <span>Platform fee (10%):</span>
+                <span>-$1.00</span>
+              </div>
+              <div className="flex justify-between text-red-600">
+                <span>Processing fee:</span>
+                <span>-$0.59</span>
+              </div>
+              <div className="flex justify-between font-medium border-t pt-1">
+                <span>You receive:</span>
+                <span className="text-green-600">$8.41</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
