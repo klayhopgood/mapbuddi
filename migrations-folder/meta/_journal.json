@@ -43,6 +43,13 @@
       "when": 1759731545663,
       "tag": "0005_add_enhanced_poi_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1759738701118,
+      "tag": "0006_broken_captain_cross",
+      "breakpoints": true
     }
   ]
 }

@@ -23,16 +23,19 @@ export async function createPaymentIntent({
 
     const cartId = Number(cookies().get("cartId")?.value);
 
+    // Always use USD for payments
+    const currency = "usd";
+    
+    const { orderTotal, platformFee, stripeFee, sellerReceives } = calculateOrderAmounts(items);
+
     const metadata = {
       cartId: isNaN(cartId) ? "" : cartId.toString(),
       items: JSON.stringify(items),
       storeId: storeId.toString(), // Track which store this payment is for
+      platformFee: platformFee.toString(), // Track platform fee
+      stripeFee: stripeFee.toString(), // Track Stripe fee  
+      sellerReceives: sellerReceives.toString(), // Track what seller should get
     };
-
-    // Always use USD for payments
-    const currency = "usd";
-    
-    const { orderTotal, platformFee } = calculateOrderAmounts(items);
 
     // check if cartid has a paymentIntent already
     if (!isNaN(cartId)) {
@@ -105,13 +108,33 @@ export async function createPaymentIntent({
 
 // Helper Functions
 const calculateOrderAmounts = (items: CheckoutItem[]) => {
-  const total = items.reduce((acc, item) => {
+  const subtotal = items.reduce((acc, item) => {
     return acc + item.price * item.qty;
   }, 0);
-  const fee = total * platformFeeDecimal;
+
+  // Convert to cents for Stripe
+  const orderTotal = Math.round(subtotal * 100);
+  
+  // Calculate what seller will receive after all fees
+  const stripeFixedFee = 30; // $0.30 in cents
+  const stripePercentFee = 0.029; // 2.9%
+  const platformFeePercent = 0.10; // 10%
+  
+  const stripeFee = stripeFixedFee + Math.round(orderTotal * stripePercentFee);
+  const platformFee = Math.round(orderTotal * platformFeePercent);
+  const sellerReceives = orderTotal - stripeFee - platformFee;
+
+  console.log("=== FEE BREAKDOWN ===");
+  console.log("Order total:", orderTotal, "cents ($" + (orderTotal/100).toFixed(2) + ")");
+  console.log("Stripe fee:", stripeFee, "cents ($" + (stripeFee/100).toFixed(2) + ")");
+  console.log("Platform fee:", platformFee, "cents ($" + (platformFee/100).toFixed(2) + ")");
+  console.log("Seller receives:", sellerReceives, "cents ($" + (sellerReceives/100).toFixed(2) + ")");
+
   return {
-    orderTotal: Number((total * 100).toFixed(0)), // converts to cents which stripe charges in
-    platformFee: Number((fee * 100).toFixed(0)),
+    orderTotal, // What buyer pays (in cents)
+    platformFee, // What MapBuddi keeps (in cents)
+    stripeFee, // What Stripe takes (in cents)
+    sellerReceives, // What seller gets (in cents)
   };
 };
 

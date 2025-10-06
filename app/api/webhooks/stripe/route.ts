@@ -1,4 +1,4 @@
-import { addresses, products } from "./../../../../db/schema";
+import { addresses, products, sellerPayouts, stores } from "./../../../../db/schema";
 import { db } from "@/db/db";
 import { carts, orders, payments } from "@/db/schema";
 import { CheckoutItem } from "@/lib/types";
@@ -112,6 +112,34 @@ export async function POST(request: Request) {
         console.log("Email:", paymentIntent.receipt_email);
         console.log("Cart ID:", cartId);
         console.log("Store ID:", storeId);
+
+        // Create seller payout record
+        const sellerAmount = parseFloat(paymentIntent.metadata.sellerReceives) / 100; // Convert cents to dollars
+        const platformFeeAmount = parseFloat(paymentIntent.metadata.platformFee) / 100;
+        const stripeFeeAmount = parseFloat(paymentIntent.metadata.stripeFee) / 100;
+
+        // Get store owner ID
+        const storeInfo = await db
+          .select({ userId: stores.userId })
+          .from(stores)
+          .where(eq(stores.id, storeId));
+
+        if (storeInfo.length && storeInfo[0].userId) {
+          const sellerPayoutRecord = await db.insert(sellerPayouts).values({
+            storeId: storeId,
+            orderId: newOrder[0].id,
+            sellerId: storeInfo[0].userId,
+            amount: sellerAmount.toString(),
+            platformFee: platformFeeAmount.toString(),
+            stripeFee: stripeFeeAmount.toString(),
+            status: "pending",
+          });
+
+          console.log("=== SELLER PAYOUT RECORD CREATED ===");
+          console.log("Seller will receive:", "$" + sellerAmount.toFixed(2));
+          console.log("Platform fee:", "$" + platformFeeAmount.toFixed(2));
+          console.log("Stripe fee:", "$" + stripeFeeAmount.toFixed(2));
+        }
       } catch (err) {
         console.log("DIRECT PAYMENT ORDER ERROR", err);
       }

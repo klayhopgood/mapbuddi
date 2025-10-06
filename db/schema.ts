@@ -185,3 +185,32 @@ export const userPreferences = pgTable("user_preferences", {
 });
 
 export type UserPreferences = InferSelectModel<typeof userPreferences>;
+
+// Seller payout tracking
+export const sellerPayouts = pgTable("seller_payouts", {
+  id: serial("id").primaryKey(),
+  storeId: integer("store_id").notNull(),
+  orderId: integer("order_id").notNull(),
+  sellerId: text("seller_id").notNull(), // Clerk user ID
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(), // Amount to pay seller (after fees)
+  platformFee: decimal("platform_fee", { precision: 10, scale: 2 }).notNull(), // Platform fee taken
+  stripeFee: decimal("stripe_fee", { precision: 10, scale: 2 }).notNull(), // Stripe fee
+  paypalEmail: text("paypal_email"), // Seller's PayPal email
+  status: varchar("status", { length: 20 }).default("pending"), // pending, paid, failed
+  payoutDate: timestamp("payout_date"),
+  paypalTransactionId: text("paypal_transaction_id"), // PayPal payout ID
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type SellerPayout = InferSelectModel<typeof sellerPayouts>;
+
+// Add PayPal email to stores table
+export const storePaymentSettings = pgTable("store_payment_settings", {
+  id: serial("id").primaryKey(),
+  storeId: integer("store_id").notNull().unique(),
+  paypalEmail: text("paypal_email"), // Seller's PayPal email for payouts
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type StorePaymentSettings = InferSelectModel<typeof storePaymentSettings>;
