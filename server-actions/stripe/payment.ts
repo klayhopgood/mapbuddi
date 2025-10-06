@@ -16,18 +16,27 @@ export async function createPaymentIntent({
   items: CheckoutItem[];
   storeId: number;
 }) {
+  console.log("=== CREATE PAYMENT INTENT DEBUG ===");
+  console.log("Items:", items);
+  console.log("Store ID:", storeId);
+  console.log("Stripe key exists:", !!process.env.STRIPE_SECRET_KEY);
+  
   try {
     // This is your test secret API key.
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
       apiVersion: "2025-08-27.basil",
     });
+    console.log("Stripe client created successfully");
 
     const cartId = Number(cookies().get("cartId")?.value);
+    console.log("Cart ID:", cartId);
 
     // Always use USD for payments
     const currency = "usd";
     
+    console.log("Calculating order amounts...");
     const { orderTotal, platformFee, stripeFee, sellerReceives } = calculateOrderAmounts(items);
+    console.log("Order amounts calculated successfully");
 
     const metadata = {
       cartId: isNaN(cartId) ? "" : cartId.toString(),
@@ -82,6 +91,7 @@ export async function createPaymentIntent({
     }
 
     // Create a direct PaymentIntent (no Connect account needed!)
+    console.log("Creating Stripe PaymentIntent with amount:", orderTotal);
     const paymentIntent = await stripe.paymentIntents.create({
       amount: orderTotal,
       currency: currency,
@@ -91,6 +101,7 @@ export async function createPaymentIntent({
       },
       description: `MapBuddi purchase - ${items.length} location list(s)`,
     });
+    console.log("PaymentIntent created successfully:", paymentIntent.id);
 
     // save paymentIntent to cart in db
     await db

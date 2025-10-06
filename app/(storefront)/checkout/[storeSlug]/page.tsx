@@ -95,6 +95,11 @@ export default async function Page({
     );
   }
 
+  console.log("=== CHECKOUT PAGE DEBUG ===");
+  console.log("Store ID:", storeId);
+  console.log("Items for checkout:", detailsOfListsInCart);
+  console.log("Cart ID from cookies:", cookies().get("cartId")?.value);
+
   const paymentIntent = createPaymentIntent({
     items: detailsOfListsInCart,
     storeId,
