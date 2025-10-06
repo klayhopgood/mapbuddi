@@ -152,13 +152,6 @@ export function PurchasedListsManager({
                           >
                             <Button variant="outline" size="sm" className="text-xs">View in Drive</Button>
                           </Link>
-                          <Link 
-                            href={`https://drive.google.com/uc?export=download&id=${syncStatus.googleMapsMapId}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                          >
-                            <Button variant="outline" size="sm" className="text-xs">Download KML</Button>
-                          </Link>
                         </div>
                       )}
                     </div>

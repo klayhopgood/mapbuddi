@@ -112,20 +112,24 @@ function generateStyles(pois: POIData[]): string {
 
   return uniqueCategories.map(categoryName => {
     const poi = pois.find(p => p.category.name === categoryName);
-    const color = poi?.category.iconColor || '#4ECDC4';
     const emoji = poi?.category.emoji || '📍';
+    
+    // Convert emoji to a usable icon URL using Twemoji
+    const emojiCode = emoji.codePointAt(0)?.toString(16).padStart(4, '0');
+    const iconUrl = `https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/${emojiCode}.png`;
     
     return `
     <Style id="style_${categoryName.replace(/\s+/g, '_')}">
       <IconStyle>
-        <color>ff${rgbToKmlColor(color)}</color>
-        <scale>1.2</scale>
         <Icon>
-          <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+          <href>${iconUrl}</href>
         </Icon>
+        <scale>1.0</scale>
+        <hotSpot x="0.5" y="1" xunits="fraction" yunits="fraction"/>
       </IconStyle>
       <LabelStyle>
-        <scale>0.8</scale>
+        <scale>0.9</scale>
+        <color>ff000000</color>
       </LabelStyle>
     </Style>`;
   }).join('');
