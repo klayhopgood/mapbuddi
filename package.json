@@ -66,6 +66,7 @@
     "@storybook/nextjs": "^7.0.6",
     "@storybook/react": "^7.0.6",
     "@storybook/testing-library": "^0.0.14-next.2",
+    "@types/google.maps": "^3.58.1",
     "drizzle-kit": "^0.31.5",
     "eslint-plugin-storybook": "^0.6.11",
     "storybook": "^7.0.6",

@@ -165,6 +165,9 @@ importers:
       '@storybook/testing-library':
         specifier: ^0.0.14-next.2
         version: 0.0.14-next.2
+      '@types/google.maps':
+        specifier: ^3.58.1
+        version: 3.58.1
       drizzle-kit:
         specifier: ^0.31.5
         version: 0.31.5

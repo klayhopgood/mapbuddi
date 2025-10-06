@@ -9,7 +9,7 @@ import { Textarea } from "../ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { toast } from "../ui/use-toast";
-import { MapPin, Search, Plus, X, Star, Clock, Globe, Phone } from "lucide-react";
+import { MapPin, Search, Plus, X, Star, Globe, Phone } from "lucide-react";
 import { getPlaceDetails, PlaceDetails } from "@/lib/google-places";
 
 export interface ListPOI {
@@ -44,9 +44,9 @@ interface EnhancedPOICreatorProps {
 
 export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedPOICreatorProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<google.maps.Marker[]>([]);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
+  const autocompleteRef = useRef<any>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   
   const [selectedPOI, setSelectedPOI] = useState<ListPOI | null>(null);
@@ -54,96 +54,31 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
-  // Initialize Google Maps
-  const initMap = useCallback(async () => {
+  const loadPlaceDetails = useCallback(async (placeId?: string) => {
+    if (!placeId) return;
+    
+    setIsLoadingDetails(true);
     try {
-      const loader = new Loader({
-        apiKey: process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY || "",
-        version: "weekly",
-        libraries: ["places", "geometry"],
-      });
-
-      const google = await loader.load();
-      
-      if (!mapRef.current) return;
-
-      // Initialize map
-      const map = new google.maps.Map(mapRef.current, {
-        center: { lat: 37.7749, lng: -122.4194 }, // San Francisco default
-        zoom: 12,
-        styles: [
-          {
-            featureType: "poi",
-            elementType: "labels",
-            stylers: [{ visibility: "on" }],
-          },
-        ],
-      });
-
-      mapInstanceRef.current = map;
-
-      // Initialize autocomplete
-      if (searchInputRef.current) {
-        const autocomplete = new google.maps.places.Autocomplete(searchInputRef.current, {
-          types: ["establishment"],
-          fields: ["place_id", "name", "formatted_address", "geometry", "types", "rating", "photos"],
-        });
-
-        autocomplete.bindTo("bounds", map);
-        autocompleteRef.current = autocomplete;
-
-        // Handle place selection
-        autocomplete.addListener("place_changed", () => {
-          const place = autocomplete.getPlace();
-          if (place.geometry?.location) {
-            map.setCenter(place.geometry.location);
-            map.setZoom(15);
-            handlePlaceSelection(place);
-          }
-        });
-      }
-
-      // Handle map clicks
-      map.addListener("click", (e: google.maps.MapMouseEvent) => {
-        if (e.latLng) {
-          handleMapClick(e.latLng);
-        }
-      });
-
-      setIsMapLoaded(true);
-      updateMapMarkers();
+      const details = await getPlaceDetails(placeId);
+      setPlaceDetails(details);
     } catch (error) {
-      console.error("Error loading Google Maps:", error);
-      toast({
-        title: "Map Error",
-        description: "Failed to load Google Maps. Please check your API key.",
-        variant: "destructive",
-      });
+      console.error("Error loading place details:", error);
+    } finally {
+      setIsLoadingDetails(false);
     }
   }, []);
 
-  useEffect(() => {
-    initMap();
-  }, [initMap]);
-
-  // Update markers when POIs change
-  useEffect(() => {
-    if (isMapLoaded) {
-      updateMapMarkers();
-    }
-  }, [pois, isMapLoaded]);
-
   const updateMapMarkers = useCallback(() => {
-    if (!mapInstanceRef.current) return;
+    if (!mapInstanceRef.current || !(window as any).google) return;
 
     // Clear existing markers
-    markersRef.current.forEach(marker => marker.setMap(null));
+    markersRef.current.forEach((marker: any) => marker.setMap(null));
     markersRef.current = [];
 
     // Add markers for each POI
-    pois.forEach((poi, index) => {
+    pois.forEach((poi) => {
       const category = categories[poi.categoryId || 0];
-      const marker = new google.maps.Marker({
+      const marker = new (window as any).google.maps.Marker({
         position: { lat: poi.latitude, lng: poi.longitude },
         map: mapInstanceRef.current,
         title: poi.name,
@@ -163,15 +98,15 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
 
     // Fit bounds if we have POIs
     if (pois.length > 0) {
-      const bounds = new google.maps.LatLngBounds();
+      const bounds = new (window as any).google.maps.LatLngBounds();
       pois.forEach(poi => {
         bounds.extend({ lat: poi.latitude, lng: poi.longitude });
       });
       mapInstanceRef.current.fitBounds(bounds);
     }
-  }, [pois, categories]);
+  }, [pois, categories, loadPlaceDetails]);
 
-  const handlePlaceSelection = async (place: google.maps.places.PlaceResult) => {
+  const handlePlaceSelection = useCallback(async (place: any) => {
     if (!place.geometry?.location) return;
 
     const newPOI: ListPOI = {
@@ -184,7 +119,7 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
       rating: place.rating,
       website: place.website,
       phoneNumber: place.formatted_phone_number,
-      photos: place.photos?.slice(0, 3).map(photo => 
+      photos: place.photos?.slice(0, 3).map((photo: any) => 
         `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}`
       ),
       categoryId: 0, // Default to first category
@@ -201,9 +136,9 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
       title: "POI Added",
       description: `${place.name} has been added to your list.`,
     });
-  };
+  }, [pois, onPoisChange, loadPlaceDetails, toast]);
 
-  const handleMapClick = (latLng: google.maps.LatLng) => {
+  const handleMapClick = useCallback((latLng: any) => {
     const newPOI: ListPOI = {
       name: "Custom Location",
       description: "",
@@ -220,21 +155,86 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
       title: "Custom POI Added",
       description: "Click on the marker to edit details.",
     });
-  };
+  }, [pois, onPoisChange, toast]);
 
-  const loadPlaceDetails = async (placeId?: string) => {
-    if (!placeId) return;
-    
-    setIsLoadingDetails(true);
+  // Initialize Google Maps
+  const initMap = useCallback(async () => {
     try {
-      const details = await getPlaceDetails(placeId);
-      setPlaceDetails(details);
+      const loader = new Loader({
+        apiKey: process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY || "",
+        version: "weekly",
+        libraries: ["places", "geometry"],
+      });
+
+      await loader.load();
+      
+      if (!mapRef.current || !(window as any).google) return;
+
+      // Initialize map
+      const map = new (window as any).google.maps.Map(mapRef.current, {
+        center: { lat: 37.7749, lng: -122.4194 },
+        zoom: 12,
+        styles: [
+          {
+            featureType: "poi",
+            elementType: "labels",
+            stylers: [{ visibility: "on" }],
+          },
+        ],
+      });
+
+      mapInstanceRef.current = map;
+
+      // Initialize autocomplete
+      if (searchInputRef.current) {
+        const autocomplete = new (window as any).google.maps.places.Autocomplete(searchInputRef.current, {
+          types: ["establishment"],
+          fields: ["place_id", "name", "formatted_address", "geometry", "types", "rating", "photos", "website", "formatted_phone_number"],
+        });
+
+        autocomplete.bindTo("bounds", map);
+        autocompleteRef.current = autocomplete;
+
+        // Handle place selection
+        autocomplete.addListener("place_changed", () => {
+          const place = autocomplete.getPlace();
+          if (place.geometry?.location) {
+            map.setCenter(place.geometry.location);
+            map.setZoom(15);
+            handlePlaceSelection(place);
+          }
+        });
+      }
+
+      // Handle map clicks
+      map.addListener("click", (e: any) => {
+        if (e.latLng) {
+          handleMapClick(e.latLng);
+        }
+      });
+
+      setIsMapLoaded(true);
+      updateMapMarkers();
     } catch (error) {
-      console.error("Error loading place details:", error);
-    } finally {
-      setIsLoadingDetails(false);
+      console.error("Error loading Google Maps:", error);
+      toast({
+        title: "Map Error",
+        description: "Failed to load Google Maps. Please check your API key.",
+        variant: "destructive",
+      });
     }
-  };
+  }, [handlePlaceSelection, handleMapClick, updateMapMarkers, toast]);
+
+  useEffect(() => {
+    initMap();
+  }, [initMap]);
+
+  // Update markers when POIs change
+  useEffect(() => {
+    if (isMapLoaded) {
+      updateMapMarkers();
+    }
+  }, [pois, isMapLoaded, updateMapMarkers]);
 
   const updatePOI = (updates: Partial<ListPOI>) => {
     if (!selectedPOI) return;
