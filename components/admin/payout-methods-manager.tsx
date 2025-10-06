@@ -145,8 +145,8 @@ export default function PayoutMethodsManager({ storeId, currentMethods, onSave }
                   </p>
                   {formData.paypalEmail && (
                     <div className="p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-                      <strong>⚠️ Important:</strong> We'll verify this email when processing your first payout. 
-                      If the account isn't verified or can't receive business payments, the payout will fail.
+                      <strong>⚠️ Important:</strong> We&apos;ll verify this email when processing your first payout. 
+                      If the account isn&apos;t verified or can&apos;t receive business payments, the payout will fail.
                       <br />
                       <a 
                         href={`https://www.paypal.com/verified/pal=${formData.paypalEmail}`}
