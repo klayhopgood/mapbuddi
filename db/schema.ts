@@ -245,3 +245,48 @@ export const sellerPayoutMethods = pgTable("seller_payout_methods", {
 });
 
 export type SellerPayoutMethods = InferSelectModel<typeof sellerPayoutMethods>;
+
+// User Maps Integration
+export const userMapsIntegration = pgTable("user_maps_integration", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(), // Clerk user ID
+  
+  // Google Maps Integration
+  googleMapsConnected: boolean("google_maps_connected").default(false),
+  googleAccessToken: text("google_access_token"), // OAuth token
+  googleRefreshToken: text("google_refresh_token"), // OAuth refresh token
+  googleTokenExpiry: timestamp("google_token_expiry"),
+  googleDriveConnected: boolean("google_drive_connected").default(false),
+  
+  // Apple Maps Integration (future)
+  appleMapsConnected: boolean("apple_maps_connected").default(false),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type UserMapsIntegration = InferSelectModel<typeof userMapsIntegration>;
+
+// Purchased List Sync Status
+export const purchasedListSync = pgTable("purchased_list_sync", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(), // Clerk user ID
+  orderId: integer("order_id").notNull(), // Reference to orders table
+  listId: integer("list_id").notNull(), // Reference to location_lists table
+  
+  // Google Maps Sync
+  googleMapsSynced: boolean("google_maps_synced").default(false),
+  googleMapsMapId: text("google_maps_map_id"), // Google My Maps ID
+  googleMapsLastSync: timestamp("google_maps_last_sync"),
+  googleMapsSyncEnabled: boolean("google_maps_sync_enabled").default(false),
+  
+  // Apple Maps Sync (future)
+  appleMapsSync: boolean("apple_maps_sync").default(false),
+  appleMapsLastSync: timestamp("apple_maps_last_sync"),
+  appleMapsSyncEnabled: boolean("apple_maps_sync_enabled").default(false),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type PurchasedListSync = InferSelectModel<typeof purchasedListSync>;
