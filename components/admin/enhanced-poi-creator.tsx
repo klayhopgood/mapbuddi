@@ -63,6 +63,57 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
 
   // Initialize Google Map
   useEffect(() => {
+    const addCustomPOI = (lat: number, lng: number) => {
+      const newPOI: ListPOI = {
+        name: "Custom Location",
+        description: "",
+        latitude: lat,
+        longitude: lng,
+        address: `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
+        categoryId: 0,
+      };
+
+      onPoisChange([...pois, newPOI]);
+      setSelectedPOI(newPOI);
+    };
+
+    const updateMapMarkers = () => {
+      if (!mapInstanceRef.current || !(window as any).google) return;
+
+      // Clear existing markers
+      markersRef.current.forEach((marker: any) => marker.setMap(null));
+      markersRef.current = [];
+
+      // Add markers for each POI
+      pois.forEach((poi) => {
+        const category = categories[poi.categoryId || 0];
+        const marker = new (window as any).google.maps.Marker({
+          position: { lat: poi.latitude, lng: poi.longitude },
+          map: mapInstanceRef.current,
+          title: poi.name,
+          label: {
+            text: category?.emoji || "📍",
+            fontSize: "16px",
+          },
+        });
+
+        marker.addListener('click', () => {
+          setSelectedPOI(poi);
+        });
+
+        markersRef.current.push(marker);
+      });
+
+      // Fit bounds if we have POIs
+      if (pois.length > 0) {
+        const bounds = new (window as any).google.maps.LatLngBounds();
+        pois.forEach(poi => {
+          bounds.extend({ lat: poi.latitude, lng: poi.longitude });
+        });
+        mapInstanceRef.current.fitBounds(bounds);
+      }
+    };
+
     const initMap = async () => {
       if (!mapRef.current) return;
 
@@ -109,14 +160,45 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
     };
 
     initMap();
-  }, []);
+  }, [categories, pois, onPoisChange]);
 
   // Update map markers when POIs change
   useEffect(() => {
-    if (isMapLoaded) {
-      updateMapMarkers();
+    if (!isMapLoaded || !mapInstanceRef.current || !(window as any).google) return;
+
+    // Clear existing markers
+    markersRef.current.forEach((marker: any) => marker.setMap(null));
+    markersRef.current = [];
+
+    // Add markers for each POI
+    pois.forEach((poi) => {
+      const category = categories[poi.categoryId || 0];
+      const marker = new (window as any).google.maps.Marker({
+        position: { lat: poi.latitude, lng: poi.longitude },
+        map: mapInstanceRef.current,
+        title: poi.name,
+        label: {
+          text: category?.emoji || "📍",
+          fontSize: "16px",
+        },
+      });
+
+      marker.addListener('click', () => {
+        setSelectedPOI(poi);
+      });
+
+      markersRef.current.push(marker);
+    });
+
+    // Fit bounds if we have POIs
+    if (pois.length > 0) {
+      const bounds = new (window as any).google.maps.LatLngBounds();
+      pois.forEach(poi => {
+        bounds.extend({ lat: poi.latitude, lng: poi.longitude });
+      });
+      mapInstanceRef.current.fitBounds(bounds);
     }
-  }, [pois, isMapLoaded]);
+  }, [pois, categories, isMapLoaded]);
 
   const updateMapMarkers = () => {
     if (!mapInstanceRef.current || !(window as any).google) return;
@@ -224,21 +306,6 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
       mapInstanceRef.current.setCenter({ lat: result.location.lat, lng: result.location.lng });
       mapInstanceRef.current.setZoom(15);
     }
-  };
-
-  // Add custom POI by dropping pin
-  const addCustomPOI = (lat: number, lng: number) => {
-    const newPOI: ListPOI = {
-      name: "Custom Location",
-      description: "",
-      latitude: lat,
-      longitude: lng,
-      address: `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
-      categoryId: 0,
-    };
-
-    onPoisChange([...pois, newPOI]);
-    setSelectedPOI(newPOI);
   };
 
   // Update POI
@@ -473,7 +540,7 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
                         <div className="font-medium text-sm">{poi.name}</div>
                         <div className="text-xs text-gray-500">{poi.address}</div>
                         {poi.sellerNotes && (
-                          <div className="text-xs text-blue-600 mt-1">"{poi.sellerNotes}"</div>
+                          <div className="text-xs text-blue-600 mt-1">&ldquo;{poi.sellerNotes}&rdquo;</div>
                         )}
                       </div>
                     </div>
