@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { LocationList, ListCategory, ListPoi } from "@/db/schema";
+import { LocationList, ListCategory as DbListCategory, ListPoi as DbListPoi } from "@/db/schema";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { toast } from "../ui/use-toast";
@@ -56,8 +56,8 @@ export const LocationListEditorElements = (props: {
   displayType?: "page" | "modal";
   listStatus: "new-list" | "existing-list";
   initialValues?: LocationList;
-  initialCategories?: ListCategory[];
-  initialPois?: ListPoi[];
+  initialCategories?: DbListCategory[];
+  initialPois?: DbListPoi[];
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);

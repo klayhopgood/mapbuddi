@@ -1,12 +1,12 @@
 import { LocationListEditorElements } from "./location-list-editor-elements";
-import { LocationList, ListCategory, ListPoi } from "@/db/schema";
+import { LocationList, ListCategory as DbListCategory, ListPoi as DbListPoi } from "@/db/schema";
 
 export const LocationListEditor = (props: {
   displayType?: "page" | "modal";
   listStatus: "new-list" | "existing-list";
   initialValues?: LocationList;
-  initialCategories?: ListCategory[];
-  initialPois?: ListPoi[];
+  initialCategories?: DbListCategory[];
+  initialPois?: DbListPoi[];
 }) => {
   return (
     <LocationListEditorElements
