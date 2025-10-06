@@ -69,15 +69,11 @@ export async function POST(request: NextRequest) {
             name: poi.name,
             description: poi.description,
             sellerNotes: poi.sellerNotes,
-            latitude: poi.latitude,
-            longitude: poi.longitude,
-            googlePlaceId: poi.googlePlaceId,
-            address: poi.address,
-            rating: poi.rating,
-            website: poi.website,
-            phoneNumber: poi.phoneNumber,
-            photos: poi.photos,
-            displayOrder: 0,
+          latitude: poi.latitude,
+          longitude: poi.longitude,
+          googlePlaceId: poi.googlePlaceId,
+          address: poi.address,
+          displayOrder: 0,
           });
         }
       }

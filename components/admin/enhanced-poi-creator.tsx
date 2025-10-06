@@ -6,7 +6,7 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
-import { Search, MapPin, Plus, X, Star } from "lucide-react";
+import { Search, MapPin, Plus, X, Star, Check } from "lucide-react";
 
 export interface ListPOI {
   id?: number;
@@ -16,12 +16,8 @@ export interface ListPOI {
   sellerNotes?: string;
   latitude: number;
   longitude: number;
-  googlePlaceId?: string;
+  googlePlaceId?: string; // Just the ID for reference, not storing Google's data
   address?: string;
-  rating?: number;
-  website?: string;
-  phoneNumber?: string;
-  photos?: string[];
 }
 
 export interface ListCategory {
@@ -43,7 +39,7 @@ interface SearchResult {
   name: string;
   address: string;
   location: { lat: number; lng: number };
-  rating?: number;
+  rating?: number; // For display only, not stored
   types: string[];
 }
 
@@ -51,7 +47,6 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
-  const autocompleteRef = useRef<any>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   
   const [searchQuery, setSearchQuery] = useState("");
@@ -59,24 +54,11 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
   const [showResults, setShowResults] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedPOI, setSelectedPOI] = useState<ListPOI | null>(null);
+  const [pendingPOI, setPendingPOI] = useState<ListPOI | null>(null); // For confirmation before adding
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
   // Initialize Google Map
   useEffect(() => {
-    const addCustomPOI = (lat: number, lng: number) => {
-      const newPOI: ListPOI = {
-        name: "Custom Location",
-        description: "",
-        latitude: lat,
-        longitude: lng,
-        address: `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
-        categoryId: 0,
-      };
-
-      onPoisChange([...pois, newPOI]);
-      setSelectedPOI(newPOI);
-    };
-
     const updateMapMarkers = () => {
       if (!mapInstanceRef.current || !(window as any).google) return;
 
@@ -84,7 +66,7 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
       markersRef.current.forEach((marker: any) => marker.setMap(null));
       markersRef.current = [];
 
-      // Add markers for each POI
+      // Add markers for confirmed POIs
       pois.forEach((poi) => {
         const category = categories[poi.categoryId || 0];
         const marker = new (window as any).google.maps.Marker({
@@ -99,17 +81,45 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
 
         marker.addListener('click', () => {
           setSelectedPOI(poi);
+          setPendingPOI(null); // Clear any pending POI
         });
 
         markersRef.current.push(marker);
       });
 
+      // Add marker for pending POI (different color)
+      if (pendingPOI) {
+        const pendingMarker = new (window as any).google.maps.Marker({
+          position: { lat: pendingPOI.latitude, lng: pendingPOI.longitude },
+          map: mapInstanceRef.current,
+          title: "New Location (click to confirm)",
+          icon: {
+            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#ff4444" stroke="#ffffff" stroke-width="2"/>
+                <circle cx="12" cy="9" r="2.5" fill="#ffffff"/>
+              </svg>
+            `),
+            scaledSize: new (window as any).google.maps.Size(24, 24),
+          },
+        });
+
+        pendingMarker.addListener('click', () => {
+          setSelectedPOI(pendingPOI);
+        });
+
+        markersRef.current.push(pendingMarker);
+      }
+
       // Fit bounds if we have POIs
-      if (pois.length > 0) {
+      if (pois.length > 0 || pendingPOI) {
         const bounds = new (window as any).google.maps.LatLngBounds();
         pois.forEach(poi => {
           bounds.extend({ lat: poi.latitude, lng: poi.longitude });
         });
+        if (pendingPOI) {
+          bounds.extend({ lat: pendingPOI.latitude, lng: pendingPOI.longitude });
+        }
         mapInstanceRef.current.fitBounds(bounds);
       }
     };
@@ -148,10 +158,19 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
 
       mapInstanceRef.current = map;
 
-      // Handle map clicks to drop pins
+      // Handle map clicks to create pending POI
       map.addListener('click', (e: any) => {
         if (e.latLng) {
-          addCustomPOI(e.latLng.lat(), e.latLng.lng());
+          const newPendingPOI: ListPOI = {
+            name: "New Location",
+            description: "",
+            latitude: e.latLng.lat(),
+            longitude: e.latLng.lng(),
+            address: `${e.latLng.lat().toFixed(6)}, ${e.latLng.lng().toFixed(6)}`,
+            categoryId: 0,
+          };
+          setPendingPOI(newPendingPOI);
+          setSelectedPOI(newPendingPOI);
         }
       });
 
@@ -160,7 +179,7 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
     };
 
     initMap();
-  }, [categories, pois, onPoisChange]);
+  }, [categories, pois, pendingPOI]);
 
   // Update map markers when POIs change
   useEffect(() => {
@@ -170,7 +189,7 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
     markersRef.current.forEach((marker: any) => marker.setMap(null));
     markersRef.current = [];
 
-    // Add markers for each POI
+    // Add markers for confirmed POIs
     pois.forEach((poi) => {
       const category = categories[poi.categoryId || 0];
       const marker = new (window as any).google.maps.Marker({
@@ -185,57 +204,36 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
 
       marker.addListener('click', () => {
         setSelectedPOI(poi);
+        setPendingPOI(null);
       });
 
       markersRef.current.push(marker);
     });
 
-    // Fit bounds if we have POIs
-    if (pois.length > 0) {
-      const bounds = new (window as any).google.maps.LatLngBounds();
-      pois.forEach(poi => {
-        bounds.extend({ lat: poi.latitude, lng: poi.longitude });
-      });
-      mapInstanceRef.current.fitBounds(bounds);
-    }
-  }, [pois, categories, isMapLoaded]);
-
-  const updateMapMarkers = () => {
-    if (!mapInstanceRef.current || !(window as any).google) return;
-
-    // Clear existing markers
-    markersRef.current.forEach((marker: any) => marker.setMap(null));
-    markersRef.current = [];
-
-    // Add markers for each POI
-    pois.forEach((poi) => {
-      const category = categories[poi.categoryId || 0];
-      const marker = new (window as any).google.maps.Marker({
-        position: { lat: poi.latitude, lng: poi.longitude },
+    // Add pending marker if exists
+    if (pendingPOI) {
+      const pendingMarker = new (window as any).google.maps.Marker({
+        position: { lat: pendingPOI.latitude, lng: pendingPOI.longitude },
         map: mapInstanceRef.current,
-        title: poi.name,
-        label: {
-          text: category?.emoji || "📍",
-          fontSize: "16px",
+        title: "New Location (click to confirm)",
+        icon: {
+          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#ff4444" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="12" cy="9" r="2.5" fill="#ffffff"/>
+            </svg>
+          `),
+          scaledSize: new (window as any).google.maps.Size(24, 24),
         },
       });
 
-      marker.addListener('click', () => {
-        setSelectedPOI(poi);
+      pendingMarker.addListener('click', () => {
+        setSelectedPOI(pendingPOI);
       });
 
-      markersRef.current.push(marker);
-    });
-
-    // Fit bounds if we have POIs
-    if (pois.length > 0) {
-      const bounds = new (window as any).google.maps.LatLngBounds();
-      pois.forEach(poi => {
-        bounds.extend({ lat: poi.latitude, lng: poi.longitude });
-      });
-      mapInstanceRef.current.fitBounds(bounds);
+      markersRef.current.push(pendingMarker);
     }
-  };
+  }, [pois, categories, isMapLoaded, pendingPOI]);
 
   // Search for places
   const searchPlaces = async (query: string) => {
@@ -255,6 +253,7 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
       
       if (response.ok) {
         const data = await response.json();
+        console.log('Search results:', data); // Debug log
         setSearchResults(data.results || []);
         setShowResults(true);
       } else {
@@ -271,32 +270,50 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
     }
   };
 
-  // Handle search input change
+  // Handle search input change with debouncing
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
-    if (value.length > 2) {
-      searchPlaces(value);
-    } else {
-      setSearchResults([]);
-      setShowResults(false);
+    
+    // Clear previous timeout
+    if ((window as any).searchTimeout) {
+      clearTimeout((window as any).searchTimeout);
+    }
+    
+    // Set new timeout for search
+    (window as any).searchTimeout = setTimeout(() => {
+      if (value.length > 2) {
+        searchPlaces(value);
+      } else {
+        setSearchResults([]);
+        setShowResults(false);
+      }
+    }, 300); // 300ms debounce
+  };
+
+  // Handle search input key press
+  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent form submission
+      if (searchQuery.length > 2) {
+        searchPlaces(searchQuery);
+      }
     }
   };
 
-  // Add POI from search result
+  // Add POI from search result as pending
   const addPOIFromSearch = (result: SearchResult) => {
-    const newPOI: ListPOI = {
+    const newPendingPOI: ListPOI = {
       name: result.name,
       description: result.address,
       latitude: result.location.lat,
       longitude: result.location.lng,
-      googlePlaceId: result.placeId,
+      googlePlaceId: result.placeId, // Just store the ID, not Google's data
       address: result.address,
-      rating: result.rating,
       categoryId: 0,
     };
 
-    onPoisChange([...pois, newPOI]);
-    setSelectedPOI(newPOI);
+    setPendingPOI(newPendingPOI);
+    setSelectedPOI(newPendingPOI);
     setSearchQuery("");
     setSearchResults([]);
     setShowResults(false);
@@ -308,24 +325,50 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
     }
   };
 
-  // Update POI
+  // Confirm pending POI (add to actual list)
+  const confirmPendingPOI = () => {
+    if (!pendingPOI) return;
+    
+    onPoisChange([...pois, pendingPOI]);
+    setPendingPOI(null);
+    setSelectedPOI(null);
+  };
+
+  // Cancel pending POI
+  const cancelPendingPOI = () => {
+    setPendingPOI(null);
+    setSelectedPOI(null);
+  };
+
+  // Update POI (works for both pending and confirmed POIs)
   const updatePOI = (updates: Partial<ListPOI>) => {
     if (!selectedPOI) return;
     
-    const updatedPois = pois.map(poi => 
-      poi === selectedPOI ? { ...poi, ...updates } : poi
-    );
-    onPoisChange(updatedPois);
-    setSelectedPOI({ ...selectedPOI, ...updates });
+    const updatedPOI = { ...selectedPOI, ...updates };
+    
+    if (pendingPOI && selectedPOI === pendingPOI) {
+      // Update pending POI
+      setPendingPOI(updatedPOI);
+      setSelectedPOI(updatedPOI);
+    } else {
+      // Update confirmed POI
+      const updatedPois = pois.map(poi => 
+        poi === selectedPOI ? updatedPOI : poi
+      );
+      onPoisChange(updatedPois);
+      setSelectedPOI(updatedPOI);
+    }
   };
 
-  // Remove POI
+  // Remove confirmed POI
   const removePOI = (poiToRemove: ListPOI) => {
     onPoisChange(pois.filter(poi => poi !== poiToRemove));
     if (selectedPOI === poiToRemove) {
       setSelectedPOI(null);
     }
   };
+
+  const isPendingPOI = selectedPOI && pendingPOI && selectedPOI === pendingPOI;
 
   return (
     <div className="space-y-6">
@@ -344,6 +387,7 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
               placeholder="Type to search for places (e.g., 'Gimlet', 'restaurants in NYC')..."
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
+              onKeyPress={handleSearchKeyPress}
               className="w-full"
             />
             
@@ -379,7 +423,7 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
                     ))}
                   </div>
                 ) : (
-                  <div className="p-4 text-center text-gray-500">No places found</div>
+                  <div className="p-4 text-center text-gray-500">No places found for &ldquo;{searchQuery}&rdquo;</div>
                 )}
               </div>
             )}
@@ -398,7 +442,7 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MapPin size={20} />
-              Map ({pois.length} locations)
+              Map ({pois.length} confirmed, {pendingPOI ? '1 pending' : '0 pending'})
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -408,7 +452,7 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
               style={{ minHeight: "400px" }}
             />
             <p className="text-xs text-gray-500 mt-2">
-              Click anywhere on the map to drop a pin and add a custom location
+              Click anywhere on the map to add a location. Red markers are pending confirmation.
             </p>
           </CardContent>
         </Card>
@@ -417,12 +461,24 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
         <Card>
           <CardHeader>
             <CardTitle>
-              {selectedPOI ? "Edit Location" : "Select a location"}
+              {selectedPOI ? (isPendingPOI ? "Confirm New Location" : "Edit Location") : "Select a location"}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {selectedPOI ? (
               <div className="space-y-4">
+                {isPendingPOI && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                    <div className="flex items-center gap-2 text-yellow-800">
+                      <MapPin size={16} />
+                      <span className="font-medium">Pending Location</span>
+                    </div>
+                    <p className="text-sm text-yellow-700 mt-1">
+                      Review the details below and click &ldquo;Confirm & Add&rdquo; to add this location to your list.
+                    </p>
+                  </div>
+                )}
+
                 {/* Category Assignment */}
                 <div>
                   <label className="block text-sm font-medium mb-2">Category</label>
@@ -476,34 +532,51 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
                 {selectedPOI.googlePlaceId && (
                   <div className="text-xs text-gray-500 border-t pt-2">
                     <div>Google Place ID: {selectedPOI.googlePlaceId}</div>
-                    {selectedPOI.rating && (
-                      <div className="flex items-center gap-1 mt-1">
-                        <Star size={12} className="text-yellow-500" />
-                        <span>Rating: {selectedPOI.rating}/5</span>
-                      </div>
-                    )}
+                    <div className="text-xs text-blue-600">Google details (photos, ratings) will be fetched dynamically when buyers view this list</div>
                   </div>
                 )}
 
                 {/* Actions */}
                 <div className="flex gap-2 pt-4 border-t">
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => removePOI(selectedPOI)}
-                  >
-                    <X size={16} className="mr-1" />
-                    Remove
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedPOI(null)}
-                  >
-                    Done
-                  </Button>
+                  {isPendingPOI ? (
+                    <>
+                      <Button
+                        type="button"
+                        onClick={confirmPendingPOI}
+                        className="flex-1"
+                      >
+                        <Check size={16} className="mr-1" />
+                        Confirm & Add
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={cancelPendingPOI}
+                      >
+                        Cancel
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => removePOI(selectedPOI)}
+                      >
+                        <X size={16} className="mr-1" />
+                        Remove
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedPOI(null)}
+                      >
+                        Done
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             ) : (
@@ -530,7 +603,10 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
                   <div
                     key={index}
                     className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
-                    onClick={() => setSelectedPOI(poi)}
+                    onClick={() => {
+                      setSelectedPOI(poi);
+                      setPendingPOI(null);
+                    }}
                   >
                     <div className="flex items-center gap-3">
                       <Badge variant="secondary">
@@ -545,12 +621,6 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {poi.rating && (
-                        <div className="flex items-center gap-1">
-                          <Star size={12} className="text-yellow-500" />
-                          <span className="text-xs">{poi.rating}</span>
-                        </div>
-                      )}
                       <Button 
                         size="sm" 
                         variant="outline"
