@@ -30,9 +30,9 @@ export function CurrencySelector() {
 
   return (
     <div className="flex items-center gap-2">
-      <Globe size={16} className="text-gray-500" />
+      <Globe size={16} className="text-gray-700" />
       <Select value={selectedCurrency} onValueChange={handleCurrencyChange}>
-        <SelectTrigger className="w-auto min-w-[80px] h-8 text-sm border-none shadow-none">
+        <SelectTrigger className="w-auto min-w-[80px] h-8 text-sm bg-white border border-gray-300 text-gray-900 font-medium">
           <SelectValue>
             {selectedCurrencyData?.symbol} {selectedCurrency}
           </SelectValue>
