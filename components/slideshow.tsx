@@ -47,7 +47,7 @@ export const SlideShow = () => {
                 </p>
                 <p>Over 100 products discounted</p>
               </div>
-              <Link href={routes.products}>
+              <Link href={routes.lists}>
                 <Button>Shop Now</Button>
               </Link>
             </div>

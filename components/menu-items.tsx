@@ -47,7 +47,7 @@ export function MenuItems() {
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <Link href="/products" legacyBehavior passHref>
+          <Link href="/" legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               Products
             </NavigationMenuLink>
@@ -74,14 +74,14 @@ export function MenuItems() {
                   </a>
                 </NavigationMenuLink>
               </li>
-              <ListItem href={routes.products} title="New Arrivals">
+              <ListItem href={routes.lists} title="New Arrivals">
                 Shop our new arrivals and exclusive collections.
               </ListItem>
-              <ListItem href={routes.products} title="Sport">
-                Discover our new sports range.
+              <ListItem href={routes.lists} title="Popular Lists">
+                Discover our new location lists range.
               </ListItem>
-              <ListItem href={routes.products} title="Summer Sale">
-                Grab a bargain with our summer sale.
+              <ListItem href={routes.lists} title="Featured">
+                Grab a bargain with our featured lists.
               </ListItem>
             </ul>
           </NavigationMenuContent>

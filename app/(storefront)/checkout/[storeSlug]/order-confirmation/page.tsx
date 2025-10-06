@@ -88,7 +88,7 @@ export default async function OrderConfirmation({
                 View My Orders
               </Button>
             </Link>
-            <Link href={routes.products}>
+            <Link href={routes.lists}>
               <Button variant="outline">
                 Browse Products
               </Button>
@@ -167,7 +167,7 @@ export default async function OrderConfirmation({
                 Continue Shopping
               </Button>
             </Link>
-            <Link href={routes.products}>
+            <Link href={routes.lists}>
               <Button variant="outline">
                 Browse Products
               </Button>

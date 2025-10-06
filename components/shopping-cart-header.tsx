@@ -39,7 +39,7 @@ export const ShoppingCartHeader = async () => {
       buttonRoute={
         numberOfCartItems && numberOfCartItems > 0
           ? routes.cart
-          : routes.products
+          : routes.lists
       }
       insideButton={
         <Button className="w-full">

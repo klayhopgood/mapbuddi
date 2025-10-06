@@ -43,7 +43,7 @@ export const MobileNavigation = () => {
           <div className="flex items-start justify-center gap-2 flex-col">
             <NavBarLink
               image={images[0]}
-              href={routes.products}
+              href={routes.lists}
               name="Products"
               setIsMobileNavOpen={setIsMobileNavOpen}
             />
