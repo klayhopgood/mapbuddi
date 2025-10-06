@@ -47,7 +47,7 @@ export function MenuItems() {
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <Link href="/" legacyBehavior passHref>
+          <Link href={routes.lists} legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               Location Lists
             </NavigationMenuLink>

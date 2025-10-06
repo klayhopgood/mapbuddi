@@ -202,6 +202,7 @@ export const LocationListEditorElements = (props: {
     try {
       const listData = {
         ...formValues,
+        currency: "USD", // Always store in USD
         totalPois: pois.length,
       };
 
@@ -296,7 +297,7 @@ export const LocationListEditorElements = (props: {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Price</label>
+                    <label className="block text-sm font-medium mb-2">Price (USD)</label>
                     <Input
                       type="number"
                       step="0.01"
@@ -306,25 +307,7 @@ export const LocationListEditorElements = (props: {
                       onChange={(e) => setFormValues({ ...formValues, price: e.target.value })}
                       required
                     />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Currency</label>
-                    <Select 
-                      value={formValues.currency || "USD"} 
-                      onValueChange={(value) => setFormValues({ ...formValues, currency: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {getCurrencySelectOptions().map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.symbol} {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <p className="text-xs text-gray-500 mt-1">All prices are stored in USD. Buyers will see prices in their preferred currency.</p>
                   </div>
                 </div>
 

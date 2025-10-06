@@ -40,8 +40,8 @@ export async function createPaymentIntent({
       items: JSON.stringify(items),
     };
 
-    // Determine currency from items (assume all items have same currency for now)
-    const currency = items[0]?.currency?.toLowerCase() || "usd";
+    // Always use USD for payments
+    const currency = "usd";
     
     const { orderTotal, platformFee } = calculateOrderAmounts(items);
 

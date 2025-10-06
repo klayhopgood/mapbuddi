@@ -38,7 +38,6 @@ export default async function Page({
     .select({
       id: locationLists.id,
       price: locationLists.price,
-      currency: locationLists.currency,
     })
     .from(locationLists)
     .leftJoin(stores, eq(locationLists.storeId, stores.id))
@@ -54,7 +53,7 @@ export default async function Page({
         id: item.id,
         price: priceAsNumber,
         qty: item.qty,
-        currency: list.currency || "USD",
+        currency: "USD", // Always use USD for payments
       };
     })
     .filter(Boolean) as CheckoutItem[];
