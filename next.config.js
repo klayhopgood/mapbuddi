@@ -20,6 +20,12 @@ const nextConfig = {
         port: "",
         pathname: "/f/**",
       },
+      {
+        protocol: "https",
+        hostname: "maps.googleapis.com",
+        port: "",
+        pathname: "/maps/api/place/photo**",
+      },
     ],
   },
 };

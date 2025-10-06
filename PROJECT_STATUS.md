@@ -163,30 +163,34 @@ CAD: 1.37, CHF: 0.88, CNY: 7.24, SEK: 10.85, NOK: 10.95
 
 ---
 
-## 🌐 **User Flows - Location Lists**
+## 🌐 **User Flows - Location Lists to Google Maps Sync**
+
+### **The Core Value Proposition**
+MapBuddi enables sellers to create curated POI lists that buyers can purchase and sync directly to their personal Google Maps app. This means when buyers open Google Maps on their phone, the purchased lists appear as saved places they can navigate to.
 
 ### **Seller Workflow**
 1. **Create Account** → Connect Stripe → Create Store
 2. **New List** → Add name, description, price (USD), cover image
 3. **Add Categories** → Name + emoji (🍽️ Restaurants, 🎭 Attractions)
-4. **Add POIs** → Search Google Places or enter manually with coordinates
-5. **Organize** → Assign POIs to categories, add seller notes
+4. **Add POIs** → Search Google Places, add rich details, seller notes ("we had the pasta and it was great")
+5. **Organize** → Assign POIs to categories, add personal recommendations
 6. **Publish** → Set list as "Live" to make available for purchase
 
 ### **Buyer Workflow**
 1. **Browse Lists** → Visit `/lists` page, filter by seller
 2. **Select Currency** → Choose display currency from top navigation
-3. **View Details** → See list preview, categories, POI count
+3. **View Details** → See list preview, categories, POI count (no exact locations shown)
 4. **Add to Cart** → Single click (no quantity selection)
 5. **Checkout** → Automatic email from signed-in account
 6. **Purchase** → Payment processed in USD, list appears in order history
+7. **Sync to Google Maps** → Export purchased list to personal Google Maps account
+8. **Use in Google Maps** → Open Google Maps app, see saved POIs, navigate normally
 
-### **Currency Experience**
-1. **Default Display** → USD for all users initially
-2. **Currency Selection** → Globe icon in top navigation
-3. **Real-time Conversion** → All prices update immediately
-4. **Persistent Choice** → Currency preference saved in localStorage
-5. **Accurate Rates** → USD $10 = AUD $15.14 (current market rates)
+### **The Key Differentiator**
+- **No in-app navigation** - MapBuddi handles discovery and purchase
+- **Google Maps for navigation** - Buyers use their familiar Google Maps app
+- **Seamless integration** - Purchased lists sync directly to personal Google Maps
+- **Rich seller context** - POIs include personal notes and recommendations
 
 ---
 
@@ -286,20 +290,36 @@ CAD: 1.37, CHF: 0.88, CNY: 7.24, SEK: 10.85, NOK: 10.95
 
 ---
 
-## 🔮 **Next Phase - Google Maps Sync**
+## 🔮 **Next Phase - Enhanced POI Creation & Google Maps Sync**
 
-### **🚧 Still To Implement**
-- **KML Generation:** Export purchased lists to Google My Maps format
-- **Google OAuth:** Authentication for Maps/Drive access
-- **One-Click Sync:** Direct import to user's Google My Maps
-- **Sync Management:** Toggle sync on/off for purchased lists
-- **List Previews:** Map view of POIs without revealing specific locations
+### **🚧 Phase 1: Enhanced Seller POI Creation (In Progress)**
+Currently, sellers can search for POIs using basic Google Places search, but the experience needs significant enhancement:
 
-### **Technical Requirements**
-- **Google APIs:** Drive API, My Maps API
-- **OAuth Scopes:** `https://www.googleapis.com/auth/drive.file`
-- **KML Structure:** Categories as folders, POIs with custom icons
-- **Error Handling:** Graceful fallback to manual KML download
+**Current Limitations:**
+- Basic text search only (no interactive map)
+- Limited place details (no photos, hours, ratings)
+- Manual coordinate entry required
+- No bulk import from Google Maps
+- Basic POI management interface
+
+**Planned Improvements:**
+- **Interactive Google Maps Integration**: Embedded map for visual POI selection
+- **Rich Place Details**: Photos, ratings, hours, website, phone
+- **Google Places Autocomplete**: Real-time search suggestions
+- **Enhanced POI Management**: Drag-and-drop, category assignment, bulk operations
+- **Seller Notes Enhancement**: Rich text notes and recommendations
+
+### **🚧 Phase 2: Buyer Google Maps Sync (Future)**
+Enable buyers to sync purchased lists directly to their personal Google Maps:
+
+**Technical Requirements:**
+- **KML Generation**: Export purchased lists to Google My Maps format
+- **Google OAuth**: Authentication for Maps/Drive access
+- **One-Click Sync**: Direct import to user's Google My Maps
+- **Sync Management**: Toggle sync on/off for purchased lists
+
+### **Current Focus: Seller POI Creation**
+The immediate priority is enhancing how sellers add and manage POIs in their lists to create rich, valuable location experiences that buyers will want to sync to their Google Maps.
 
 ---
 

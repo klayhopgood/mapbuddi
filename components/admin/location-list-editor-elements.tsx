@@ -15,6 +15,7 @@ import { getCurrencySelectOptions, formatPrice } from "@/lib/currency";
 import { searchPlaces, PlaceSearchResult, getPlaceTypeEmoji } from "@/lib/google-places";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { EnhancedPOICreator, ListPOI as EnhancedListPOI, ListCategory as EnhancedListCategory } from "./enhanced-poi-creator";
 
 interface ListCategory {
   id?: number;
@@ -61,9 +62,6 @@ export const LocationListEditorElements = (props: {
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<PlaceSearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
 
   const [formValues, setFormValues] = useState<Omit<LocationList, "id" | "storeId" | "totalPois" | "avgRating" | "createdAt" | "updatedAt">>(
     props.initialValues ?? defaultValues
@@ -112,66 +110,6 @@ export const LocationListEditorElements = (props: {
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [onKeyDown]);
-
-  const handleSearchPlaces = async () => {
-    if (!searchQuery.trim()) return;
-    
-    setIsSearching(true);
-    try {
-      const results = await searchPlaces(searchQuery);
-      setSearchResults(results);
-    } catch (error) {
-      toast({
-        title: "Search failed",
-        description: "Failed to search for places. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  const addPOIFromSearch = (place: PlaceSearchResult, categoryIndex: number) => {
-    const newPOI: ListPOI = {
-      name: place.name,
-      description: place.address,
-      latitude: place.location.lat,
-      longitude: place.location.lng,
-      googlePlaceId: place.placeId,
-      address: place.address,
-      categoryId: categoryIndex,
-    };
-    setPois([...pois, newPOI]);
-    setSearchQuery("");
-    setSearchResults([]);
-    toast({
-      title: "POI Added",
-      description: `${place.name} has been added to your list.`,
-    });
-  };
-
-  const addManualPOI = (categoryIndex: number) => {
-    const newPOI: ListPOI = {
-      name: "New Location",
-      description: "",
-      sellerNotes: "",
-      latitude: 0,
-      longitude: 0,
-      address: "",
-      categoryId: categoryIndex,
-    };
-    setPois([...pois, newPOI]);
-  };
-
-  const removePOI = (index: number) => {
-    setPois(pois.filter((_, i) => i !== index));
-  };
-
-  const updatePOI = (index: number, updates: Partial<ListPOI>) => {
-    const updatedPois = [...pois];
-    updatedPois[index] = { ...updatedPois[index], ...updates };
-    setPois(updatedPois);
-  };
 
   const addCategory = () => {
     const newCategory: ListCategory = {
@@ -374,113 +312,39 @@ export const LocationListEditorElements = (props: {
           </TabsContent>
 
           <TabsContent value="pois" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Add Places</CardTitle>
-                <CardDescription>Search for places or add them manually</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex space-x-2">
-                    <Input
-                      placeholder="Search for restaurants, attractions, etc..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && handleSearchPlaces()}
-                    />
-                    <Button type="button" onClick={handleSearchPlaces} disabled={isSearching}>
-                      {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search size={16} />}
-                    </Button>
-                  </div>
-
-                  {searchResults.length > 0 && (
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Search Results:</h4>
-                      {searchResults.map((place, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                          <div className="flex items-center space-x-3">
-                            <span className="text-xl">{getPlaceTypeEmoji(place.types)}</span>
-                            <div>
-                              <div className="font-medium">{place.name}</div>
-                              <div className="text-sm text-gray-500">{place.address}</div>
-                            </div>
-                          </div>
-                          <div className="flex space-x-2">
-                            {categories.map((category, categoryIndex) => (
-                              <Button
-                                key={categoryIndex}
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => addPOIFromSearch(place, categoryIndex)}
-                              >
-                                Add to {category.emoji} {category.name}
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="space-y-4">
-                    <h4 className="font-medium">Added Places ({pois.length}):</h4>
-                    {pois.map((poi, index) => (
-                      <div key={index} className="p-4 border rounded-lg space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <span>{categories[poi.categoryId || 0]?.emoji}</span>
-                            <Badge variant="secondary">{categories[poi.categoryId || 0]?.name}</Badge>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removePOI(index)}
-                          >
-                            <X size={16} />
-                          </Button>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <Input
-                            placeholder="Place name"
-                            value={poi.name}
-                            onChange={(e) => updatePOI(index, { name: e.target.value })}
-                          />
-                          <Input
-                            placeholder="Address"
-                            value={poi.address || ""}
-                            onChange={(e) => updatePOI(index, { address: e.target.value })}
-                          />
-                        </div>
-                        <Textarea
-                          placeholder="Your notes about this place..."
-                          value={poi.sellerNotes || ""}
-                          onChange={(e) => updatePOI(index, { sellerNotes: e.target.value })}
-                          rows={2}
-                        />
-                        <div className="grid grid-cols-2 gap-4">
-                          <Input
-                            placeholder="Latitude"
-                            type="number"
-                            step="any"
-                            value={poi.latitude}
-                            onChange={(e) => updatePOI(index, { latitude: parseFloat(e.target.value) })}
-                          />
-                          <Input
-                            placeholder="Longitude"
-                            type="number"
-                            step="any"
-                            value={poi.longitude}
-                            onChange={(e) => updatePOI(index, { longitude: parseFloat(e.target.value) })}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <EnhancedPOICreator
+              categories={categories.map(cat => ({
+                id: cat.id,
+                name: cat.name,
+                emoji: cat.emoji,
+                iconColor: cat.iconColor,
+                displayOrder: cat.displayOrder,
+              }))}
+              pois={pois.map(poi => ({
+                id: poi.id,
+                categoryId: poi.categoryId,
+                name: poi.name,
+                description: poi.description,
+                sellerNotes: poi.sellerNotes,
+                latitude: poi.latitude,
+                longitude: poi.longitude,
+                googlePlaceId: poi.googlePlaceId,
+                address: poi.address,
+              }))}
+              onPoisChange={(newPois) => {
+                setPois(newPois.map(poi => ({
+                  id: poi.id,
+                  categoryId: poi.categoryId,
+                  name: poi.name,
+                  description: poi.description,
+                  sellerNotes: poi.sellerNotes,
+                  latitude: poi.latitude,
+                  longitude: poi.longitude,
+                  googlePlaceId: poi.googlePlaceId,
+                  address: poi.address,
+                })));
+              }}
+            />
           </TabsContent>
         </Tabs>
 
