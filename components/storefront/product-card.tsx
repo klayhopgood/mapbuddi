@@ -48,7 +48,6 @@ export const ProductCard = (props: {
           </Link>
           <ProductForm
             addToCartAction={addToCart}
-            disableQuantitySelector={true}
             productId={props.storeAndProduct.product.id}
             productName={props.storeAndProduct.product.name}
             buttonSize="sm"
