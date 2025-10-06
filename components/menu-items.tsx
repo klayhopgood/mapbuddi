@@ -49,7 +49,7 @@ export function MenuItems() {
         <NavigationMenuItem>
           <Link href="/" legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Products
+              Location Lists
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>

@@ -40,6 +40,9 @@ export async function createPaymentIntent({
       items: JSON.stringify(items),
     };
 
+    // Determine currency from items (assume all items have same currency for now)
+    const currency = items[0]?.currency?.toLowerCase() || "usd";
+    
     const { orderTotal, platformFee } = calculateOrderAmounts(items);
 
     // check if cartid has a paymentIntent already
@@ -69,6 +72,7 @@ export async function createPaymentIntent({
             paymentIntent[0].paymentIntentId,
             {
               amount: orderTotal,
+              currency: currency,
               application_fee_amount: platformFee,
               metadata,
             },
@@ -95,7 +99,7 @@ export async function createPaymentIntent({
     const paymentIntent = await stripe.paymentIntents.create(
       {
         amount: orderTotal,
-        currency: "usd",
+        currency: currency,
         metadata,
         automatic_payment_methods: {
           enabled: true,

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
 import { db } from '@/db/db';
 import { locationLists, listCategories, listPois } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 
 export async function PUT(
   request: NextRequest, 
@@ -45,10 +45,20 @@ export async function PUT(
         .where(eq(locationLists.id, listId))
         .returning();
 
-      // Delete existing categories and POIs
-      await tx.delete(listPois).where(
-        eq(listPois.categoryId, listCategories.id)
-      );
+      // Delete existing POIs first (by getting categories for this list)
+      const existingCategories = await tx
+        .select({ id: listCategories.id })
+        .from(listCategories)
+        .where(eq(listCategories.listId, listId));
+      
+      if (existingCategories.length > 0) {
+        const categoryIds = existingCategories.map(cat => cat.id);
+        await tx.delete(listPois).where(
+          inArray(listPois.categoryId, categoryIds)
+        );
+      }
+      
+      // Delete existing categories
       await tx.delete(listCategories).where(eq(listCategories.listId, listId));
 
       // Create new categories

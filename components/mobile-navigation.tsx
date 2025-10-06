@@ -44,7 +44,7 @@ export const MobileNavigation = () => {
             <NavBarLink
               image={images[0]}
               href={routes.lists}
-              name="Products"
+              name="Location Lists"
               setIsMobileNavOpen={setIsMobileNavOpen}
             />
             <NavBarLink

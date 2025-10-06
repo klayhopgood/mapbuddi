@@ -21,15 +21,26 @@ import {
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs";
 
 export default function CheckoutForm() {
   const { storeSlug } = useParams();
   const stripe = useStripe();
   const elements = useElements();
+  const { user } = useUser();
 
-  const [email, setEmail] = useState("");
+  // Use the logged-in user's email automatically
+  const userEmail = user?.emailAddresses[0]?.emailAddress || "";
+  const [email, setEmail] = useState(userEmail);
   const [message, setMessage] = useState<null | string>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Set email when user data loads
+  useEffect(() => {
+    if (userEmail && !email) {
+      setEmail(userEmail);
+    }
+  }, [userEmail, email]);
 
   useEffect(() => {
     if (!stripe) {
@@ -78,7 +89,7 @@ export default function CheckoutForm() {
       confirmParams: {
         // Make sure to change this to your payment completion page
         return_url: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/${routes.checkout}/${storeSlug}/${routes.orderConfirmation}`,
-        receipt_email: email,
+        receipt_email: userEmail || email,
       },
     });
 
@@ -118,12 +129,19 @@ export default function CheckoutForm() {
       )}
       <div className="flex flex-col gap-2 bg-secondary border-border border rounded-md md:p-6 p-4 md:pb-7 pb-5">
         <Heading size="h4">Contact Info</Heading>
-        <LinkAuthenticationElement
-          id="link-authentication-element"
-          onChange={(e: StripeLinkAuthenticationElementChangeEvent) =>
-            setEmail(e.value.email)
-          }
-        />
+        {userEmail ? (
+          <div className="p-3 bg-white border rounded-md">
+            <p className="text-sm text-gray-600">Email</p>
+            <p className="font-medium">{userEmail}</p>
+          </div>
+        ) : (
+          <LinkAuthenticationElement
+            id="link-authentication-element"
+            onChange={(e: StripeLinkAuthenticationElementChangeEvent) =>
+              setEmail(e.value.email)
+            }
+          />
+        )}
       </div>
       <div className="flex flex-col gap-2 bg-secondary border-border border rounded-md md:p-6 p-4 md:pb-7 pb-5">
         <Heading size="h4">Shipping</Heading>

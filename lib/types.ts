@@ -12,6 +12,7 @@ export type CheckoutItem = {
   id: number;
   price: number;
   qty: number;
+  currency?: string;
 };
 
 export type CartLineItemDetails = Omit<LocationList, "description" | "coverImage"> & {
