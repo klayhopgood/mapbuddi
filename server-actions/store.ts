@@ -81,21 +81,30 @@ export async function updateStore(args: {
   industry: string | null;
 }) {
   const inputSchema = z.object({
-    name: z.string(),
-    description: z.string(),
-    industry: z.string(),
+    name: z.string().nullable(),
+    description: z.string().nullable(),
+    industry: z.string().nullable(),
   });
 
   try {
     const user = await currentUser();
-
-    if (!inputSchema.parse(args)) {
-      throw new Error("invalid input");
+    
+    if (!user) {
+      throw new Error("User not authenticated");
     }
+
+    // Validate input
+    const validatedArgs = inputSchema.parse(args);
+    
+    // Filter out null values for the update
+    const updateData: any = {};
+    if (validatedArgs.name !== null) updateData.name = validatedArgs.name;
+    if (validatedArgs.description !== null) updateData.description = validatedArgs.description;
+    if (validatedArgs.industry !== null) updateData.industry = validatedArgs.industry;
 
     await db
       .update(stores)
-      .set(args)
+      .set(updateData)
       .where(eq(stores.id, Number(user?.privateMetadata.storeId)));
 
     const res = {
@@ -106,10 +115,10 @@ export async function updateStore(args: {
 
     return res;
   } catch (err) {
-    console.log(err);
+    console.error("Error updating store:", err);
     const res = {
       error: true,
-      message: "Sorry, an error occured updating your details.",
+      message: "Sorry, an error occurred updating your details.",
       action: "Please try again.",
     };
     return res;
