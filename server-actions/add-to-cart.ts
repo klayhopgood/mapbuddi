@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db/db";
-import { carts } from "@/db/schema";
+import { carts, locationLists, stores } from "@/db/schema";
 import { CartItem } from "@/lib/types";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -11,6 +11,20 @@ import { currentUser } from "@clerk/nextjs/server";
 export async function addToCart(newCartItem: CartItem) {
   const user = await currentUser();
   if (!user) throw new Error("User not authenticated");
+
+  // ✅ Prevent users from adding their own products to cart
+  const listDetails = await db
+    .select({
+      storeId: locationLists.storeId,
+      storeOwnerId: stores.userId,
+    })
+    .from(locationLists)
+    .leftJoin(stores, eq(locationLists.storeId, stores.id))
+    .where(eq(locationLists.id, newCartItem.id));
+
+  if (listDetails.length && listDetails[0].storeOwnerId === user.id) {
+    throw new Error("You cannot add your own location lists to the cart");
+  }
 
   const cookieStore = cookies();
   const cartId = cookieStore.get("cartId")?.value;

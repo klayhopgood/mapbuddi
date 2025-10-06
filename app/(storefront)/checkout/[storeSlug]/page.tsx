@@ -13,18 +13,21 @@ import { Button } from "@/components/ui/button";
 import { routes } from "@/lib/routes";
 import Link from "next/link";
 import { hasConnectedStripeAccount } from "@/server-actions/stripe/account";
+import { currentUser } from "@clerk/nextjs/server";
 
 export default async function Page({
   params,
 }: {
   params: { storeSlug: string };
 }) {
+  const user = await currentUser();
   const cartId = cookies().get("cartId")?.value;
   const { cartItems, cartItemDetails } = await getCart(Number(cartId));
 
   const store = await db
     .select({
       storeId: stores.id,
+      userId: stores.userId,
       stripeAccountId: payments.stripeAccountId,
     })
     .from(stores)
@@ -32,7 +35,24 @@ export default async function Page({
     .where(eq(stores.slug, params.storeSlug));
 
   const storeId = Number(store[0].storeId);
+  const storeOwnerId = store[0].userId;
   const storeStripeAccountId = store[0].stripeAccountId;
+
+  // ✅ Prevent users from buying their own products
+  if (user && user.id === storeOwnerId) {
+    return (
+      <InfoCard
+        heading="Cannot purchase your own lists"
+        subheading="You cannot purchase location lists from your own store. These lists are already available in your seller dashboard."
+        icon={<AlertCircle size={24} />}
+        button={
+          <Link href={routes.cart}>
+            <Button>Return to cart</Button>
+          </Link>
+        }
+      />
+    );
+  }
 
   const storeLists = await db
     .select({
