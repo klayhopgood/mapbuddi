@@ -161,6 +161,11 @@ export const LocationListEditorElements = (props: {
 
       const data = await response.json();
 
+      console.log("=== LIST SAVE RESPONSE ===");
+      console.log("Response data:", data);
+      console.log("Error:", data.error);
+      console.log("List ID:", data.listId);
+
       if (data.error) {
         toast({
           title: "Error",
@@ -174,8 +179,12 @@ export const LocationListEditorElements = (props: {
             ? "Location list updated successfully!" 
             : "Location list created successfully!",
         });
-        router.push("/account/selling/lists");
-        router.refresh();
+        
+        // Add a small delay to ensure database write completes
+        setTimeout(() => {
+          router.push("/account/selling/lists");
+          router.refresh();
+        }, 500);
       }
     } catch (error) {
       toast({

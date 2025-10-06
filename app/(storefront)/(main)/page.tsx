@@ -24,6 +24,9 @@ import {
 
 import { LocationListAndStore } from "@/lib/collection-types";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function Home() {
   const rawData = await db
     .select({

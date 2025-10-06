@@ -37,6 +37,9 @@ async function getData(): Promise<LocationListData[]> {
     : [];
 }
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function LocationListsPage() {
   const listsList = await getData();
 

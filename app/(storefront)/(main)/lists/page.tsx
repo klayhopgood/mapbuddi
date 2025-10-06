@@ -8,6 +8,9 @@ import { eq, inArray } from "drizzle-orm";
 
 const LISTS_PER_PAGE = 12;
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function LocationListsPage(context: {
   params: { slug: string };
   searchParams: { page: string; seller: string };

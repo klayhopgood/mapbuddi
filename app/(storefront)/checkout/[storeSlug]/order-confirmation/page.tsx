@@ -141,7 +141,7 @@ export default async function OrderConfirmation({
         <div className="text-center space-y-4">
           <Heading size="h2">Order Verification Issue</Heading>
           <p className="text-muted-foreground">
-            We're having trouble verifying your order details. This usually resolves itself within a few minutes.
+            We&apos;re having trouble verifying your order details. This usually resolves itself within a few minutes.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Link href="/">
