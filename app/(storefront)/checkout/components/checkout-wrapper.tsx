@@ -22,21 +22,32 @@ export default function CheckoutWrapper(props: {
   cartLineItems: React.ReactNode;
 }) {
   const [clientSecret, setClientSecret] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const stripePromise = useMemo(
     () => loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!),
     []
   );
 
   useEffect(() => {
-    let error;
+    console.log("=== CHECKOUT WRAPPER DEBUG ===");
+    setLoading(true);
     props.paymentIntent.then((data) => {
+      console.log("Payment intent data:", data);
       if (!data || !data.clientSecret) {
-        error = true;
+        console.error("No client secret found in payment intent data");
+        setError("Failed to initialize payment. Please try again.");
+        setLoading(false);
         return;
       }
+      console.log("Setting client secret:", data.clientSecret);
       setClientSecret(data.clientSecret);
+      setLoading(false);
+    }).catch((error) => {
+      console.error("Error in payment intent:", error);
+      setError(`Payment initialization failed: ${error.message}`);
+      setLoading(false);
     });
-    if (error) throw new Error("Payment intent not found");
   }, [props.paymentIntent]);
 
   const options = {
@@ -72,7 +83,25 @@ export default function CheckoutWrapper(props: {
           Checkout
         </Button>
       </div>
-      {clientSecret && (
+      {loading && (
+        <div className="mt-8 p-8 text-center">
+          <p>Loading checkout...</p>
+        </div>
+      )}
+      
+      {error && (
+        <div className="mt-8 p-8 text-center bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-600">{error}</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="mt-4"
+          >
+            Try Again
+          </Button>
+        </div>
+      )}
+      
+      {clientSecret && !loading && !error && (
         <div>
           <div className="lg:grid lg:grid-cols-12 lg:gap-8 mt-4 flex flex-col-reverse gap-6">
             <div className="col-span-7">
