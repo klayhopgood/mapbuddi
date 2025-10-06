@@ -282,7 +282,7 @@ export const LocationListEditorElements = (props: {
                   <div>
                     <label className="block text-sm font-medium mb-2">Currency</label>
                     <Select 
-                      value={formValues.currency} 
+                      value={formValues.currency || "USD"} 
                       onValueChange={(value) => setFormValues({ ...formValues, currency: value })}
                     >
                       <SelectTrigger>
