@@ -16,15 +16,15 @@ import { EditCartLineItem } from "./edit-cart-line-item";
 
 export const CartLineItems = (props: {
   cartItems: CartItem[];
-  products: CartLineItemDetails[];
+  lists: CartLineItemDetails[];
   variant: "cart" | "checkout";
 }) => {
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">Image</TableHead>
-          <TableHead>Name</TableHead>
+          <TableHead className="w-[100px]">Cover</TableHead>
+          <TableHead>List Name</TableHead>
           {props.variant === "cart" ? (
             <>
               <TableHead>Price</TableHead>
@@ -40,16 +40,16 @@ export const CartLineItems = (props: {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {props.products.map((product) => {
-          const currentProductInCart = props.cartItems.find(
-            (item) => item.id === product.id
+        {props.lists.map((list) => {
+          const currentListInCart = props.cartItems.find(
+            (item) => item.id === list.id
           );
           return (
-            <TableRow key={product.id}>
+            <TableRow key={list.id}>
               <TableCell className="font-medium">
                 <ProductImage
-                  src={product.images[0]?.url}
-                  alt={product.images[0]?.alt}
+                  src={list.coverImage[0]?.url}
+                  alt={list.coverImage[0]?.alt}
                   sizes="50px"
                   height="h-[50px]"
                   width="w-[50px]"
@@ -57,9 +57,9 @@ export const CartLineItems = (props: {
               </TableCell>
               <TableCell className="max-w-[200px] w-[200px] truncate">
                 {props.variant === "cart" ? (
-                  <Link href={`${routes.product}/${product.id}`}>
+                  <Link href={`${routes.list}/${list.id}`}>
                     <Button className="m-0 p-0 h-auto" variant="link">
-                      {product.name}
+                      {list.name}
                     </Button>
                   </Link>
                 ) : (
@@ -67,37 +67,37 @@ export const CartLineItems = (props: {
                     className="m-0 p-0 h-auto hover:no-underline hover:cursor-auto"
                     variant="link"
                   >
-                    {product.name}
+                    {list.name}
                   </Button>
                 )}
               </TableCell>
               {props.variant === "cart" ? (
                 <>
                   <TableCell>
-                    {currencyFormatter(Number(product.price))}
+                    {currencyFormatter(Number(list.price))}
                   </TableCell>
-                  <TableCell>{currentProductInCart?.qty}</TableCell>
+                  <TableCell>{currentListInCart?.qty}</TableCell>
                 </>
               ) : (
                 <>
-                  <TableCell>{currentProductInCart?.qty}</TableCell>
+                  <TableCell>{currentListInCart?.qty}</TableCell>
                   <TableCell className="text-right">
-                    {currencyFormatter(Number(product.price))}
+                    {currencyFormatter(Number(list.price))}
                   </TableCell>
                 </>
               )}
               {props.variant === "cart" ? (
                 <TableCell>
                   {currencyFormatter(
-                    Number(currentProductInCart?.qty) * Number(product.price)
+                    Number(currentListInCart?.qty) * Number(list.price)
                   )}
                 </TableCell>
               ) : null}
               {props.variant === "cart" ? (
                 <TableCell className="text-right">
                   <EditCartLineItem
-                    productInCart={currentProductInCart}
-                    product={product}
+                    listInCart={currentListInCart}
+                    list={list}
                   />
                 </TableCell>
               ) : null}

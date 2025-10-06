@@ -20,12 +20,12 @@ import { handleInputQuantity } from "@/lib/utils";
 import { toast } from "../ui/use-toast";
 
 export const EditCartLineItem = (props: {
-  productInCart: CartItem | undefined;
-  product: CartLineItemDetails;
+  listInCart: CartItem | undefined;
+  list: CartLineItemDetails;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [quantity, setQuantity] = useState<string | number>(
-    props.productInCart?.qty ?? 1
+    props.listInCart?.qty ?? 1
   );
 
   return (
@@ -36,9 +36,9 @@ export const EditCartLineItem = (props: {
         </Button>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Edit {props.product.name}</AlertDialogTitle>
+            <AlertDialogTitle>Edit {props.list.name}</AlertDialogTitle>
             <AlertDialogDescription>
-              Change the quantity or remove this item from your cart.
+              Change the quantity or remove this location list from your cart.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="mb-6">
@@ -56,14 +56,14 @@ export const EditCartLineItem = (props: {
               className="mr-auto"
               onClick={() => {
                 setIsOpen((prev) => !prev);
-                if (props.productInCart) {
+                if (props.listInCart) {
                   void updateCart({
-                    ...props.productInCart,
+                    ...props.listInCart,
                     qty: 0,
                   });
                   toast({
                     title: "Cart updated",
-                    description: `${props.product.name} has been removed from your cart.`,
+                    description: `${props.list.name} has been removed from your cart.`,
                   });
                 }
               }}
@@ -74,17 +74,17 @@ export const EditCartLineItem = (props: {
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              disabled={!props.productInCart}
+              disabled={!props.listInCart}
               onClick={() => {
                 setIsOpen((prev) => !prev);
-                if (props.productInCart) {
+                if (props.listInCart) {
                   void updateCart({
-                    ...props.productInCart,
+                    ...props.listInCart,
                     qty: Number(quantity),
                   });
                   toast({
                     title: "Cart updated",
-                    description: `${props.product.name} has been updated in your cart.`,
+                    description: `${props.list.name} has been updated in your cart.`,
                   });
                 }
               }}

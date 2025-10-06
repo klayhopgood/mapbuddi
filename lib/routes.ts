@@ -4,6 +4,8 @@ export const routes = {
   account: "/account",
   products: "/products",
   product: "/product",
+  lists: "/",
+  list: "/list",
   productQuickView: "/quickview/product",
   seller: "/seller",
   cart: "/cart",

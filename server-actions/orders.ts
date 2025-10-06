@@ -1,24 +1,24 @@
 "use server";
 
 import { db } from "@/db/db";
-import { products } from "@/db/schema";
+import { locationLists } from "@/db/schema";
 import { CheckoutItem, OrderItemDetails } from "@/lib/types";
 import { inArray } from "drizzle-orm";
 
-export const getDetailsOfProductsOrdered = async (
+export const getDetailsOfListsOrdered = async (
   checkoutItems: CheckoutItem[]
 ) => {
   return (await db
     .select({
-      id: products.id,
-      name: products.name,
-      images: products.images,
-      storeId: products.storeId,
+      id: locationLists.id,
+      name: locationLists.name,
+      coverImage: locationLists.coverImage,
+      storeId: locationLists.storeId,
     })
-    .from(products)
+    .from(locationLists)
     .where(
       inArray(
-        products.id,
+        locationLists.id,
         checkoutItems.map((item) => item.id)
       )
     )) as OrderItemDetails[];

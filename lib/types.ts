@@ -1,6 +1,6 @@
-import { Order, Product } from "@/db/schema";
+import { Order, LocationList } from "@/db/schema";
 
-export type ProductImages = {
+export type ListImages = {
   id: string;
   alt: string;
   url: string;
@@ -14,16 +14,16 @@ export type CheckoutItem = {
   qty: number;
 };
 
-export type CartLineItemDetails = Omit<Product, "description" | "images"> & {
+export type CartLineItemDetails = Omit<LocationList, "description" | "coverImage"> & {
   storeName: string | null;
-  images: ProductImages[];
+  coverImage: ListImages[];
 };
 
 export type OrderItemDetails = Omit<
-  Product,
-  "description" | "images" | "description" | "price"
+  LocationList,
+  "description" | "coverImage" | "price"
 > & {
-  images: ProductImages[];
+  coverImage: ListImages[];
 };
 
 export type StripeAccount = {

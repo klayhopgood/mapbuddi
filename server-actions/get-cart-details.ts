@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db/db";
-import { carts, products, stores } from "@/db/schema";
+import { carts, locationLists, stores } from "@/db/schema";
 import { CartItem, CartLineItemDetails } from "@/lib/types";
 import { eq, inArray, and } from "drizzle-orm";
 import { currentUser } from "@clerk/nextjs/server";
@@ -63,19 +63,30 @@ async function getCartItemDetails(
   cartItems: CartItem[]
 ) {
   if (!cartId) return [];
-  const productIds = cartItems.map((item) => Number(item.id));
-  if (!productIds.length) return [];
+  const listIds = cartItems.map((item) => Number(item.id));
+  if (!listIds.length) return [];
   const vals = await db
     .select({
-      id: products.id,
-      name: products.name,
-      price: products.price,
-      storeId: products.storeId,
-      images: products.images,
+      id: locationLists.id,
+      name: locationLists.name,
+      price: locationLists.price,
+      currency: locationLists.currency,
+      storeId: locationLists.storeId,
+      coverImage: locationLists.coverImage,
+      totalPois: locationLists.totalPois,
+      avgRating: locationLists.avgRating,
+      isActive: locationLists.isActive,
+      createdAt: locationLists.createdAt,
+      updatedAt: locationLists.updatedAt,
       storeName: stores.name,
     })
-    .from(products)
-    .leftJoin(stores, eq(products.storeId, stores.id))
-    .where(inArray(products.id, productIds));
+    .from(locationLists)
+    .leftJoin(stores, eq(locationLists.storeId, stores.id))
+    .where(
+      and(
+        inArray(locationLists.id, listIds),
+        eq(locationLists.isActive, true)
+      )
+    );
   return vals as CartLineItemDetails[];
 }
