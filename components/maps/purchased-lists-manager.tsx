@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { MapPin, Calendar, DollarSign, Users, CheckCircle, AlertCircle, Clock } from "lucide-react";
+import { MapPin, Calendar, DollarSign, Users, CheckCircle, AlertCircle, Clock, Smartphone } from "lucide-react";
 import { UserMapsIntegration, PurchasedListSync } from "@/db/schema";
 import { toggleListSync } from "@/server-actions/maps-integration";
 import { toast } from "sonner";
