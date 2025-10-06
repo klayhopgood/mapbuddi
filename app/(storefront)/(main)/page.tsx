@@ -22,17 +22,10 @@ import {
   MapPin,
 } from "lucide-react";
 
-export type LocationListAndStore = {
-  locationList: typeof locationLists.$inferSelect;
-  store: {
-    id: number;
-    name: string | null;
-    slug: string | null;
-  };
-};
+import { LocationListAndStore } from "@/lib/collection-types";
 
 export default async function Home() {
-  const storeAndLocationList = (await db
+  const rawData = await db
     .select({
       locationList: locationLists,
       store: {
@@ -44,7 +37,18 @@ export default async function Home() {
     .from(locationLists)
     .leftJoin(stores, eq(locationLists.storeId, stores.id))
     .where(eq(locationLists.isActive, true))
-    .limit(8)) as LocationListAndStore[];
+    .limit(8);
+
+  // Transform coverImage from string to parsed object
+  const storeAndLocationList = rawData.map(item => ({
+    ...item,
+    locationList: {
+      ...item.locationList,
+      coverImage: typeof item.locationList.coverImage === 'string' 
+        ? JSON.parse(item.locationList.coverImage) 
+        : item.locationList.coverImage || []
+    }
+  })) as LocationListAndStore[];
 
   return (
     <div>

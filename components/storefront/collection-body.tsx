@@ -1,7 +1,7 @@
 "use client";
-import { ProductAndStore } from "@/app/(storefront)/(main)/products/page";
+import { LocationListAndStore } from "@/lib/collection-types";
 import { ProductSidebar } from "./product-sidebar";
-import { ProductCard } from "./product-card";
+import { LocationListCard } from "./location-list-card";
 import { PropsWithChildren } from "react";
 import { useSearchParams } from "next/navigation";
 import { Heading } from "../ui/heading";
@@ -17,7 +17,7 @@ import { EmptyStateWrapper } from "../ui/empty-state-wrapper";
 
 export const CollectionBody = (
   props: PropsWithChildren<{
-    storeAndProduct: ProductAndStore[];
+    storeAndLocationList: LocationListAndStore[];
     activeSellers: {
       id: number;
       name: string | null;
@@ -57,17 +57,17 @@ export const CollectionBody = (
           </AlertDialogContent>
         </AlertDialog>
       </div>
-      {props.storeAndProduct.length > 0 ? (
+      {props.storeAndLocationList.length > 0 ? (
         <div className="grid col-span-12 lg:col-span-9 grid-cols-12 gap-6 h-fit">
-          {props.storeAndProduct.map(
-            (product, i) =>
-              (selectedSellers.includes(product.store.slug ?? "") ||
+          {props.storeAndLocationList.map(
+            (locationListItem, i) =>
+              (selectedSellers.includes(locationListItem.store.slug ?? "") ||
                 selectedSellers.length === 0) && (
                 <div
                   className="sm:col-span-6 md:col-span-4 col-span-12"
                   key={i}
                 >
-                  <ProductCard storeAndProduct={product} />
+                  <LocationListCard storeAndLocationList={locationListItem} />
                 </div>
               )
           )}
@@ -75,7 +75,7 @@ export const CollectionBody = (
         </div>
       ) : (
         <EmptyStateWrapper height="h-[200px]">
-          <Heading size="h4">No products match your filters</Heading>
+          <Heading size="h4">No location lists match your filters</Heading>
           <p>Change your filters or try again later</p>
         </EmptyStateWrapper>
       )}

@@ -4,7 +4,7 @@ import { MapPin, Star } from "lucide-react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/currency";
 import { Button } from "../ui/button";
-import { LocationListAndStore } from "@/app/(storefront)/(main)/page";
+import { LocationListAndStore } from "@/lib/collection-types";
 import { Badge } from "../ui/badge";
 
 export const LocationListCard = (props: {
@@ -16,10 +16,10 @@ export const LocationListCard = (props: {
   return (
     <div key={props.storeAndLocationList.locationList.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
       <Link href={listPageLink}>
-        {props.storeAndLocationList.locationList.coverImage ? (
+        {props.storeAndLocationList.locationList.coverImage && props.storeAndLocationList.locationList.coverImage.length > 0 ? (
           <Image
-            src={props.storeAndLocationList.locationList.coverImage}
-            alt={props.storeAndLocationList.locationList.name}
+            src={props.storeAndLocationList.locationList.coverImage[0].url}
+            alt={props.storeAndLocationList.locationList.coverImage[0].alt || props.storeAndLocationList.locationList.name || "Location list"}
             width={300}
             height={200}
             className="w-full h-48 object-cover rounded-md"
