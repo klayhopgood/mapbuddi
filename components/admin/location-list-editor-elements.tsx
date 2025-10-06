@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { TextInputWithLabel } from "../text-input-with-label";
 import { LocationList } from "@/db/schema";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
@@ -246,13 +245,15 @@ export const LocationListEditorElements = (props: {
                 <CardDescription>Set up the basic details for your location list</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <TextInputWithLabel
-                  label="List Name"
-                  placeholder="e.g., Best of Lisbon"
-                  value={formValues.name}
-                  onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
-                  required
-                />
+                <div>
+                  <label className="block text-sm font-medium mb-2">List Name</label>
+                  <Input
+                    placeholder="e.g., Best of Lisbon"
+                    value={formValues.name}
+                    onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
+                    required
+                  />
+                </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2">Description</label>
@@ -265,16 +266,18 @@ export const LocationListEditorElements = (props: {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <TextInputWithLabel
-                    label="Price"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="9.99"
-                    value={formValues.price}
-                    onChange={(e) => setFormValues({ ...formValues, price: e.target.value })}
-                    required
-                  />
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Price</label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="9.99"
+                      value={formValues.price}
+                      onChange={(e) => setFormValues({ ...formValues, price: e.target.value })}
+                      required
+                    />
+                  </div>
 
                   <div>
                     <label className="block text-sm font-medium mb-2">Currency</label>
