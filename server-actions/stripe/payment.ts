@@ -1,12 +1,13 @@
 "use server";
 
 import { db } from "@/db/db";
-import { carts } from "@/db/schema";
+import { carts, payments, stores } from "@/db/schema";
 import { platformFeeDecimal } from "@/lib/application-constants";
 import { CheckoutItem } from "@/lib/types";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import Stripe from "stripe";
+import { getStoreId } from "../store-details";
 
 export async function createPaymentIntent({
   items,
