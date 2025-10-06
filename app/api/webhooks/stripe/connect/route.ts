@@ -59,13 +59,6 @@ export async function POST(request: Request) {
       console.log("Last Payment Error:", JSON.stringify(paymentIntentPaymentFailed.last_payment_error, null, 2));
       console.log("Metadata:", JSON.stringify(paymentIntentPaymentFailed.metadata, null, 2));
       console.log("Application Fee Amount:", paymentIntentPaymentFailed.application_fee_amount);
-      console.log("Charges:", paymentIntentPaymentFailed.charges?.data?.map((charge: any) => ({
-        id: charge.id,
-        status: charge.status,
-        failure_code: charge.failure_code,
-        failure_message: charge.failure_message,
-        outcome: charge.outcome
-      })));
       console.log("=== END PAYMENT FAILED DEBUG ===");
       break;
     case "payment_intent.processing":

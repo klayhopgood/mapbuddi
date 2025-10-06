@@ -233,7 +233,7 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
 
       markersRef.current.push(pendingMarker);
     }
-  }, [pois.length, categories.length, isMapLoaded, pendingPOI?.latitude, pendingPOI?.longitude]); // Optimized dependencies
+  }, [pois, categories, isMapLoaded, pendingPOI]); // Include full objects for proper dependency tracking
 
   // Search for places
   const searchPlaces = async (query: string) => {
