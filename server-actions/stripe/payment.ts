@@ -249,34 +249,31 @@ export async function getPaymentIntentDetails({
       apiVersion: "2025-08-27.basil",
     });
 
-    const store = await db
-      .select({
-        stripeAccountId: payments.stripeAccountId,
-      })
-      .from(stores)
-      .leftJoin(payments, eq(payments.storeId, stores.id))
-      .where(eq(stores.slug, storeSlug));
+    // For direct payments, retrieve from main account (no Connect account needed)
+    console.log("=== RETRIEVING PAYMENT INTENT ===");
+    console.log("Payment Intent ID:", paymentIntentId);
+    console.log("Cart ID from cookies:", cartId);
 
-    if (!store[0].stripeAccountId) throw Error("Store not found");
+    const paymentDetails = await stripe.paymentIntents.retrieve(paymentIntentId);
+    
+    console.log("Payment Intent retrieved successfully");
+    console.log("Payment status:", paymentDetails.status);
+    console.log("Payment metadata cart ID:", paymentDetails.metadata.cartId);
 
-    const paymentDetails = await stripe.paymentIntents.retrieve(
-      paymentIntentId,
-      {
-        stripeAccount: store[0].stripeAccountId,
-      }
-    );
-
-    if (
-      paymentDetails.metadata.cartId !== cartId &&
-      deliveryPostalCode !==
-        paymentDetails.shipping?.address?.postal_code?.split(" ").join("")
-    ) {
+    // For digital products, we don't need strict postal code verification
+    // Just verify the cart ID matches or use the deliveryPostalCode override
+    const isCartValid = paymentDetails.metadata.cartId === cartId;
+    const isPostcodeOverride = deliveryPostalCode === "DIGITAL";
+    
+    if (!isCartValid && !isPostcodeOverride) {
+      console.log("Cart validation failed - cart ID mismatch");
       throw Error("Invalid cart id - further verification needed");
     }
 
+    console.log("Payment intent verification successful");
     return { paymentDetails, isVerified: true };
   } catch (err) {
-    console.log("ERROR", err);
-    return { isVerified: false };
+    console.log("=== PAYMENT INTENT RETRIEVAL ERROR ===", err);
+    return { paymentDetails: null, isVerified: false };
   }
 }

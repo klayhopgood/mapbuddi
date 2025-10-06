@@ -41,13 +41,18 @@ export default async function OrderConfirmation({
     deliveryPostalCode: "DIGITAL", // Digital products don't need postcode verification
   });
 
+  console.log("=== ORDER CONFIRMATION DEBUG ===");
+  console.log("Payment Intent ID:", searchParams.payment_intent);
+  console.log("Is Verified:", isVerified);
+  console.log("Payment Details exists:", !!paymentDetails);
+
   const checkoutItems = JSON.parse(
     paymentDetails?.metadata?.items ?? "[]"
   ) as CheckoutItem[];
 
   let products: OrderItemDetails[] = [];
   let sellerDetails;
-  if (isVerified) {
+  if (isVerified && paymentDetails) {
     sellerDetails = (await getSellerName(params.storeSlug))[0];
     products = await getDetailsOfListsOrdered(checkoutItems);
   }
@@ -133,8 +138,31 @@ export default async function OrderConfirmation({
           </div>
         </div>
       ) : (
-        <div className="text-center">
-          <p>Processing your order...</p>
+        <div className="text-center space-y-4">
+          <Heading size="h2">Order Verification Issue</Heading>
+          <p className="text-muted-foreground">
+            We're having trouble verifying your order details. This usually resolves itself within a few minutes.
+          </p>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <Link href="/">
+              <Button variant="default">
+                Return Home
+              </Button>
+            </Link>
+            <Link href={singleLevelNestedRoutes.account["your-purchases"]}>
+              <Button variant="outline">
+                Check My Orders
+              </Button>
+            </Link>
+            <Link href={`/checkout/${params.storeSlug}/order-confirmation?payment_intent=${searchParams.payment_intent}&payment_intent_client_secret=${searchParams.payment_intent_client_secret}&redirect_status=success`}>
+              <Button variant="outline">
+                Refresh Page
+              </Button>
+            </Link>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            If this issue persists, please contact support with order ID: {searchParams.payment_intent.slice(3)}
+          </p>
         </div>
       )}
     </div>
