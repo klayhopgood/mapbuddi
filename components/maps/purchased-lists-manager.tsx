@@ -147,21 +147,28 @@ export function PurchasedListsManager({
                       </div>
                       {/* Action buttons for synced maps */}
                       {syncStatus?.googleMapsSynced && syncStatus?.googleMapsMapId && (
-                        <div className="flex gap-2 mt-2">
-                          <Link 
-                            href={`https://drive.google.com/file/d/${syncStatus.googleMapsMapId}/view`} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                          >
-                            <Button variant="outline" size="sm" className="text-xs">View File</Button>
-                          </Link>
-                          <Link 
-                            href="https://drive.google.com/drive/folders?q=name:MapBuddi" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                          >
-                            <Button variant="outline" size="sm" className="text-xs">📁 MapBuddi Folder</Button>
-                          </Link>
+                        <div className="flex flex-col gap-2 mt-2">
+                          <div className="flex gap-2">
+                            <Link 
+                              href="https://mymaps.google.com/maps/d/create" 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                            >
+                              <Button variant="default" size="sm" className="text-xs bg-blue-600 hover:bg-blue-700">
+                                🗺️ Import to My Maps
+                              </Button>
+                            </Link>
+                            <Link 
+                              href={`https://drive.google.com/file/d/${syncStatus.googleMapsMapId}/view`} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                            >
+                              <Button variant="outline" size="sm" className="text-xs">View KML</Button>
+                            </Link>
+                          </div>
+                          <div className="text-xs text-muted-foreground bg-blue-50 p-2 rounded">
+                            💡 Click "Import to My Maps" → Click "Import" → Select your KML file from Drive
+                          </div>
                         </div>
                       )}
                     </div>
