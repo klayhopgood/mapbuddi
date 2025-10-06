@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
 import { db } from '@/db/db';
 import { locationLists, listCategories, listPois, stores } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 export async function POST(request: NextRequest) {
   try {
     console.log("=== LOCATION LIST CREATION START ===");
+    console.log("Timestamp:", new Date().toISOString());
+    console.log("User-Agent:", request.headers.get('user-agent'));
+    console.log("Request URL:", request.url);
     
     const user = await currentUser();
     if (!user) {
@@ -14,10 +17,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: true, message: 'Unauthorized' }, { status: 401 });
     }
 
+    console.log("User ID:", user.id);
+    console.log("User email:", user.emailAddresses[0]?.emailAddress);
+
     const storeId = Number(user.privateMetadata?.storeId);
     console.log("Store ID:", storeId);
-    if (!storeId) {
-      console.log("ERROR: Store not found for user");
+    console.log("Store ID type:", typeof storeId);
+    console.log("User private metadata:", user.privateMetadata);
+    
+    if (!storeId || isNaN(storeId)) {
+      console.log("ERROR: Store not found for user - storeId is:", storeId);
       return NextResponse.json({ error: true, message: 'Store not found' }, { status: 400 });
     }
 
@@ -35,6 +44,17 @@ export async function POST(request: NextRequest) {
 
     // Start transaction
     console.log("Starting database transaction...");
+    console.log("Database connection status: attempting transaction");
+    
+    // Test database connection first
+    try {
+      const testQuery = await db.select({ count: sql`count(*)` }).from(locationLists).where(eq(locationLists.storeId, storeId));
+      console.log("Database connection test successful. Current list count for store:", testQuery[0]?.count);
+    } catch (dbTestError) {
+      console.error("Database connection test failed:", dbTestError);
+      throw new Error("Database connection failed");
+    }
+    
     const result = await db.transaction(async (tx) => {
       console.log("Creating location list with data:", {
         name: list.name,
@@ -114,6 +134,10 @@ export async function POST(request: NextRequest) {
 
     console.log("=== LOCATION LIST CREATION SUCCESS ===");
     console.log("Created list ID:", result.id);
+    console.log("Transaction completed successfully");
+    
+    // Force a small delay to ensure database write is fully committed
+    await new Promise(resolve => setTimeout(resolve, 100));
     
     return NextResponse.json({ 
       success: true, 
@@ -125,7 +149,14 @@ export async function POST(request: NextRequest) {
     console.error('=== LOCATION LIST CREATION ERROR ===', error);
     console.error('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : 'Unknown',
+    });
+    
+    // Log additional context
+    console.error('Request context:', {
+      timestamp: new Date().toISOString(),
+      userAgent: request.headers.get('user-agent'),
     });
     
     return NextResponse.json({ 
