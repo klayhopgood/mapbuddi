@@ -106,9 +106,10 @@ export async function POST(request: Request) {
           email: paymentIntent.receipt_email || "unknown@email.com",
           createdAt: event.created,
           addressId: addressId,
-        });
+        }).returning();
+        
         console.log("=== DIRECT PAYMENT ORDER CREATED ===");
-        console.log("Order ID:", newOrder);
+        console.log("Order ID:", newOrder[0]?.id);
         console.log("Email:", paymentIntent.receipt_email);
         console.log("Cart ID:", cartId);
         console.log("Store ID:", storeId);
@@ -124,7 +125,7 @@ export async function POST(request: Request) {
           .from(stores)
           .where(eq(stores.id, storeId));
 
-        if (storeInfo.length && storeInfo[0].userId) {
+        if (storeInfo.length && storeInfo[0].userId && newOrder[0]?.id) {
           const sellerPayoutRecord = await db.insert(sellerPayouts).values({
             storeId: storeId,
             orderId: newOrder[0].id,
@@ -132,6 +133,7 @@ export async function POST(request: Request) {
             amount: sellerAmount.toString(),
             platformFee: platformFeeAmount.toString(),
             stripeFee: stripeFeeAmount.toString(),
+            payoutMethod: "paypal", // Default to PayPal, will be updated based on seller preference
             status: "pending",
           });
 

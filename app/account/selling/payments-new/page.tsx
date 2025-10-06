@@ -144,7 +144,7 @@ export default async function PaymentsPage() {
                   <div>
                     <p className="font-medium">{currencyFormatter(parseFloat(payout.amount))}</p>
                     <p className="text-sm text-gray-500">
-                      Order #{payout.orderId} • {new Date(payout.createdAt).toLocaleDateString()}
+                      Order #{payout.orderId} • {payout.createdAt ? new Date(payout.createdAt).toLocaleDateString() : 'Unknown date'}
                     </p>
                   </div>
                   <Badge 
