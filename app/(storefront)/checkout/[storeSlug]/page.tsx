@@ -3,7 +3,7 @@ import CheckoutWrapper from "../components/checkout-wrapper";
 import { cookies } from "next/headers";
 import { getCart } from "@/server-actions/get-cart-details";
 import { db } from "@/db/db";
-import { payments, locationLists, stores } from "@/db/schema";
+import { locationLists, stores } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { CheckoutItem } from "@/lib/types";
 import { CartLineItems } from "@/components/storefront/cart-line-items";
@@ -12,7 +12,6 @@ import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { routes } from "@/lib/routes";
 import Link from "next/link";
-import { hasConnectedStripeAccount } from "@/server-actions/stripe/account";
 import { currentUser } from "@clerk/nextjs/server";
 
 export default async function Page({
@@ -28,15 +27,14 @@ export default async function Page({
     .select({
       storeId: stores.id,
       userId: stores.userId,
-      stripeAccountId: payments.stripeAccountId,
+      storeName: stores.name,
     })
     .from(stores)
-    .leftJoin(payments, eq(payments.storeId, stores.id))
     .where(eq(stores.slug, params.storeSlug));
 
   const storeId = Number(store[0].storeId);
   const storeOwnerId = store[0].userId;
-  const storeStripeAccountId = store[0].stripeAccountId;
+  const storeName = store[0].storeName;
 
   // ✅ Prevent users from buying their own products
   if (user && user.id === storeOwnerId) {
@@ -78,24 +76,6 @@ export default async function Page({
     })
     .filter(Boolean) as CheckoutItem[];
 
-  if (
-    !storeStripeAccountId ||
-    !(await hasConnectedStripeAccount(storeId))
-  ) {
-    return (
-      <InfoCard
-        heading="Online payments not setup"
-        subheading="This seller does not have online payments setup yet. Please contact the seller directly to submit your order."
-        icon={<AlertCircle size={24} />}
-        button={
-          <Link href={routes.cart}>
-            <Button>Return to cart</Button>
-          </Link>
-        }
-      />
-    );
-  }
-
   if (!storeLists.length || isNaN(storeId)) {
     throw new Error("Store not found");
   }
@@ -124,7 +104,7 @@ export default async function Page({
     <CheckoutWrapper
       detailsOfProductsInCart={detailsOfListsInCart}
       paymentIntent={paymentIntent}
-      storeStripeAccountId={storeStripeAccountId}
+      storeName={storeName || "Unknown Store"}
       cartLineItems={
         <CartLineItems
           variant="checkout"

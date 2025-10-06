@@ -66,29 +66,27 @@ export async function POST(request: Request) {
       const items = paymentIntent.metadata.items;
 
       try {
-        if (!event.account) throw new Error("No account on event");
-        const store = await db
-          .select({
-            storeId: payments.storeId,
-          })
-          .from(payments)
-          .where(eq(payments.stripeAccountId, event.account));
+        // Get store ID from metadata (no Connect account needed)
+        const storeId = parseInt(paymentIntent.metadata.storeId);
+        
+        if (!storeId) throw new Error("No store ID in payment metadata");
 
-        const storeId = store[0].storeId as number;
-
-        // create new address in DB
+        // create new address in DB (if shipping address provided)
         const stripeAddress = paymentIntent.shipping?.address;
+        let addressId = null;
 
-        const newAddress = await db.insert(addresses).values({
-          line1: stripeAddress?.line1,
-          line2: stripeAddress?.line2,
-          city: stripeAddress?.city,
-          state: stripeAddress?.state,
-          postal_code: stripeAddress?.postal_code,
-          country: stripeAddress?.country,
-        }).returning();
+        if (stripeAddress) {
+          const newAddress = await db.insert(addresses).values({
+            line1: stripeAddress?.line1,
+            line2: stripeAddress?.line2,
+            city: stripeAddress?.city,
+            state: stripeAddress?.state,
+            postal_code: stripeAddress?.postal_code,
+            country: stripeAddress?.country,
+          }).returning();
 
-        if (!newAddress[0]?.id) throw new Error("No address created");
+          addressId = newAddress[0]?.id;
+        }
 
         // get current order count in DB
         const storeOrderCount = await db
@@ -104,17 +102,18 @@ export async function POST(request: Request) {
           total: String(Number(orderTotal) / 100),
           stripePaymentIntentId: paymentIntentId,
           stripePaymentIntentStatus: paymentIntent.status,
-          name: paymentIntent.shipping?.name,
-          email: paymentIntent.receipt_email,
+          name: paymentIntent.shipping?.name || "Unknown",
+          email: paymentIntent.receipt_email || "unknown@email.com",
           createdAt: event.created,
-          addressId: newAddress[0].id,
+          addressId: addressId,
         });
-        console.log("=== ORDER CREATED SUCCESSFULLY ===");
+        console.log("=== DIRECT PAYMENT ORDER CREATED ===");
         console.log("Order ID:", newOrder);
         console.log("Email:", paymentIntent.receipt_email);
         console.log("Cart ID:", cartId);
+        console.log("Store ID:", storeId);
       } catch (err) {
-        console.log("ORDER CREATION WEBHOOK ERROR", err);
+        console.log("DIRECT PAYMENT ORDER ERROR", err);
       }
 
       try {

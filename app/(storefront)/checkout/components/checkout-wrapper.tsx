@@ -18,16 +18,13 @@ import { currencyFormatter } from "@/lib/currency";
 export default function CheckoutWrapper(props: {
   paymentIntent: Promise<{ clientSecret: string | null } | undefined>;
   detailsOfProductsInCart: CheckoutItem[];
-  storeStripeAccountId: string;
+  storeName: string;
   cartLineItems: React.ReactNode;
 }) {
   const [clientSecret, setClientSecret] = useState("");
   const stripePromise = useMemo(
-    () =>
-      loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!, {
-        stripeAccount: props.storeStripeAccountId,
-      }),
-    [props.storeStripeAccountId]
+    () => loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!),
+    []
   );
 
   useEffect(() => {

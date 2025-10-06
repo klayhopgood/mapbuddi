@@ -1,13 +1,12 @@
 "use server";
 
 import { db } from "@/db/db";
-import { carts, payments, stores } from "@/db/schema";
+import { carts } from "@/db/schema";
 import { platformFeeDecimal } from "@/lib/application-constants";
 import { CheckoutItem } from "@/lib/types";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import Stripe from "stripe";
-import { getStoreId } from "../store-details";
 
 export async function createPaymentIntent({
   items,
@@ -22,22 +21,12 @@ export async function createPaymentIntent({
       apiVersion: "2025-08-27.basil",
     });
 
-    const payment = await db
-      .select()
-      .from(payments)
-      .where(eq(payments.storeId, storeId));
-
-    if (!payment.length || !payment[0]?.stripeAccountId) {
-      throw new Error("Stripe Account Id not found");
-    }
-
-    const stripeAccountId = payment[0].stripeAccountId;
-
     const cartId = Number(cookies().get("cartId")?.value);
 
     const metadata = {
-      cartId: isNaN(cartId) ? "" : cartId,
+      cartId: isNaN(cartId) ? "" : cartId.toString(),
       items: JSON.stringify(items),
+      storeId: storeId.toString(), // Track which store this payment is for
     };
 
     // Always use USD for payments
@@ -58,10 +47,7 @@ export async function createPaymentIntent({
       if (paymentIntent.length && paymentIntent[0]?.clientSecret && paymentIntent[0]?.paymentIntentId) {
         // Check if the PaymentIntent is still updateable (not completed/captured)
         const existingPaymentIntent = await stripe.paymentIntents.retrieve(
-          paymentIntent[0].paymentIntentId,
-          {
-            stripeAccount: stripeAccountId,
-          }
+          paymentIntent[0].paymentIntentId
         );
         
         // Only update if PaymentIntent is still in a pending state
@@ -73,11 +59,7 @@ export async function createPaymentIntent({
             {
               amount: orderTotal,
               currency: currency,
-              application_fee_amount: platformFee,
               metadata,
-            },
-            {
-              stripeAccount: stripeAccountId,
             }
           );
           return { clientSecret: paymentIntent[0].clientSecret };
@@ -95,21 +77,17 @@ export async function createPaymentIntent({
       }
     }
 
-    // If no existing paymentIntent connected to cart, create a new PaymentIntent with the order amount and currency
-    const paymentIntent = await stripe.paymentIntents.create(
-      {
-        amount: orderTotal,
-        currency: currency,
-        metadata,
-        automatic_payment_methods: {
-          enabled: true,
-        },
-        application_fee_amount: platformFee,
+    // Create a direct PaymentIntent (no Connect account needed!)
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: orderTotal,
+      currency: currency,
+      metadata,
+      automatic_payment_methods: {
+        enabled: true,
       },
-      {
-        stripeAccount: stripeAccountId,
-      }
-    );
+      description: `MapBuddi purchase - ${items.length} location list(s)`,
+    });
+
     // save paymentIntent to cart in db
     await db
       .update(carts)
@@ -118,6 +96,7 @@ export async function createPaymentIntent({
         clientSecret: paymentIntent.client_secret,
       })
       .where(eq(carts.id, cartId));
+    
     return { clientSecret: paymentIntent.client_secret };
   } catch (err) {
     console.log(err);
