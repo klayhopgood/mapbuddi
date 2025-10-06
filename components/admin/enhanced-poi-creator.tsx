@@ -1,16 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import Image from "next/image";
-import { Loader } from "@googlemaps/js-api-loader";
+import { useState, useRef } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
-import { toast } from "../ui/use-toast";
-import { MapPin, Search, Plus, X, Star, Globe, Phone } from "lucide-react";
-import { getPlaceDetails, PlaceDetails } from "@/lib/google-places";
+import { Search, Plus, X, Star } from "lucide-react";
 
 export interface ListPOI {
   id?: number;
@@ -36,221 +32,101 @@ export interface ListCategory {
   displayOrder: number;
 }
 
-interface EnhancedPOICreatorProps {
+interface SimplePOICreatorProps {
   categories: ListCategory[];
   pois: ListPOI[];
   onPoisChange: (pois: ListPOI[]) => void;
 }
 
-export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedPOICreatorProps) => {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
-  const markersRef = useRef<any[]>([]);
-  const autocompleteRef = useRef<any>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  
+interface PlaceResult {
+  place_id: string;
+  name: string;
+  formatted_address: string;
+  geometry: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
+  rating?: number;
+  website?: string;
+  formatted_phone_number?: string;
+}
+
+export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: SimplePOICreatorProps) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<PlaceResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [selectedPOI, setSelectedPOI] = useState<ListPOI | null>(null);
-  const [placeDetails, setPlaceDetails] = useState<PlaceDetails | null>(null);
-  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
-  const [isMapLoaded, setIsMapLoaded] = useState(false);
 
-  const loadPlaceDetails = useCallback(async (placeId?: string) => {
-    if (!placeId) return;
+  const searchPlaces = async () => {
+    if (!searchQuery.trim()) return;
     
-    setIsLoadingDetails(true);
+    setIsSearching(true);
     try {
-      const details = await getPlaceDetails(placeId);
-      setPlaceDetails(details);
+      const response = await fetch('/api/places/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: searchQuery }),
+      });
+      
+      const data = await response.json();
+      setSearchResults(data.results || []);
     } catch (error) {
-      console.error("Error loading place details:", error);
+      console.error('Search failed:', error);
+      setSearchResults([]);
     } finally {
-      setIsLoadingDetails(false);
+      setIsSearching(false);
     }
-  }, []);
+  };
 
-  const updateMapMarkers = useCallback(() => {
-    if (!mapInstanceRef.current || !(window as any).google) return;
-
-    // Clear existing markers
-    markersRef.current.forEach((marker: any) => marker.setMap(null));
-    markersRef.current = [];
-
-    // Add markers for each POI
-    pois.forEach((poi) => {
-      const category = categories[poi.categoryId || 0];
-      const marker = new (window as any).google.maps.Marker({
-        position: { lat: poi.latitude, lng: poi.longitude },
-        map: mapInstanceRef.current,
-        title: poi.name,
-        label: {
-          text: category?.emoji || "📍",
-          fontSize: "16px",
-        },
-      });
-
-      marker.addListener("click", () => {
-        setSelectedPOI(poi);
-        loadPlaceDetails(poi.googlePlaceId);
-      });
-
-      markersRef.current.push(marker);
-    });
-
-    // Fit bounds if we have POIs
-    if (pois.length > 0) {
-      const bounds = new (window as any).google.maps.LatLngBounds();
-      pois.forEach(poi => {
-        bounds.extend({ lat: poi.latitude, lng: poi.longitude });
-      });
-      mapInstanceRef.current.fitBounds(bounds);
-    }
-  }, [pois, categories, loadPlaceDetails]);
-
-  const handlePlaceSelection = useCallback(async (place: any) => {
-    if (!place.geometry?.location) return;
-
+  const addPOIFromSearch = (place: PlaceResult, categoryIndex: number) => {
     const newPOI: ListPOI = {
-      name: place.name || "Unknown Place",
-      description: place.formatted_address || "",
-      latitude: place.geometry.location.lat(),
-      longitude: place.geometry.location.lng(),
+      name: place.name,
+      description: place.formatted_address,
+      latitude: place.geometry.location.lat,
+      longitude: place.geometry.location.lng,
       googlePlaceId: place.place_id,
       address: place.formatted_address,
       rating: place.rating,
       website: place.website,
       phoneNumber: place.formatted_phone_number,
-      photos: place.photos?.slice(0, 3).map((photo: any) => 
-        `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}`
-      ),
-      categoryId: 0, // Default to first category
+      categoryId: categoryIndex,
     };
 
     onPoisChange([...pois, newPOI]);
-    setSelectedPOI(newPOI);
-    
-    if (place.place_id) {
-      loadPlaceDetails(place.place_id);
-    }
+    setSearchQuery("");
+    setSearchResults([]);
+  };
 
-    toast({
-      title: "POI Added",
-      description: `${place.name} has been added to your list.`,
-    });
-  }, [pois, onPoisChange, loadPlaceDetails, toast]);
-
-  const handleMapClick = useCallback((latLng: any) => {
+  const addManualPOI = () => {
     const newPOI: ListPOI = {
       name: "Custom Location",
       description: "",
-      latitude: latLng.lat(),
-      longitude: latLng.lng(),
-      address: `${latLng.lat().toFixed(6)}, ${latLng.lng().toFixed(6)}`,
+      sellerNotes: "",
+      latitude: 0,
+      longitude: 0,
+      address: "",
       categoryId: 0,
     };
-
     onPoisChange([...pois, newPOI]);
     setSelectedPOI(newPOI);
-    
-    toast({
-      title: "Custom POI Added",
-      description: "Click on the marker to edit details.",
-    });
-  }, [pois, onPoisChange, toast]);
-
-  // Initialize Google Maps
-  const initMap = useCallback(async () => {
-    try {
-      const loader = new Loader({
-        apiKey: process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY || "",
-        version: "weekly",
-        libraries: ["places", "geometry"],
-      });
-
-      await loader.load();
-      
-      if (!mapRef.current || !(window as any).google) return;
-
-      // Initialize map
-      const map = new (window as any).google.maps.Map(mapRef.current, {
-        center: { lat: 37.7749, lng: -122.4194 },
-        zoom: 12,
-        styles: [
-          {
-            featureType: "poi",
-            elementType: "labels",
-            stylers: [{ visibility: "on" }],
-          },
-        ],
-      });
-
-      mapInstanceRef.current = map;
-
-      // Initialize autocomplete
-      if (searchInputRef.current) {
-        const autocomplete = new (window as any).google.maps.places.Autocomplete(searchInputRef.current, {
-          types: ["establishment"],
-          fields: ["place_id", "name", "formatted_address", "geometry", "types", "rating", "photos", "website", "formatted_phone_number"],
-        });
-
-        autocomplete.bindTo("bounds", map);
-        autocompleteRef.current = autocomplete;
-
-        // Handle place selection
-        autocomplete.addListener("place_changed", () => {
-          const place = autocomplete.getPlace();
-          if (place.geometry?.location) {
-            map.setCenter(place.geometry.location);
-            map.setZoom(15);
-            handlePlaceSelection(place);
-          }
-        });
-      }
-
-      // Handle map clicks
-      map.addListener("click", (e: any) => {
-        if (e.latLng) {
-          handleMapClick(e.latLng);
-        }
-      });
-
-      setIsMapLoaded(true);
-      updateMapMarkers();
-    } catch (error) {
-      console.error("Error loading Google Maps:", error);
-      toast({
-        title: "Map Error",
-        description: "Failed to load Google Maps. Please check your API key.",
-        variant: "destructive",
-      });
-    }
-  }, [handlePlaceSelection, handleMapClick, updateMapMarkers, toast]);
-
-  useEffect(() => {
-    initMap();
-  }, [initMap]);
-
-  // Update markers when POIs change
-  useEffect(() => {
-    if (isMapLoaded) {
-      updateMapMarkers();
-    }
-  }, [pois, isMapLoaded, updateMapMarkers]);
-
-  const updatePOI = (updates: Partial<ListPOI>) => {
-    if (!selectedPOI) return;
-    
-    const updatedPois = pois.map(poi => 
-      poi === selectedPOI ? { ...poi, ...updates } : poi
-    );
-    onPoisChange(updatedPois);
-    setSelectedPOI({ ...selectedPOI, ...updates });
   };
 
-  const removePOI = (poiToRemove: ListPOI) => {
-    onPoisChange(pois.filter(poi => poi !== poiToRemove));
-    if (selectedPOI === poiToRemove) {
+  const removePOI = (index: number) => {
+    const updatedPois = pois.filter((_, i) => i !== index);
+    onPoisChange(updatedPois);
+    if (selectedPOI === pois[index]) {
       setSelectedPOI(null);
-      setPlaceDetails(null);
+    }
+  };
+
+  const updatePOI = (index: number, updates: Partial<ListPOI>) => {
+    const updatedPois = [...pois];
+    updatedPois[index] = { ...updatedPois[index], ...updates };
+    onPoisChange(updatedPois);
+    if (selectedPOI === pois[index]) {
+      setSelectedPOI(updatedPois[index]);
     }
   };
 
@@ -261,212 +137,175 @@ export const EnhancedPOICreator = ({ categories, pois, onPoisChange }: EnhancedP
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Search size={20} />
-            Search & Add Places
+            Search Places
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="flex gap-2">
             <Input
-              ref={searchInputRef}
-              placeholder="Search for restaurants, attractions, hotels..."
+              placeholder="Search for restaurants, attractions, etc..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && searchPlaces()}
               className="flex-1"
             />
-            <Button type="button" variant="outline">
-              <MapPin size={16} />
+            <Button onClick={searchPlaces} disabled={isSearching}>
+              {isSearching ? "..." : "Search"}
             </Button>
           </div>
-          <p className="text-sm text-gray-500 mt-2">
-            Search for places or click anywhere on the map to add a custom location
-          </p>
-        </CardContent>
-      </Card>
 
-      {/* Map and Details Side by Side */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Interactive Map */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Map View ({pois.length} locations)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div 
-              ref={mapRef} 
-              className="w-full h-96 rounded-lg border"
-              style={{ minHeight: "400px" }}
-            />
-          </CardContent>
-        </Card>
-
-        {/* POI Details Panel */}
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {selectedPOI ? "Edit Location" : "Select a location"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {selectedPOI ? (
-              <div className="space-y-4">
-                {/* Category Assignment */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">Category</label>
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((category, index) => (
-                      <Button
-                        key={index}
-                        type="button"
-                        variant={selectedPOI.categoryId === index ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => updatePOI({ categoryId: index })}
-                      >
-                        {category.emoji} {category.name}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Basic Info */}
-                <div className="space-y-3">
-                  <Input
-                    placeholder="Location name"
-                    value={selectedPOI.name}
-                    onChange={(e) => updatePOI({ name: e.target.value })}
-                  />
-                  <Input
-                    placeholder="Address or description"
-                    value={selectedPOI.description || ""}
-                    onChange={(e) => updatePOI({ description: e.target.value })}
-                  />
-                  <Textarea
-                    placeholder="Your personal notes and recommendations..."
-                    value={selectedPOI.sellerNotes || ""}
-                    onChange={(e) => updatePOI({ sellerNotes: e.target.value })}
-                    rows={3}
-                  />
-                </div>
-
-                {/* Google Place Details */}
-                {placeDetails && (
-                  <div className="border-t pt-4 space-y-3">
-                    <h4 className="font-medium text-sm">Google Place Details</h4>
-                    
-                    {placeDetails.rating && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Star size={16} className="text-yellow-500" />
-                        <span>{placeDetails.rating}/5</span>
-                      </div>
-                    )}
-                    
-                    {placeDetails.website && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Globe size={16} />
-                        <a 
-                          href={placeDetails.website} 
-                          target="_blank" 
-                          className="text-blue-600 hover:underline"
-                        >
-                          Website
-                        </a>
-                      </div>
-                    )}
-                    
-                    {placeDetails.phoneNumber && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Phone size={16} />
-                        <span>{placeDetails.phoneNumber}</span>
-                      </div>
-                    )}
-
-                    {placeDetails.photos && placeDetails.photos.length > 0 && (
-                      <div>
-                        <Image 
-                          src={placeDetails.photos[0]} 
-                          alt={placeDetails.name}
-                          width={400}
-                          height={128}
-                          className="w-full h-32 object-cover rounded"
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex gap-2 pt-4 border-t">
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => removePOI(selectedPOI)}
-                  >
-                    <X size={16} className="mr-1" />
-                    Remove
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedPOI(null)}
-                  >
-                    Done
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center text-gray-500 py-8">
-                <MapPin size={48} className="mx-auto mb-4 opacity-50" />
-                <p>Click on a marker or search for a place to edit its details</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* POI List Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Added Locations ({pois.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {pois.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {pois.map((poi, index) => {
-                const category = categories[poi.categoryId || 0];
-                return (
-                  <div
-                    key={index}
-                    className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
-                    onClick={() => {
-                      setSelectedPOI(poi);
-                      loadPlaceDetails(poi.googlePlaceId);
-                    }}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <Badge variant="secondary">
-                        {category?.emoji} {category?.name}
-                      </Badge>
-                      {poi.rating && (
-                        <div className="flex items-center gap-1 text-sm">
+          {/* Search Results */}
+          {searchResults.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="font-medium">Search Results:</h4>
+              {searchResults.map((place, index) => (
+                <div key={index} className="p-3 border rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="font-medium">{place.name}</div>
+                      <div className="text-sm text-gray-500">{place.formatted_address}</div>
+                      {place.rating && (
+                        <div className="flex items-center gap-1 text-sm mt-1">
                           <Star size={12} className="text-yellow-500" />
-                          {poi.rating}
+                          {place.rating}/5
                         </div>
                       )}
                     </div>
-                    <h4 className="font-medium text-sm">{poi.name}</h4>
-                    <p className="text-xs text-gray-500 truncate">{poi.address}</p>
-                    {poi.sellerNotes && (
-                      <p className="text-xs text-blue-600 mt-1 truncate">
-                        &ldquo;{poi.sellerNotes}&rdquo;
-                      </p>
+                    <div className="flex flex-wrap gap-1 ml-4">
+                      {categories.map((category, categoryIndex) => (
+                        <Button
+                          key={categoryIndex}
+                          size="sm"
+                          variant="outline"
+                          onClick={() => addPOIFromSearch(place, categoryIndex)}
+                        >
+                          Add to {category.emoji}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Current POIs */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Added Places ({pois.length})</span>
+            <Button onClick={addManualPOI} variant="outline" size="sm">
+              <Plus size={16} className="mr-1" />
+              Add Custom
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {pois.length === 0 ? (
+            <div className="text-center text-gray-500 py-8">
+              <Search size={48} className="mx-auto mb-4 opacity-50" />
+              <p>No places added yet. Search above to get started!</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {pois.map((poi, index) => {
+                const category = categories[poi.categoryId || 0];
+                const isSelected = selectedPOI === poi;
+                
+                return (
+                  <div key={index} className={`p-4 border rounded-lg ${isSelected ? 'border-blue-500 bg-blue-50' : ''}`}>
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary">
+                          {category?.emoji} {category?.name}
+                        </Badge>
+                        {poi.rating && (
+                          <div className="flex items-center gap-1 text-sm">
+                            <Star size={12} className="text-yellow-500" />
+                            {poi.rating}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedPOI(isSelected ? null : poi)}
+                        >
+                          {isSelected ? "Close" : "Edit"}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removePOI(index)}
+                        >
+                          <X size={16} />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="mb-2">
+                      <div className="font-medium">{poi.name}</div>
+                      <div className="text-sm text-gray-500">{poi.address}</div>
+                    </div>
+
+                    {/* Edit Form */}
+                    {isSelected && (
+                      <div className="space-y-3 mt-4 pt-4 border-t">
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Category</label>
+                          <div className="flex flex-wrap gap-2">
+                            {categories.map((cat, catIndex) => (
+                              <Button
+                                key={catIndex}
+                                size="sm"
+                                variant={poi.categoryId === catIndex ? "default" : "outline"}
+                                onClick={() => updatePOI(index, { categoryId: catIndex })}
+                              >
+                                {cat.emoji} {cat.name}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Name</label>
+                          <Input
+                            value={poi.name}
+                            onChange={(e) => updatePOI(index, { name: e.target.value })}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Address/Description</label>
+                          <Input
+                            value={poi.address || ""}
+                            onChange={(e) => updatePOI(index, { address: e.target.value })}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Your Notes & Recommendations</label>
+                          <Textarea
+                            placeholder="Tell buyers why this place is special..."
+                            value={poi.sellerNotes || ""}
+                            onChange={(e) => updatePOI(index, { sellerNotes: e.target.value })}
+                            rows={3}
+                          />
+                        </div>
+
+                        {poi.googlePlaceId && (
+                          <div className="text-xs text-gray-500">
+                            Google Place ID: {poi.googlePlaceId}
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
                 );
               })}
-            </div>
-          ) : (
-            <div className="text-center text-gray-500 py-8">
-              <Plus size={48} className="mx-auto mb-4 opacity-50" />
-              <p>No locations added yet. Search for places or click on the map to get started!</p>
             </div>
           )}
         </CardContent>
