@@ -102,3 +102,8 @@ export function getCurrencySelectOptions() {
     symbol: currency.symbol,
   }));
 }
+
+// Legacy function for backward compatibility
+export function currencyFormatter(amount: number): string {
+  return formatPrice(amount, DEFAULT_CURRENCY);
+}
