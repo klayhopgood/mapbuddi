@@ -127,26 +127,8 @@ export async function createSubscription(storeId: number) {
       },
     });
 
-    // Update or create subscription record with customer ID
-    if (existingSubscription) {
-      await db
-        .update(subscriptions)
-        .set({
-          stripeCustomerId: customerId,
-          updatedAt: new Date(),
-        })
-        .where(eq(subscriptions.id, existingSubscription.id));
-    } else {
-      await db
-        .insert(subscriptions)
-        .values({
-          storeId,
-          stripeCustomerId: customerId,
-          status: "pending",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
-    }
+    // Don't create any database record here - let webhooks handle everything
+    // This prevents orphaned pending records and race conditions
 
     return { url: session.url };
   } catch (error) {
@@ -287,12 +269,21 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
           
           // Remove delay that might be causing timeouts
           
-          // Try to update existing record first, then insert if none exists
-          console.log(`Updating subscription for storeId: ${storeId}`);
+          // Use UPSERT to handle both INSERT and UPDATE atomically
+          console.log(`Upserting subscription for storeId: ${storeId}`);
           
-          const updateResult = await db
-            .update(subscriptions)
-            .set({
+          await db.insert(subscriptions).values({
+            storeId,
+            stripeCustomerId: subscription.customer as string,
+            stripeSubscriptionId: subscription.id,
+            stripePriceId: subscription.items.data[0]?.price.id,
+            status: subscription.status,
+            currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+            cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
+          }).onConflictDoUpdate({
+            target: subscriptions.storeId,
+            set: {
               stripeCustomerId: subscription.customer as string,
               stripeSubscriptionId: subscription.id,
               stripePriceId: subscription.items.data[0]?.price.id,
@@ -301,29 +292,18 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
               currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
               cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
               updatedAt: new Date(),
-            })
+            }
+          });
+          
+          console.log(`Subscription record upserted successfully`);
+          
+          // Verify the operation worked
+          const [finalRecord] = await db
+            .select()
+            .from(subscriptions)
             .where(eq(subscriptions.storeId, storeId))
-            .returning();
-            
-          console.log(`Updated ${updateResult.length} records`);
-
-          // If no record was updated, insert a new one
-          if (updateResult.length === 0) {
-            console.log(`No existing record found, inserting new subscription record`);
-            await db.insert(subscriptions).values({
-              storeId,
-              stripeCustomerId: subscription.customer as string,
-              stripeSubscriptionId: subscription.id,
-              stripePriceId: subscription.items.data[0]?.price.id,
-              status: subscription.status,
-              currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-              currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-              cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
-            });
-            console.log(`New subscription record created`);
-          } else {
-            console.log(`Subscription record updated successfully`);
-          }
+            .limit(1);
+          console.log(`Final record status: ${finalRecord?.status}`);
         } else {
           console.log(`=== UPDATING SUBSCRIPTION RECORD ===`);
           const updateResult = await db
