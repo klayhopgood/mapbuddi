@@ -150,7 +150,7 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
               <MapPin size={48} className="mx-auto mb-4 text-gray-400" />
               <Heading size="h3" className="mb-2">No location lists yet</Heading>
               <Text className="text-gray-600">
-                {store.name} hasn't published any location lists yet.
+                {store.name} hasn&apos;t published any location lists yet.
               </Text>
             </div>
           )}
