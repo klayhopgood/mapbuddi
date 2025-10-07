@@ -56,17 +56,20 @@ export const LocationListCard = (props: {
               {props.storeAndLocationList.locationList.totalPois || 0} places
             </Badge>
             
-            {props.storeAndLocationList.locationList.avgRating && (
-              <div className="flex items-center space-x-1">
-                <span className="text-sm">⭐️</span>
-                <Text className="text-sm">
-                  {parseFloat(props.storeAndLocationList.locationList.avgRating).toFixed(1)}
-                  {props.reviewCount !== undefined && (
-                    <span className="text-muted-foreground"> ({props.reviewCount})</span>
-                  )}
-                </Text>
-              </div>
-            )}
+            {/* Always show rating, greyed out if no reviews */}
+            <div className={`flex items-center space-x-1 ${
+              props.storeAndLocationList.locationList.avgRating && props.reviewCount! > 0 
+                ? '' 
+                : 'opacity-50'
+            }`}>
+              <span className="text-sm">⭐️</span>
+              <Text className="text-sm">
+                {props.storeAndLocationList.locationList.avgRating && props.reviewCount! > 0
+                  ? `${parseFloat(props.storeAndLocationList.locationList.avgRating).toFixed(1)} (${props.reviewCount})`
+                  : '0.0 (0)'
+                }
+              </Text>
+            </div>
           </div>
         </div>
 
@@ -85,13 +88,15 @@ export const LocationListCard = (props: {
 
       {!props.hideButtonActions && (
         <div className="flex gap-2 items-center justify-between mt-4">
-          <LocationListForm
-            addToCartAction={addToCart}
-            listId={props.storeAndLocationList.locationList.id}
-            listName={props.storeAndLocationList.locationList.name}
-            buttonSize="sm"
-            cartItems={props.cartItems}
-          />
+          <div className="flex-1">
+            <LocationListForm
+              addToCartAction={addToCart}
+              listId={props.storeAndLocationList.locationList.id}
+              listName={props.storeAndLocationList.locationList.name}
+              buttonSize="sm"
+              cartItems={props.cartItems}
+            />
+          </div>
           <Link href={listPageLink} className="flex-1">
             <Button size="sm" className="w-full">
               View List

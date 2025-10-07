@@ -2,9 +2,9 @@ import { CollectionBody } from "@/components/storefront/collection-body";
 import { CollectionHeaderWrapper } from "@/components/storefront/collection-header-wrapper";
 import { CollectionPagePagination } from "@/components/storefront/collection-page-pagination";
 import { db } from "@/db/db";
-import { locationLists, stores } from "@/db/schema";
+import { locationLists, stores, listReviews } from "@/db/schema";
 import { LocationListAndStore } from "@/lib/collection-types";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, count } from "drizzle-orm";
 import { getCart } from "@/server-actions/get-cart-details";
 import { cookies } from "next/headers";
 
@@ -59,6 +59,23 @@ export default async function LocationListsPage(context: {
     }
   })) as LocationListAndStore[];
 
+  // Get review counts for all lists
+  const listIds = storeAndLocationList.map(item => item.locationList.id);
+  const reviewCounts = await db
+    .select({
+      listId: listReviews.listId,
+      count: count(listReviews.id),
+    })
+    .from(listReviews)
+    .where(inArray(listReviews.listId, listIds))
+    .groupBy(listReviews.listId);
+
+  // Create a map for quick lookup
+  const reviewCountMap = new Map<number, number>();
+  reviewCounts.forEach(rc => {
+    reviewCountMap.set(rc.listId, Number(rc.count));
+  });
+
   return (
     <div>
       <CollectionHeaderWrapper heading="Location Lists">
@@ -82,6 +99,7 @@ export default async function LocationListsPage(context: {
         storeAndLocationList={storeAndLocationList}
         activeSellers={await getActiveSellers()}
         cartItems={cartItems}
+        reviewCountMap={reviewCountMap}
       >
         <CollectionPagePagination
           productsPerPage={LISTS_PER_PAGE}

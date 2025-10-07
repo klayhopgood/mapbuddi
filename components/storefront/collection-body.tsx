@@ -25,6 +25,7 @@ export const CollectionBody = (
       slug: string | null;
     }[];
     cartItems?: CartItem[];
+    reviewCountMap?: Map<number, number>;
   }>
 ) => {
   const searchParams = useSearchParams();
@@ -72,6 +73,7 @@ export const CollectionBody = (
                   <LocationListCard 
                     storeAndLocationList={locationListItem} 
                     cartItems={props.cartItems}
+                    reviewCount={props.reviewCountMap?.get(locationListItem.locationList.id) || 0}
                   />
                 </div>
               )
