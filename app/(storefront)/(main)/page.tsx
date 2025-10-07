@@ -3,8 +3,8 @@ import { SlideShow } from "@/components/slideshow";
 import { Heading } from "@/components/ui/heading";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { db } from "@/db/db";
-import { locationLists, stores } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { locationLists, stores, listReviews } from "@/db/schema";
+import { eq, inArray, count } from "drizzle-orm";
 import { PropsWithChildren } from "react";
 import { LocationListCard } from "@/components/storefront/location-list-card";
 import { Button } from "@/components/ui/button";
@@ -52,6 +52,23 @@ export default async function Home() {
         : item.locationList.coverImage || []
     }
   })) as LocationListAndStore[];
+
+  // Get review counts for all lists (same logic as lists page)
+  const listIds = storeAndLocationList.map(item => item.locationList.id);
+  const reviewCounts = await db
+    .select({
+      listId: listReviews.listId,
+      count: count(listReviews.id),
+    })
+    .from(listReviews)
+    .where(inArray(listReviews.listId, listIds))
+    .groupBy(listReviews.listId);
+
+  // Create a map for quick lookup
+  const reviewCountMap = new Map<number, number>();
+  reviewCounts.forEach(rc => {
+    reviewCountMap.set(rc.listId, Number(rc.count));
+  });
 
   return (
     <div>
@@ -114,6 +131,7 @@ export default async function Home() {
                     key={item.locationList.id}
                     storeAndLocationList={item}
                     hideButtonActions={true}
+                    reviewCount={reviewCountMap.get(item.locationList.id) || 0}
                   />
                 ))}
               </div>
