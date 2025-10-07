@@ -206,9 +206,9 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
             stripeSubscriptionId: subscription.id,
             stripePriceId: subscription.items.data[0]?.price.id || null,
             status: subscription.status,
-            currentPeriodStart: new Date(subscription.current_period_start * 1000),
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-            cancelAtPeriodEnd: subscription.cancel_at_period_end || false,
+            currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+            cancelAtPeriodEnd: (subscription as any).cancel_at_period_end || false,
           });
         } catch (error: any) {
           // If unique constraint violation, update instead
@@ -219,9 +219,9 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
                 stripeSubscriptionId: subscription.id,
                 stripePriceId: subscription.items.data[0]?.price.id || null,
                 status: subscription.status,
-                currentPeriodStart: new Date(subscription.current_period_start * 1000),
-                currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-                cancelAtPeriodEnd: subscription.cancel_at_period_end || false,
+                currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+                currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+                cancelAtPeriodEnd: (subscription as any).cancel_at_period_end || false,
                 updatedAt: new Date(),
               })
               .where(eq(subscriptions.storeId, storeId));
