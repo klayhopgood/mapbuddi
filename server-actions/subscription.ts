@@ -274,6 +274,16 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
         // For subscription.updated, we UPDATE
         if (event.type === "customer.subscription.created") {
           console.log(`=== CREATING SUBSCRIPTION RECORD ===`);
+          console.log(`Subscription data from Stripe:`, {
+            id: subscription.id,
+            customer: subscription.customer,
+            status: subscription.status,
+            current_period_start: (subscription as any).current_period_start,
+            current_period_end: (subscription as any).current_period_end,
+            cancel_at_period_end: (subscription as any).cancel_at_period_end,
+            price_id: subscription.items.data[0]?.price.id
+          });
+          
           // Try to update existing record first, then insert if none exists
           const updateResult = await db
             .update(subscriptions)
@@ -291,6 +301,7 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
             .returning();
 
           console.log(`Update result:`, updateResult);
+          console.log(`Updated ${updateResult.length} records`);
 
           // If no record was updated, insert a new one
           if (updateResult.length === 0) {
@@ -307,7 +318,8 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
             }).returning();
             console.log(`Insert result:`, insertResult);
           } else {
-            console.log(`Updated existing subscription record`);
+            console.log(`Updated existing subscription record successfully`);
+            console.log(`Final subscription record:`, updateResult[0]);
           }
         } else {
           console.log(`=== UPDATING SUBSCRIPTION RECORD ===`);
