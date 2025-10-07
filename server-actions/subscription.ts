@@ -192,10 +192,10 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
       storeId: storeId,
       stripeCustomerId: subscription.customer,
       stripeSubscriptionId: subscription.id,
-      stripePriceId: subscription.items.data[0]?.price?.id,
+      stripePriceId: subscription.items.data[0]?.price?.id || null,
       status: subscription.status,
-      currentPeriodStart: new Date(subscription.current_period_start * 1000),
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      currentPeriodStart: subscription.current_period_start ? new Date(subscription.current_period_start * 1000) : null,
+      currentPeriodEnd: subscription.current_period_end ? new Date(subscription.current_period_end * 1000) : null,
       cancelAtPeriodEnd: subscription.cancel_at_period_end || false,
     });
 
