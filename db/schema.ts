@@ -163,14 +163,20 @@ export const purchasedLists = pgTable("purchased_lists", {
 
 export type PurchasedList = InferSelectModel<typeof purchasedLists>;
 
-// List Reviews (for future implementation)
+// List Reviews
 export const listReviews = pgTable("list_reviews", {
   id: serial("id").primaryKey(),
   listId: integer("list_id").notNull(),
   userId: text("user_id").notNull(), // Clerk user ID
   rating: integer("rating").notNull(), // 1-5 stars
-  review: text("review"),
+  review: varchar("review", { length: 500 }), // Review text up to 500 characters
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => {
+  return {
+    // Ensure a user can only review a list once
+    userListReviewIndex: uniqueIndex("user_list_review_index").on(table.userId, table.listId),
+  };
 });
 
 export type ListReview = InferSelectModel<typeof listReviews>;

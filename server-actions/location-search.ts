@@ -5,7 +5,7 @@ import { locationLists, stores } from "@/db/schema";
 import { like, eq, or } from "drizzle-orm";
 
 export async function getLocationListsBySearchTerm(searchTerm: string) {
-  return await db
+  const results = await db
     .select({
       id: locationLists.id,
       name: locationLists.name,
@@ -16,7 +16,6 @@ export async function getLocationListsBySearchTerm(searchTerm: string) {
       storeId: locationLists.storeId,
       storeName: stores.name,
       storeSlug: stores.slug,
-      type: 'list' as const,
     })
     .from(locationLists)
     .leftJoin(stores, eq(locationLists.storeId, stores.id))
@@ -28,16 +27,17 @@ export async function getLocationListsBySearchTerm(searchTerm: string) {
       )
     )
     .limit(10);
+    
+  return results.map(item => ({ ...item, type: 'list' as const }));
 }
 
 export async function getStoresBySearchTerm(searchTerm: string) {
-  return await db
+  const results = await db
     .select({
       id: stores.id,
       name: stores.name,
       description: stores.description,
       slug: stores.slug,
-      type: 'store' as const,
     })
     .from(stores)
     .where(
@@ -47,6 +47,8 @@ export async function getStoresBySearchTerm(searchTerm: string) {
       )
     )
     .limit(5);
+    
+  return results.map(item => ({ ...item, type: 'store' as const }));
 }
 
 export async function searchAll(searchTerm: string) {

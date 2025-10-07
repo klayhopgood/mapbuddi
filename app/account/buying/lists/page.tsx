@@ -6,7 +6,7 @@ import { db } from "@/db/db";
 import { orders, stores, locationLists, userMapsIntegration, purchasedListSync } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { MapsConnectionStatus } from "@/components/maps/maps-connection-status";
-import { PurchasedListsManager } from "@/components/maps/purchased-lists-manager";
+import { PurchasedListsManager } from "@/components/maps/purchased-lists-manager-new";
 
 async function getUserListsData(userId: string, userEmail: string) {
   try {
