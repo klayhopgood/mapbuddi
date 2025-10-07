@@ -17,6 +17,18 @@ import { MapPin, Star } from "lucide-react";
 import { getReviewsForList } from "@/server-actions/reviews";
 import { currentUser } from "@clerk/nextjs/server";
 
+// Utility function to format email for display (first 3 chars + *** until @)
+function formatEmailForDisplay(email: string): string {
+  if (!email || email.length < 3) return 'Anonymous';
+  
+  const atIndex = email.indexOf('@');
+  if (atIndex === -1) return 'Anonymous';
+  
+  const firstThree = email.substring(0, 3);
+  const domain = email.substring(atIndex);
+  return `${firstThree}***${domain}`;
+}
+
 export default async function StorefrontListDetails(props: {
   params: { listId: string };
 }) {
@@ -210,7 +222,7 @@ export default async function StorefrontListDetails(props: {
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <Text className="font-medium">
-                            {review.userId.split('_')[1] || 'Anonymous'} {/* Show partial user ID as name */}
+                            {formatEmailForDisplay(review.userEmail || '')}
                           </Text>
                           <div className="flex items-center">
                             {[1, 2, 3, 4, 5].map((star) => (

@@ -18,8 +18,10 @@ export async function createOrUpdateReview(listId: number, reviewData: ReviewDat
       throw new Error("User not authenticated");
     }
 
+    const userEmail = user.emailAddresses[0]?.emailAddress || "";
+    
     // Verify user has purchased this list
-    const hasPurchased = await verifyListPurchase(user.id, user.emailAddresses[0]?.emailAddress || "", listId);
+    const hasPurchased = await verifyListPurchase(user.id, userEmail, listId);
     if (!hasPurchased) {
       throw new Error("You must purchase this list before leaving a review");
     }
@@ -47,6 +49,7 @@ export async function createOrUpdateReview(listId: number, reviewData: ReviewDat
         .set({
           rating: reviewData.rating,
           review: reviewData.review,
+          userEmail: userEmail, // Update email too
           updatedAt: new Date(),
         })
         .where(and(eq(listReviews.listId, listId), eq(listReviews.userId, user.id)));
@@ -57,6 +60,7 @@ export async function createOrUpdateReview(listId: number, reviewData: ReviewDat
         .values({
           listId,
           userId: user.id,
+          userEmail: userEmail,
           rating: reviewData.rating,
           review: reviewData.review,
         });
@@ -88,6 +92,7 @@ export async function getReviewsForList(listId: number) {
         review: listReviews.review,
         createdAt: listReviews.createdAt,
         userId: listReviews.userId,
+        userEmail: listReviews.userEmail,
       })
       .from(listReviews)
       .where(eq(listReviews.listId, listId))

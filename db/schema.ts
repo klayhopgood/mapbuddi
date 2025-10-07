@@ -168,6 +168,7 @@ export const listReviews = pgTable("list_reviews", {
   id: serial("id").primaryKey(),
   listId: integer("list_id").notNull(),
   userId: text("user_id").notNull(), // Clerk user ID
+  userEmail: text("user_email").notNull(), // User email for display purposes
   rating: integer("rating").notNull(), // 1-5 stars
   review: varchar("review", { length: 500 }), // Review text up to 500 characters
   createdAt: timestamp("created_at").defaultNow(),
