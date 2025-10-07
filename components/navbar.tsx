@@ -3,7 +3,6 @@ import { Logo } from "./logo";
 import { ContentWrapper } from "./content-wrapper";
 import { MenuItems } from "./menu-items";
 import { Line } from "./line";
-import { AnnouncementBar } from "./announcement-bar";
 import { routes } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { MobileNavigation } from "./mobile-navigation";
@@ -18,10 +17,6 @@ export const NavBar = ({
 }) => {
   return (
     <>
-      <AnnouncementBar
-        columns={2}
-        description=""
-      />
       <nav
         className={cn(
           "pb-1 sticky top-0 bg-white z-10 shadow-sm",
@@ -50,28 +45,28 @@ export const NavBar = ({
               <div className="relative group">
                 <Link
                   href={routes.account}
-                  className="uppercase text-secondary text-sm hover:text-primary transition-colors"
+                  className="uppercase text-gray-700 text-sm hover:text-primary transition-colors"
                 >
                   Account
                 </Link>
                 <div className="absolute right-0 top-full mt-2 w-32 bg-white border border-border shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <div className="py-2">
                     <Link
-                      href={`${routes.account}/selling`}
-                      className="block px-4 py-2 text-sm text-secondary hover:bg-gray-50 hover:text-primary transition-colors"
+                      href={routes.selling}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
                     >
                       Selling
                     </Link>
                     <Link
-                      href={`${routes.account}/buying`}
-                      className="block px-4 py-2 text-sm text-secondary hover:bg-gray-50 hover:text-primary transition-colors"
+                      href={routes.buying}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
                     >
                       Buying
                     </Link>
                   </div>
                 </div>
               </div>
-              <Link href="/" className="uppercase text-secondary text-sm hover:text-primary transition-colors">
+              <Link href="/" className="uppercase text-gray-700 text-sm hover:text-primary transition-colors">
                 Help Centre
               </Link>
             </li>
