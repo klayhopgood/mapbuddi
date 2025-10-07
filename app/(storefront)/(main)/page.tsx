@@ -83,34 +83,36 @@ export default async function Home() {
           </div>
           <TabsContent value="for-sellers">
             <HomePageLayout
-              heading={<Heading size="h1">Sell online with ease.</Heading>}
+              heading={<Heading size="h1">Turn Your Local Knowledge Into Income</Heading>}
               subheading={
                 <Heading size="h2">
-                  Access our global marketplace and sell your <br /> location lists to
-                  over 1 million visitors.
+                  Create and sell location lists to travelers worldwide. <br /> Keep 85% of every sale with no upfront costs.
                 </Heading>
               }
             >
               <div className="md:grid md:grid-cols-3 gap-4 flex flex-col mt-12">
                 <FeatureBanner
-                  heading="No monthly fees"
-                  subheading="Fugit voluptates nihil ex et voluptas dignissimos blanditiis. Consectetur velit pariatur nihil quis nihil similique voluptatum in. Et nostrum ipsam quo magni. Velit et odit dolores."
+                  heading="No Monthly Fees"
+                  subheading="Start selling with zero upfront costs. Only pay when you make a sale - we keep 15%, you keep 85% of every transaction."
                   icon={<DollarSign size={32} />}
                 />
                 <FeatureBanner
-                  heading="Access to millions of buyers"
-                  subheading="Fugit voluptates nihil ex et voluptas dignissimos blanditiis. Consectetur velit pariatur nihil quis nihil similique voluptatum in. Et nostrum ipsam quo magni. Velit et odit dolores."
+                  heading="Global Marketplace"
+                  subheading="Reach travelers from around the world looking for authentic local experiences and insider knowledge in your area."
                   icon={<User size={32} />}
                 />
                 <FeatureBanner
-                  heading="Quick and easy setup"
-                  subheading="Fugit voluptates nihil ex et voluptas dignissimos blanditiis. Consectetur velit pariatur nihil quis nihil similique voluptatum in. Et nostrum ipsam quo magni. Velit et odit dolores."
+                  heading="Quick Setup"
+                  subheading="Create your seller profile, add payment details, and publish your first location list in under 30 minutes."
                   icon={<AlarmClock size={32} />}
                 />
               </div>
-              <div className="flex items-center justify-center mt-12">
+              <div className="flex items-center justify-center gap-4 mt-12 flex-wrap">
                 <Link href={routes.signUp}>
-                  <Button size="lg">Create account</Button>
+                  <Button size="lg">Start Selling Today</Button>
+                </Link>
+                <Link href={`${routes.helpCentre}?tab=sellers`}>
+                  <Button variant="outline" size="lg">Learn How It Works</Button>
                 </Link>
               </div>
             </HomePageLayout>
