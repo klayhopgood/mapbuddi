@@ -77,9 +77,10 @@ export async function POST(request: Request) {
 
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
-      // Skip subscription-related payment intents - they're handled by subscription webhooks
-      if ((paymentIntent as any).invoice) {
-        console.log("Skipping subscription payment_intent - handled by subscription webhooks");
+      // Skip subscription-related payment intents
+      if (paymentIntent.description === "Subscription creation" || 
+          Object.keys(paymentIntent.metadata).length === 0) {
+        console.log("Skipping subscription payment_intent - handled by customer.subscription.created");
         break;
       }
 
@@ -194,16 +195,12 @@ export async function POST(request: Request) {
     case "customer.subscription.updated":
     case "customer.subscription.deleted":
     case "invoice.payment_failed":
-      console.log(`=== SUBSCRIPTION EVENT: ${event.type} ===`);
-      console.log(`Event ID: ${event.id}`);
-      console.log(`Event created: ${new Date(event.created * 1000).toISOString()}`);
-      console.log(`Event data preview:`, JSON.stringify(event.data.object, null, 2).substring(0, 500) + '...');
+      console.log(`Processing subscription event: ${event.type}`);
       try {
         await handleSubscriptionWebhook(event);
-        console.log(`✅ Successfully processed ${event.type} for event ${event.id}`);
+        console.log(`Successfully processed ${event.type}`);
       } catch (error) {
-        console.error(`❌ Error processing subscription event ${event.type}:`, error);
-        console.error(`Event that failed:`, JSON.stringify(event, null, 2));
+        console.error(`Error processing subscription event ${event.type}:`, error);
         return NextResponse.json(
           { error: `Failed to process ${event.type}` },
           { status: 500 }
