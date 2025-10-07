@@ -222,7 +222,7 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
           </div>
         </div>
 
-        {/* Location Lists Section */}
+        {/* Location Lists Section - Fixed Heading className issue */}
         <div>
           <div className="mb-6">
             <Heading size="h2">
