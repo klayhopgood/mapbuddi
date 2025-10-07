@@ -1,13 +1,12 @@
 import Link from "next/link";
-import { ContentWrapper } from "@/components/content-wrapper";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Map, Download, Smartphone, Shield } from "lucide-react";
 
-export default function BuyingPage() {
+export default function BuyingOverviewPage() {
   return (
-    <ContentWrapper className="max-w-4xl mx-auto py-12">
-      <div className="text-center mb-12">
+    <div className="max-w-4xl mx-auto space-y-12">
+      <div className="text-center">
         <h1 className="text-4xl font-bold mb-4">Discover & Integrate Location Lists</h1>
         <p className="text-lg text-muted-foreground mb-8">
           Find curated location lists from local experts and seamlessly integrate them into Google Maps for your next adventure.
@@ -22,7 +21,7 @@ export default function BuyingPage() {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8 mb-12">
+      <div className="grid md:grid-cols-2 gap-8">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -90,7 +89,7 @@ export default function BuyingPage() {
         </Card>
       </div>
 
-      <div className="mb-12">
+      <div>
         <h2 className="text-2xl font-bold mb-6 text-center">How to Buy & Integrate in 3 Steps</h2>
         <div className="grid md:grid-cols-3 gap-6">
           <Card className="text-center">
@@ -146,7 +145,7 @@ export default function BuyingPage() {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8 mb-12">
+      <div className="grid md:grid-cols-2 gap-8">
         <Card>
           <CardHeader>
             <CardTitle>Popular List Categories</CardTitle>
@@ -227,6 +226,6 @@ export default function BuyingPage() {
           </CardContent>
         </Card>
       </div>
-    </ContentWrapper>
+    </div>
   );
 }

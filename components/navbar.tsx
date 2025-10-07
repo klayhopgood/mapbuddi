@@ -52,13 +52,13 @@ export const NavBar = ({
                 <div className="absolute right-0 top-full mt-2 w-32 bg-white border border-border shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <div className="py-2">
                     <Link
-                      href={routes.selling}
+                      href={`${routes.account}/selling`}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
                     >
                       Selling
                     </Link>
                     <Link
-                      href={routes.buying}
+                      href={`${routes.account}/buying`}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
                     >
                       Buying

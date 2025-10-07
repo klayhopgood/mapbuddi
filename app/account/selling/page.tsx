@@ -1,20 +1,19 @@
 import Link from "next/link";
-import { ContentWrapper } from "@/components/content-wrapper";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, MapPin, DollarSign, Users, BarChart3 } from "lucide-react";
 
-export default function SellingPage() {
+export default function SellingOverviewPage() {
   return (
-    <ContentWrapper className="max-w-4xl mx-auto py-12">
-      <div className="text-center mb-12">
+    <div className="max-w-4xl mx-auto space-y-12">
+      <div className="text-center">
         <h1 className="text-4xl font-bold mb-4">Start Selling Location Lists</h1>
         <p className="text-lg text-muted-foreground mb-8">
           Turn your local knowledge into income by creating and selling curated location lists to travelers and locals alike.
         </p>
         <div className="flex gap-4 justify-center">
-          <Link href="/account/selling">
-            <Button size="lg">Get Started Selling</Button>
+          <Link href="/account/selling/lists">
+            <Button size="lg">Create Your First List</Button>
           </Link>
           <Link href="/">
             <Button variant="outline" size="lg">Learn More</Button>
@@ -22,7 +21,7 @@ export default function SellingPage() {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8 mb-12">
+      <div className="grid md:grid-cols-2 gap-8">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -90,7 +89,7 @@ export default function SellingPage() {
         </Card>
       </div>
 
-      <div className="mb-12">
+      <div>
         <h2 className="text-2xl font-bold mb-6 text-center">Getting Started in 4 Steps</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="text-center">
@@ -178,6 +177,6 @@ export default function SellingPage() {
           </CardContent>
         </Card>
       </div>
-    </ContentWrapper>
+    </div>
   );
 }

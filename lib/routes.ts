@@ -2,8 +2,6 @@ export const routes = {
   signIn: "/auth/sign-in",
   signUp: "/auth/sign-up",
   account: "/account",
-  selling: "/selling",
-  buying: "/buying",
   products: "/products",
   product: "/product",
   lists: "/lists",

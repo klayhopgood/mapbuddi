@@ -117,10 +117,10 @@ export default async function Home() {
           </TabsContent>
           <TabsContent value="for-buyers">
             <HomePageLayout
-              heading={<Heading size="h1">Online shopping made easy.</Heading>}
+              heading={<Heading size="h1">Personalised Lists of the best places from the best Travellers</Heading>}
               subheading={
                 <Heading size="h2">
-                  Shop hundreds of curated location lists from sellers worldwide.
+                  Find a list that matches your style, download, sync to Google Maps and explore with ease!
                 </Heading>
               }
             >
