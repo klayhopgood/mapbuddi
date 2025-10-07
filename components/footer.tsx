@@ -8,7 +8,7 @@ export const Footer = () => {
       <ContentWrapper className="flex items-start md:items-end justify-start md:justify-between gap-2 flex-col md:flex-row">
         <div>
           <Logo />
-          <p>More "WOW!" and less "huh?"</p>
+          <p>More &ldquo;WOW!&rdquo; and less &ldquo;huh?&rdquo;</p>
         </div>
         <div className="flex gap-2 items-center justify-start md:justify-end">
           <div className="flex items-start md:items-end justify-center flex-col gap-1 text-secondary text-sm">
