@@ -81,12 +81,12 @@ export const MobileNavigation = () => {
                     setIsMobileNavOpen={setIsMobileNavOpen}
                   />
                   <SubMenuLink 
-                    href={`${routes.account}/selling`} 
+                    href={`${routes.account}?tab=selling`} 
                     name="Selling Overview" 
                     setIsMobileNavOpen={setIsMobileNavOpen}
                   />
                   <SubMenuLink 
-                    href={`${routes.account}/buying`} 
+                    href={`${routes.account}?tab=buying`} 
                     name="Buying Overview" 
                     setIsMobileNavOpen={setIsMobileNavOpen}
                   />

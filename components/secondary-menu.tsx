@@ -2,7 +2,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export type MenuItems = { name: string; href: string; group: Groups }[];
 type Groups = "buying" | "selling";
@@ -10,17 +10,15 @@ type Groups = "buying" | "selling";
 export const SecondaryMenu = (props: { menuItems: MenuItems }) => {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   
-  // Determine which tab should be active based on current path
-  const activeTab = pathname.includes('/buying/') ? 'buying' : 'selling';
+  // Determine which tab should be active based on current path or search params
+  const tab = searchParams.get('tab');
+  const activeTab = tab || (pathname.includes('/buying/') ? 'buying' : 'selling');
   
-  // Handle tab switching by navigating to the first item in each group
+  // Handle tab switching by navigating to account page with tab parameter
   const handleTabChange = (value: string) => {
-    const targetGroup = value as Groups;
-    const firstItemInGroup = props.menuItems.find(item => item.group === targetGroup);
-    if (firstItemInGroup) {
-      router.push(firstItemInGroup.href);
-    }
+    router.push(`/account?tab=${value}`);
   };
   
   return (
