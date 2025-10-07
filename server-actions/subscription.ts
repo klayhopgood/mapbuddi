@@ -119,6 +119,12 @@ export async function createSubscription(storeId: number) {
         storeId: storeId.toString(),
         userId: user.id,
       },
+      subscription_data: {
+        metadata: {
+          storeId: storeId.toString(),
+          userId: user.id,
+        },
+      },
     });
 
     // Update or create subscription record with customer ID
