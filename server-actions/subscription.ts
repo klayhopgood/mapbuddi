@@ -188,11 +188,18 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
       return;
     }
 
-    // Convert Unix timestamps directly - no fancy null checks
+    // Debug what we're actually receiving
+    console.log(`Raw subscription object:`, JSON.stringify(subscription, null, 2));
+    console.log(`Period start type: ${typeof subscription.current_period_start}, value: ${subscription.current_period_start}`);
+    console.log(`Period end type: ${typeof subscription.current_period_end}, value: ${subscription.current_period_end}`);
+    
+    if (!subscription.current_period_start || !subscription.current_period_end) {
+      console.error("Missing period timestamps in subscription object");
+      return;
+    }
+    
     const startDate = new Date(subscription.current_period_start * 1000);
     const endDate = new Date(subscription.current_period_end * 1000);
-    
-    console.log(`Converting timestamps: start=${subscription.current_period_start} -> ${startDate.toISOString()}, end=${subscription.current_period_end} -> ${endDate.toISOString()}`);
     
     await db.insert(subscriptions).values({
       storeId: storeId,
