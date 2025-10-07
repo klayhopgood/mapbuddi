@@ -188,6 +188,8 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
       return;
     }
 
+    console.log(`Subscription periods: start=${subscription.current_period_start}, end=${subscription.current_period_end}`);
+    
     await db.insert(subscriptions).values({
       storeId: storeId,
       stripeCustomerId: subscription.customer,
