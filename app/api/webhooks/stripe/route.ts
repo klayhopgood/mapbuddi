@@ -19,12 +19,28 @@ async function getRawBody(readable: Readable): Promise<Buffer> {
   return Buffer.concat(chunks);
 }
 
+export async function GET() {
+  console.log("=== WEBHOOK GET REQUEST ===");
+  return NextResponse.json({ 
+    message: "Webhook endpoint is reachable",
+    timestamp: new Date().toISOString()
+  });
+}
+
 export async function POST(request: Request) {
+  // FIRST: Log that we received ANY request
+  console.log("=== WEBHOOK ENDPOINT HIT ===");
+  console.log("Request method:", request.method);
+  console.log("Request URL:", request.url);
+  console.log("Headers:", JSON.stringify(Object.fromEntries(request.headers.entries())));
+  
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: "2025-08-27.basil",
   });
 
+  console.log("=== GETTING RAW BODY ===");
   const rawBody = await getRawBody(request.body as unknown as Readable);
+  console.log("Raw body length:", rawBody.length);
 
   const headersList = headers();
   const sig = headersList.get("stripe-signature");
