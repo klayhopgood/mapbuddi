@@ -226,7 +226,7 @@ export default async function StorefrontListDetails(props: {
                           </div>
                         </div>
                         <Text className="text-sm text-muted-foreground">
-                          {new Date(review.createdAt).toLocaleDateString()}
+                          {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'Unknown date'}
                         </Text>
                       </div>
                       {review.review && (
