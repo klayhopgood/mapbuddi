@@ -177,110 +177,29 @@ export async function cancelSubscription(storeId: number) {
 }
 
 export async function handleSubscriptionWebhook(event: Stripe.Event) {
-  console.log(`=== PROCESSING WEBHOOK: ${event.type} ===`);
-  console.log(`Event ID: ${event.id}`);
+  console.log(`Processing webhook: ${event.type}`);
   
-  try {
-    switch (event.type) {
-      case "checkout.session.completed": {
-        // Skip checkout.session.completed - let customer.subscription.created handle it
-        console.log("Skipping checkout.session.completed - will be handled by customer.subscription.created");
-        break;
-      }
-      
-      case "customer.subscription.created":
-      case "customer.subscription.updated": {
-        const subscription = event.data.object as Stripe.Subscription;
-        const storeId = parseInt(subscription.metadata.storeId || "0");
-        
-        if (!storeId) {
-          console.error("No storeId in subscription metadata");
-          return;
-        }
-
-        // Simple INSERT with conflict handling
-        try {
-          await db.insert(subscriptions).values({
-            storeId,
-            stripeCustomerId: subscription.customer as string,
-            stripeSubscriptionId: subscription.id,
-            stripePriceId: subscription.items.data[0]?.price.id || null,
-            status: subscription.status,
-            currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-            cancelAtPeriodEnd: (subscription as any).cancel_at_period_end || false,
-          });
-        } catch (error: any) {
-          // If unique constraint violation, update instead
-          if (error.code === '23505') {
-            await db.update(subscriptions)
-              .set({
-                stripeCustomerId: subscription.customer as string,
-                stripeSubscriptionId: subscription.id,
-                stripePriceId: subscription.items.data[0]?.price.id || null,
-                status: subscription.status,
-                currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-                currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-                cancelAtPeriodEnd: (subscription as any).cancel_at_period_end || false,
-                updatedAt: new Date(),
-              })
-              .where(eq(subscriptions.storeId, storeId));
-          } else {
-            throw error;
-          }
-        }
-
-        console.log(`Subscription processed for store ${storeId}`);
-        break;
-      }
-
-      case "customer.subscription.deleted": {
-        const subscription = event.data.object as Stripe.Subscription;
-        const storeId = parseInt(subscription.metadata.storeId || "0");
-        
-        if (!storeId) {
-          console.error("No storeId in subscription metadata");
-          return;
-        }
-
-        await db
-          .update(subscriptions)
-          .set({
-            status: "canceled",
-            updatedAt: new Date(),
-          })
-          .where(eq(subscriptions.storeId, storeId));
-
-        // Deactivate all active lists (make them drafts)
-        await deactivateAllActiveLists(storeId);
-        break;
-      }
-
-      case "invoice.payment_failed": {
-        const invoice = event.data.object as Stripe.Invoice;
-        if ((invoice as any).subscription) {
-          const subscription = await stripe.subscriptions.retrieve((invoice as any).subscription as string);
-          const storeId = parseInt(subscription.metadata.storeId || "0");
-          
-          if (storeId) {
-            await db
-              .update(subscriptions)
-              .set({
-                status: "past_due",
-                updatedAt: new Date(),
-              })
-              .where(eq(subscriptions.storeId, storeId));
-
-            // Optionally deactivate lists for past due subscriptions
-            await deactivateAllActiveLists(storeId);
-          }
-        }
-        break;
-      }
+  if (event.type === "customer.subscription.created") {
+    const subscription = event.data.object as any;
+    const storeId = parseInt(subscription.metadata?.storeId || "0");
+    
+    if (!storeId) {
+      console.error("No storeId in metadata");
+      return;
     }
-  } catch (error) {
-    console.error(`Webhook error:`, error);
-    throw error;
+
+    await db.insert(subscriptions).values({
+      storeId: storeId,
+      stripeCustomerId: subscription.customer,
+      stripeSubscriptionId: subscription.id,
+      stripePriceId: subscription.items.data[0]?.price?.id,
+      status: subscription.status,
+      currentPeriodStart: new Date(subscription.current_period_start * 1000),
+      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      cancelAtPeriodEnd: subscription.cancel_at_period_end || false,
+    });
+
+    console.log(`Created subscription for store ${storeId}`);
   }
 }
 
