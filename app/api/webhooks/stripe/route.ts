@@ -7,6 +7,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { Readable } from "stream";
 import Stripe from "stripe";
+import { handleSubscriptionWebhook } from "@/server-actions/subscription";
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -164,6 +165,26 @@ export async function POST(request: Request) {
       }
 
       break;
+    
+    // Subscription events
+    case "checkout.session.completed":
+    case "customer.subscription.created":
+    case "customer.subscription.updated":
+    case "customer.subscription.deleted":
+    case "invoice.payment_failed":
+      console.log(`=== SUBSCRIPTION EVENT: ${event.type} ===`);
+      try {
+        await handleSubscriptionWebhook(event);
+        console.log(`Successfully processed ${event.type}`);
+      } catch (error) {
+        console.error(`Error processing subscription event ${event.type}:`, error);
+        return NextResponse.json(
+          { error: `Failed to process ${event.type}` },
+          { status: 500 }
+        );
+      }
+      break;
+
     // ... handle other event types
     default:
       console.log(`Unhandled event type ${event.type}`);

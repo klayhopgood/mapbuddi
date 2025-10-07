@@ -190,7 +190,66 @@ export async function cancelSubscription(storeId: number) {
 
 export async function handleSubscriptionWebhook(event: Stripe.Event) {
   try {
+    console.log(`=== PROCESSING WEBHOOK: ${event.type} ===`);
+    
     switch (event.type) {
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        console.log("Checkout session:", JSON.stringify(session, null, 2));
+        
+        const subscriptionId = session.subscription as string;
+        const customerId = session.customer as string;
+        const storeId = parseInt(session.metadata?.storeId || "0");
+
+        console.log(`Session data: subscriptionId=${subscriptionId}, customerId=${customerId}, storeId=${storeId}`);
+
+        if (!subscriptionId || !customerId || !storeId) {
+          console.error("Missing data in checkout.session.completed event", {
+            subscriptionId,
+            customerId,
+            storeId
+          });
+          return;
+        }
+
+        // Get the subscription details from Stripe
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        console.log("Retrieved subscription:", JSON.stringify(subscription, null, 2));
+
+        // Update or insert subscription record
+        await db.insert(subscriptions).values({
+          storeId,
+          stripeCustomerId: customerId,
+          stripeSubscriptionId: subscription.id,
+          stripePriceId: subscription.items.data[0]?.price.id,
+          status: subscription.status,
+          currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+          cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
+        }).onConflictDoUpdate({
+          target: subscriptions.storeId,
+          set: {
+            stripeCustomerId: customerId,
+            stripeSubscriptionId: subscription.id,
+            stripePriceId: subscription.items.data[0]?.price.id,
+            status: subscription.status,
+            currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+            cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
+            updatedAt: new Date(),
+          },
+        });
+
+        console.log(`Subscription record updated for store ${storeId}`);
+
+        // Activate all draft lists if subscription is active
+        if (subscription.status === "active") {
+          await activateAllDraftLists(storeId);
+          console.log(`Activated all draft lists for store ${storeId}`);
+        }
+        break;
+      }
+      
       case "customer.subscription.created":
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
