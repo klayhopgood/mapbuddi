@@ -76,25 +76,29 @@ export async function createStore(storeName: string) {
 }
 
 export async function updateStore(args: {
-  name: string | null;
-  description: string | null;
+  storeId?: number;
+  name?: string | null;
+  description?: string | null;
   industry?: string | null; // Keep for backward compatibility
   firstName?: string | null;
   lastName?: string | null;
   age?: number | null;
   nationality?: string | null; // JSON string
   socialLinks?: string | null; // JSON string
+  website?: string | null;
   verifiedSocials?: string | null; // JSON string
 }) {
   const inputSchema = z.object({
-    name: z.string().nullable(),
-    description: z.string().nullable(),
+    storeId: z.number().optional(),
+    name: z.string().nullable().optional(),
+    description: z.string().nullable().optional(),
     industry: z.string().nullable().optional(),
     firstName: z.string().nullable().optional(),
     lastName: z.string().nullable().optional(),
     age: z.number().nullable().optional(),
     nationality: z.string().nullable().optional(),
     socialLinks: z.string().nullable().optional(),
+    website: z.string().nullable().optional(),
     verifiedSocials: z.string().nullable().optional(),
   });
 
@@ -118,12 +122,15 @@ export async function updateStore(args: {
     if (validatedArgs.age !== null && validatedArgs.age !== undefined) updateData.age = validatedArgs.age;
     if (validatedArgs.nationality !== null && validatedArgs.nationality !== undefined) updateData.nationality = validatedArgs.nationality;
     if (validatedArgs.socialLinks !== null && validatedArgs.socialLinks !== undefined) updateData.socialLinks = validatedArgs.socialLinks;
+    if (validatedArgs.website !== null && validatedArgs.website !== undefined) updateData.website = validatedArgs.website;
     if (validatedArgs.verifiedSocials !== null && validatedArgs.verifiedSocials !== undefined) updateData.verifiedSocials = validatedArgs.verifiedSocials;
 
+    const storeId = validatedArgs.storeId || Number(user?.privateMetadata.storeId);
+    
     await db
       .update(stores)
       .set(updateData)
-      .where(eq(stores.id, Number(user?.privateMetadata.storeId)));
+      .where(eq(stores.id, storeId));
 
     const res = {
       error: false,

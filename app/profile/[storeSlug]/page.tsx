@@ -8,7 +8,7 @@ import { LocationListCard } from "@/components/storefront/location-list-card";
 import { LocationListAndStore } from "@/lib/collection-types";
 import { ContentWrapper } from "@/components/content-wrapper";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, User, CheckCircle, Youtube, Instagram } from "lucide-react";
+import { MapPin, User, CheckCircle, Youtube, Instagram, ExternalLink } from "lucide-react";
 import Image from "next/image";
 
 export const dynamic = 'force-dynamic';
@@ -169,45 +169,53 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
                 </Text>
               )}
 
-              {/* Social Links - Only show verified accounts */}
-              {verifiedSocials.length > 0 && (
-                <div className="flex gap-3">
-                  {verifiedSocials.includes('youtube') && socialLinks.youtube && (
+              {/* Social Links and Website */}
+              {(socialLinks.youtube || socialLinks.instagram || socialLinks.tiktok || store.website) && (
+                <div className="flex flex-wrap gap-3">
+                  {socialLinks.youtube && (
                     <a
-                      href={socialLinks.youtube}
+                      href={socialLinks.youtube.startsWith('@') ? `https://youtube.com/${socialLinks.youtube}` : socialLinks.youtube}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
                     >
                       <Youtube size={16} />
                       <span className="text-sm">YouTube</span>
-                      <CheckCircle size={14} className="text-green-600" />
                     </a>
                   )}
-                  {verifiedSocials.includes('instagram') && socialLinks.instagram && (
+                  {socialLinks.instagram && (
                     <a
-                      href={socialLinks.instagram}
+                      href={socialLinks.instagram.startsWith('@') ? `https://instagram.com/${socialLinks.instagram.slice(1)}` : socialLinks.instagram}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 px-3 py-2 bg-pink-100 text-pink-700 rounded-lg hover:bg-pink-200 transition-colors"
                     >
                       <Instagram size={16} />
                       <span className="text-sm">Instagram</span>
-                      <CheckCircle size={14} className="text-green-600" />
                     </a>
                   )}
-                  {verifiedSocials.includes('tiktok') && socialLinks.tiktok && (
+                  {socialLinks.tiktok && (
                     <a
-                      href={socialLinks.tiktok}
+                      href={socialLinks.tiktok.startsWith('@') ? `https://tiktok.com/${socialLinks.tiktok}` : socialLinks.tiktok}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
                     >
-                      <div className="w-4 h-4 bg-black rounded-sm flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">T</span>
+                      <div className="w-4 h-4 bg-white rounded-sm flex items-center justify-center">
+                        <span className="text-black text-xs font-bold">T</span>
                       </div>
                       <span className="text-sm">TikTok</span>
-                      <CheckCircle size={14} className="text-green-600" />
+                    </a>
+                  )}
+                  {store.website && (
+                    <a
+                      href={store.website.startsWith('http') ? store.website : `https://${store.website}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                    >
+                      <ExternalLink size={16} />
+                      <span className="text-sm">Website</span>
                     </a>
                   )}
                 </div>

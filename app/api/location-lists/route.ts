@@ -78,6 +78,8 @@ export async function POST(request: NextRequest) {
           isActive: list.isActive,
           storeId,
           totalPois: pois.length,
+          country: list.country,
+          cities: list.cities,
         })
         .returning();
 

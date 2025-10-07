@@ -27,6 +27,7 @@ export const stores = pgTable(
     lastName: varchar("last_name", { length: 50 }),
     age: integer("age"),
     socialLinks: text("social_links"), // JSON object with YouTube, TikTok, Instagram URLs
+    website: text("website"), // Website URL
     verifiedSocials: text("verified_socials"), // JSON array of verified platforms
     slug: varchar("slug", { length: 50 }),
     userId: text("user_id"), // Clerk user ID

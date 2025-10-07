@@ -45,6 +45,8 @@ export async function PUT(
           coverImage: list.coverImage,
           isActive: list.isActive,
           totalPois: pois.length,
+          country: list.country,
+          cities: list.cities,
           updatedAt: new Date(),
         })
         .where(eq(locationLists.id, listId))
