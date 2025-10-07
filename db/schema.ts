@@ -28,7 +28,6 @@ export const stores = pgTable(
     age: integer("age"),
     socialLinks: text("social_links"), // JSON object with YouTube, TikTok, Instagram URLs
     verifiedSocials: text("verified_socials"), // JSON array of verified platforms
-    socialData: text("social_data"), // JSON object with detailed platform data (follower counts, etc.)
     slug: varchar("slug", { length: 50 }),
     userId: text("user_id"), // Clerk user ID
     currency: varchar("currency", { length: 3 }).default("USD"), // ISO currency code

@@ -14,10 +14,10 @@ export const Footer = () => {
           <div className="flex items-start md:items-end justify-center flex-col gap-1 text-secondary text-sm">
             <p>© 2025 MapBuddi. All rights reserved.</p>
             <div className="flex gap-4">
-              <a href="/privacy" className="text-white border-b pb-[1px] border-secondary">
+              <a href="/privacy-policy" className="text-white border-b pb-[1px] border-secondary">
                 Privacy Policy
               </a>
-              <a href="/terms" className="text-white border-b pb-[1px] border-secondary">
+              <a href="/terms-of-service" className="text-white border-b pb-[1px] border-secondary">
                 Terms of Service
               </a>
             </div>
