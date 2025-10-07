@@ -5,6 +5,8 @@ import { db } from "@/db/db";
 import { locationLists, stores } from "@/db/schema";
 import { LocationListAndStore } from "@/lib/collection-types";
 import { eq, inArray } from "drizzle-orm";
+import { getCart } from "@/server-actions/get-cart-details";
+import { cookies } from "next/headers";
 
 const LISTS_PER_PAGE = 12;
 
@@ -15,6 +17,11 @@ export default async function LocationListsPage(context: {
   params: { slug: string };
   searchParams: { page: string; seller: string };
 }) {
+  // Get cart data
+  const cookieStore = cookies();
+  const cartId = cookieStore.get("cartId")?.value;
+  const { cartItems } = cartId ? await getCart(Number(cartId)) : { cartItems: [] };
+
   const rawData = await db
     .select({
       locationList: locationLists,
@@ -74,6 +81,7 @@ export default async function LocationListsPage(context: {
       <CollectionBody
         storeAndLocationList={storeAndLocationList}
         activeSellers={await getActiveSellers()}
+        cartItems={cartItems}
       >
         <CollectionPagePagination
           productsPerPage={LISTS_PER_PAGE}

@@ -8,10 +8,14 @@ import { Button } from "../ui/button";
 import { LocationListAndStore } from "@/lib/collection-types";
 import { Badge } from "../ui/badge";
 import { useCurrency } from "@/hooks/use-currency";
+import { LocationListForm } from "./location-list-form";
+import { CartItem } from "@/lib/types";
+import { addToCart } from "@/server-actions/add-to-cart";
 
 export const LocationListCard = (props: {
   storeAndLocationList: LocationListAndStore;
   hideButtonActions?: boolean;
+  cartItems?: CartItem[];
 }) => {
   const { formatDisplayPrice } = useCurrency();
   const listPageLink = `/list/${props.storeAndLocationList.locationList.id}`;
@@ -77,14 +81,16 @@ export const LocationListCard = (props: {
 
       {!props.hideButtonActions && (
         <div className="flex gap-2 items-center justify-between mt-4">
-          <Link href={`/list/${props.storeAndLocationList.locationList.id}/preview`} className="flex-1">
-            <Button variant="outline" size="sm" className="w-full">
-              Preview
-            </Button>
-          </Link>
+          <LocationListForm
+            addToCartAction={addToCart}
+            listId={props.storeAndLocationList.locationList.id}
+            listName={props.storeAndLocationList.locationList.name}
+            buttonSize="sm"
+            cartItems={props.cartItems}
+          />
           <Link href={listPageLink} className="flex-1">
             <Button size="sm" className="w-full">
-              Buy Now
+              View List
             </Button>
           </Link>
         </div>

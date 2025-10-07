@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { SlidersHorizontal } from "lucide-react";
 import { EmptyStateWrapper } from "../ui/empty-state-wrapper";
+import { CartItem } from "@/lib/types";
 
 export const CollectionBody = (
   props: PropsWithChildren<{
@@ -23,6 +24,7 @@ export const CollectionBody = (
       name: string | null;
       slug: string | null;
     }[];
+    cartItems?: CartItem[];
   }>
 ) => {
   const searchParams = useSearchParams();
@@ -67,7 +69,10 @@ export const CollectionBody = (
                   className="sm:col-span-6 md:col-span-4 col-span-12"
                   key={i}
                 >
-                  <LocationListCard storeAndLocationList={locationListItem} />
+                  <LocationListCard 
+                    storeAndLocationList={locationListItem} 
+                    cartItems={props.cartItems}
+                  />
                 </div>
               )
           )}
