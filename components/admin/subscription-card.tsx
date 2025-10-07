@@ -117,7 +117,7 @@ export function SubscriptionCard({
                 <p className="text-blue-700">Everything you need to sell location lists</p>
                 <div className="mt-2">
                   <span className="text-3xl font-bold text-blue-900">$19</span>
-                  <span className="text-blue-700">/month</span>
+                  <span className="text-blue-700"> USD/month</span>
                 </div>
               </div>
               <Button 
@@ -224,7 +224,7 @@ export function SubscriptionCard({
         </div>
         
         <div className="text-sm text-gray-600">
-          <p>Billing: $19.00 charged monthly via Stripe</p>
+          <p>Billing: $19.00 USD charged monthly via Stripe</p>
           <p>Next charge: {subscriptionStatus.currentPeriodEnd ? new Date(subscriptionStatus.currentPeriodEnd).toLocaleDateString() : 'Unknown'}</p>
         </div>
       </CardContent>

@@ -113,7 +113,7 @@ export async function createSubscription(storeId: number) {
         },
       ],
       mode: "subscription",
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/account/selling/membership?success=true`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/subscription/success`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/account/selling/membership?canceled=true`,
       metadata: {
         storeId: storeId.toString(),

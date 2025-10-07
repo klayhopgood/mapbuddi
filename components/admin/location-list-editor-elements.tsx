@@ -17,6 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { LocationSelector } from "./location-selector-api";
 import { EnhancedPOICreator } from "./enhanced-poi-creator";
+import { SubscriptionPrompt } from "./subscription-prompt";
 
 interface ListCategory {
   id?: number;
@@ -101,6 +102,7 @@ export const LocationListEditorElements = (props: {
     })) ?? []
   );
   const [activeTab, setActiveTab] = useState("basic");
+  const [showSubscriptionPrompt, setShowSubscriptionPrompt] = useState(false);
 
   // Handle location changes
   const handleLocationChange = (country: string | undefined, cities: string[]) => {
@@ -195,18 +197,23 @@ export const LocationListEditorElements = (props: {
           variant: "destructive",
         });
       } else {
-        toast({
-          title: "Success",
-          description: props.listStatus === "existing-list" 
-            ? "Location list updated successfully!" 
-            : "Location list created successfully!",
-        });
-        
-        // Add a small delay to ensure database write completes
-        setTimeout(() => {
-          router.push("/account/selling/lists");
-          router.refresh();
-        }, 500);
+        // Check if subscription is required (list was saved as draft)
+        if (data.subscriptionRequired) {
+          setShowSubscriptionPrompt(true);
+        } else {
+          toast({
+            title: "Success",
+            description: props.listStatus === "existing-list" 
+              ? "Location list updated successfully!" 
+              : "Location list created successfully!",
+          });
+          
+          // Add a small delay to ensure database write completes
+          setTimeout(() => {
+            router.push("/account/selling/lists");
+            router.refresh();
+          }, 500);
+        }
       }
     } catch (error) {
       toast({
@@ -396,6 +403,20 @@ export const LocationListEditorElements = (props: {
           </Button>
         </div>
       </form>
+
+      {/* Subscription Prompt */}
+      <SubscriptionPrompt
+        isOpen={showSubscriptionPrompt}
+        onClose={() => {
+          setShowSubscriptionPrompt(false);
+          // Navigate to lists after closing prompt
+          setTimeout(() => {
+            router.push("/account/selling/lists");
+            router.refresh();
+          }, 100);
+        }}
+        listName={formValues.name}
+      />
     </div>
   );
 };
