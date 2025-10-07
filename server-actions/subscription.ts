@@ -188,7 +188,11 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
       return;
     }
 
-    console.log(`Subscription periods: start=${subscription.current_period_start}, end=${subscription.current_period_end}`);
+    // Convert Unix timestamps directly - no fancy null checks
+    const startDate = new Date(subscription.current_period_start * 1000);
+    const endDate = new Date(subscription.current_period_end * 1000);
+    
+    console.log(`Converting timestamps: start=${subscription.current_period_start} -> ${startDate.toISOString()}, end=${subscription.current_period_end} -> ${endDate.toISOString()}`);
     
     await db.insert(subscriptions).values({
       storeId: storeId,
@@ -196,12 +200,8 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
       stripeSubscriptionId: subscription.id,
       stripePriceId: subscription.items.data[0]?.price?.id || null,
       status: subscription.status,
-      currentPeriodStart: subscription.current_period_start && subscription.current_period_start > 0 
-        ? new Date(subscription.current_period_start * 1000) 
-        : null,
-      currentPeriodEnd: subscription.current_period_end && subscription.current_period_end > 0 
-        ? new Date(subscription.current_period_end * 1000) 
-        : null,
+      currentPeriodStart: startDate,
+      currentPeriodEnd: endDate,
       cancelAtPeriodEnd: subscription.cancel_at_period_end || false,
     });
 
