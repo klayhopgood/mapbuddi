@@ -306,8 +306,25 @@ async function deactivateAllActiveLists(storeId: number) {
 
 export async function checkSubscriptionForListActivation(storeId: number): Promise<boolean> {
   try {
-    const subscriptionStatus = await getSubscriptionStatus(storeId);
-    return subscriptionStatus.isActive || false;
+    console.log(`Checking subscription for store ID: ${storeId}`);
+    
+    const [subscription] = await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.storeId, storeId))
+      .limit(1);
+
+    console.log(`Subscription found:`, subscription);
+    
+    if (!subscription) {
+      console.log(`No subscription found for store ${storeId}`);
+      return false;
+    }
+
+    const isActive = subscription.status === 'active';
+    console.log(`Subscription status: ${subscription.status}, isActive: ${isActive}`);
+    
+    return isActive;
   } catch (error) {
     console.error("Error checking subscription for list activation:", error);
     return false;

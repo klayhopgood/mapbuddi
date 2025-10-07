@@ -26,10 +26,7 @@ async function getData(): Promise<LocationListData[]> {
           createdAt: locationLists.createdAt,
         })
         .from(locationLists)
-        .where(and(
-          eq(locationLists.storeId, Number(user?.privateMetadata.storeId)),
-          eq(locationLists.isActive, true)
-        ))
+        .where(eq(locationLists.storeId, Number(user?.privateMetadata.storeId)))
         .catch((err) => {
           console.log(err);
           return [];
