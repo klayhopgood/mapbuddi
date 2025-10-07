@@ -183,59 +183,8 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
   try {
     switch (event.type) {
       case "checkout.session.completed": {
-        const session = event.data.object as Stripe.Checkout.Session;
-        console.log("Checkout session:", JSON.stringify(session, null, 2));
-        
-        const subscriptionId = session.subscription as string;
-        const customerId = session.customer as string;
-        const storeId = parseInt(session.metadata?.storeId || "0");
-
-        console.log(`Session data: subscriptionId=${subscriptionId}, customerId=${customerId}, storeId=${storeId}`);
-
-        if (!subscriptionId || !customerId || !storeId) {
-          console.error("Missing data in checkout.session.completed event", {
-            subscriptionId,
-            customerId,
-            storeId
-          });
-          return;
-        }
-
-        // Get the subscription details from Stripe
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        console.log("Retrieved subscription:", JSON.stringify(subscription, null, 2));
-
-        // Update or insert subscription record
-        await db.insert(subscriptions).values({
-          storeId,
-          stripeCustomerId: customerId,
-          stripeSubscriptionId: subscription.id,
-          stripePriceId: subscription.items.data[0]?.price.id,
-          status: subscription.status,
-          currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-          cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
-        }).onConflictDoUpdate({
-          target: subscriptions.storeId,
-          set: {
-            stripeCustomerId: customerId,
-            stripeSubscriptionId: subscription.id,
-            stripePriceId: subscription.items.data[0]?.price.id,
-            status: subscription.status,
-            currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-            cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
-            updatedAt: new Date(),
-          },
-        });
-
-        console.log(`Subscription record updated for store ${storeId}`);
-
-        // Activate all draft lists if subscription is active
-        if (subscription.status === "active") {
-          await activateAllDraftLists(storeId);
-          console.log(`Activated all draft lists for store ${storeId}`);
-        }
+        // Skip checkout.session.completed - let customer.subscription.created handle it
+        console.log("Skipping checkout.session.completed - will be handled by customer.subscription.created");
         break;
       }
       
@@ -244,94 +193,44 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
         const subscription = event.data.object as Stripe.Subscription;
         const storeId = parseInt(subscription.metadata.storeId || "0");
         
-        console.log(`Processing ${event.type} for storeId: ${storeId}, status: ${subscription.status}`);
-        console.log(`Subscription metadata:`, subscription.metadata);
-        
         if (!storeId) {
-          console.error("No storeId in subscription metadata", subscription.metadata);
+          console.error("No storeId in subscription metadata");
           return;
         }
 
-        // For subscription.created, we need to INSERT or UPDATE (upsert)
-        // For subscription.updated, we UPDATE
-        if (event.type === "customer.subscription.created") {
-          console.log(`=== CREATING SUBSCRIPTION RECORD ===`);
-          console.log(`Event timestamp: ${new Date(event.created * 1000).toISOString()}`);
-          console.log(`Subscription data from Stripe:`, {
-            id: subscription.id,
-            customer: subscription.customer,
-            status: subscription.status,
-            current_period_start: (subscription as any).current_period_start,
-            current_period_end: (subscription as any).current_period_end,
-            cancel_at_period_end: (subscription as any).cancel_at_period_end,
-            price_id: subscription.items.data[0]?.price.id
-          });
-          
-          // Remove delay that might be causing timeouts
-          
-          // Use UPSERT to handle both INSERT and UPDATE atomically
-          console.log(`Upserting subscription for storeId: ${storeId}`);
-          
+        // Simple INSERT with conflict handling
+        try {
           await db.insert(subscriptions).values({
             storeId,
             stripeCustomerId: subscription.customer as string,
             stripeSubscriptionId: subscription.id,
-            stripePriceId: subscription.items.data[0]?.price.id,
+            stripePriceId: subscription.items.data[0]?.price.id || null,
             status: subscription.status,
-            currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-            cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
-          }).onConflictDoUpdate({
-            target: subscriptions.storeId,
-            set: {
-              stripeCustomerId: subscription.customer as string,
-              stripeSubscriptionId: subscription.id,
-              stripePriceId: subscription.items.data[0]?.price.id,
-              status: subscription.status,
-              currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-              currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-              cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
-              updatedAt: new Date(),
-            }
+            currentPeriodStart: new Date(subscription.current_period_start * 1000),
+            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            cancelAtPeriodEnd: subscription.cancel_at_period_end || false,
           });
-          
-          console.log(`Subscription record upserted successfully`);
-          
-          // Verify the operation worked
-          const [finalRecord] = await db
-            .select()
-            .from(subscriptions)
-            .where(eq(subscriptions.storeId, storeId))
-            .limit(1);
-          console.log(`Final record status: ${finalRecord?.status}`);
-        } else {
-          console.log(`=== UPDATING SUBSCRIPTION RECORD ===`);
-          const updateResult = await db
-            .update(subscriptions)
-            .set({
-              stripeSubscriptionId: subscription.id,
-              stripePriceId: subscription.items.data[0]?.price.id,
-              status: subscription.status,
-              currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-              currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-              cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
-              updatedAt: new Date(),
-            })
-            .where(eq(subscriptions.storeId, storeId))
-            .returning();
-          console.log(`Update result:`, updateResult);
+        } catch (error: any) {
+          // If unique constraint violation, update instead
+          if (error.code === '23505') {
+            await db.update(subscriptions)
+              .set({
+                stripeCustomerId: subscription.customer as string,
+                stripeSubscriptionId: subscription.id,
+                stripePriceId: subscription.items.data[0]?.price.id || null,
+                status: subscription.status,
+                currentPeriodStart: new Date(subscription.current_period_start * 1000),
+                currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+                cancelAtPeriodEnd: subscription.cancel_at_period_end || false,
+                updatedAt: new Date(),
+              })
+              .where(eq(subscriptions.storeId, storeId));
+          } else {
+            throw error;
+          }
         }
 
-        console.log(`Subscription record processed for store ${storeId}`);
-
-        // If subscription is active, activate all draft lists
-        if (subscription.status === "active") {
-          await activateAllDraftLists(storeId);
-          console.log(`Activated all draft lists for store ${storeId}`);
-        } else {
-          await deactivateAllActiveLists(storeId);
-          console.log(`Deactivated all active lists for store ${storeId}`);
-        }
+        console.log(`Subscription processed for store ${storeId}`);
         break;
       }
 
@@ -380,8 +279,7 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
       }
     }
   } catch (error) {
-    console.error(`ERROR in handleSubscriptionWebhook: ${event.type}`, error);
-    // Re-throw the error so the webhook returns 500 and Stripe retries
+    console.error(`Webhook error:`, error);
     throw error;
   }
 }
