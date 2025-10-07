@@ -1,11 +1,9 @@
 import Link from "next/link";
 import { Logo } from "./logo";
 import { ContentWrapper } from "./content-wrapper";
-import { Truck } from "lucide-react";
 import { MenuItems } from "./menu-items";
 import { Line } from "./line";
 import { AnnouncementBar } from "./announcement-bar";
-import { IconWithText } from "./icon-with-text";
 import { routes } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { MobileNavigation } from "./mobile-navigation";
@@ -22,7 +20,7 @@ export const NavBar = ({
     <>
       <AnnouncementBar
         columns={2}
-        description="Free shipping on all orders over $50"
+        description=""
       >
         <div className="items-center justify-end gap-6 hidden sm:flex">
           <CurrencySelector />
@@ -60,15 +58,6 @@ export const NavBar = ({
             <li className="flex-1">
               <ProductSearch />
             </li>
-            <li className="hidden lg:block">
-              <Link href="/">
-                <IconWithText
-                  icon={<Truck size="36" strokeWidth={2} />}
-                  headingText="Fast Dispatch"
-                  description="Get your order in 2-3 days"
-                />
-              </Link>
-            </li>
             <li>
               <ShoppingCartHeader />
             </li>
@@ -81,14 +70,6 @@ export const NavBar = ({
           </div>
         </ContentWrapper>
       </nav>
-      {showSecondAnnouncementBar && (
-        <AnnouncementBar
-          columns={1}
-          description="New summer sale - limited time only!"
-          backgroundColor="bg-blue-900"
-          textColor="text-secondary"
-        />
-      )}
       <Line />
     </>
   );

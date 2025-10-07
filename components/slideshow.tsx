@@ -40,15 +40,15 @@ export const SlideShow = () => {
         <div className="absolute w-full h-full bg-translucentDark top-0 bottom-0 left-0 right-0">
           <div className="absolute md:top-0 bottom-0 right-0 left-0 m-auto w-fit h-fit text-center">
             <div className="bg-white md:border border-border md:rounded-md py-8 px-16 flex flex-col gap-3">
-              <p className="uppercase font-medium tracking-wide">Summer Sale</p>
+              <p className="uppercase font-medium tracking-wide">Location Lists</p>
               <div className="flex flex-col gap-2 mb-2">
                 <p className="text-3xl font-bold">
-                  Save up to 50% on our entire range
+                  Discover curated places worth visiting
                 </p>
-                <p>Over 100 products discounted</p>
+                <p>Expertly crafted location lists from local experts</p>
               </div>
               <Link href={routes.lists}>
-                <Button>Shop Now</Button>
+                <Button>Explore Lists</Button>
               </Link>
             </div>
           </div>

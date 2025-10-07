@@ -140,19 +140,19 @@ export default async function Home() {
               </div>
               <div className="md:grid md:grid-cols-3 gap-4 flex flex-col mt-12">
                 <FeatureBanner
-                  heading="Free Shipping"
-                  subheading="Free shipping on all orders over $50"
-                  icon={<Truck size={32} />}
+                  heading="Curated Lists"
+                  subheading="Discover expertly crafted location lists from local experts and travelers"
+                  icon={<MapPin size={32} />}
                 />
                 <FeatureBanner
-                  heading="24/7 Customer Support"
-                  subheading="Have a question? Get in touch."
+                  heading="Map Integration"
+                  subheading="Sync your purchased lists directly to Google Maps and other mapping apps"
                   icon={<Phone size={32} />}
                 />
                 <FeatureBanner
-                  heading="Best prices"
-                  subheading="We offer the best prices on the market."
-                  icon={<DollarSign size={32} />}
+                  heading="Local Insights"
+                  subheading="Get insider knowledge from people who know these places best"
+                  icon={<User size={32} />}
                 />
               </div>
             </HomePageLayout>
