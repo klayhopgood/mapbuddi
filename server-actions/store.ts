@@ -78,12 +78,24 @@ export async function createStore(storeName: string) {
 export async function updateStore(args: {
   name: string | null;
   description: string | null;
-  industry: string | null;
+  industry?: string | null; // Keep for backward compatibility
+  firstName?: string | null;
+  lastName?: string | null;
+  age?: number | null;
+  nationality?: string | null; // JSON string
+  socialLinks?: string | null; // JSON string
+  verifiedSocials?: string | null; // JSON string
 }) {
   const inputSchema = z.object({
     name: z.string().nullable(),
     description: z.string().nullable(),
-    industry: z.string().nullable(),
+    industry: z.string().nullable().optional(),
+    firstName: z.string().nullable().optional(),
+    lastName: z.string().nullable().optional(),
+    age: z.number().nullable().optional(),
+    nationality: z.string().nullable().optional(),
+    socialLinks: z.string().nullable().optional(),
+    verifiedSocials: z.string().nullable().optional(),
   });
 
   try {
@@ -96,11 +108,17 @@ export async function updateStore(args: {
     // Validate input
     const validatedArgs = inputSchema.parse(args);
     
-    // Filter out null values for the update
+    // Filter out null/undefined values for the update
     const updateData: any = {};
-    if (validatedArgs.name !== null) updateData.name = validatedArgs.name;
-    if (validatedArgs.description !== null) updateData.description = validatedArgs.description;
-    if (validatedArgs.industry !== null) updateData.industry = validatedArgs.industry;
+    if (validatedArgs.name !== null && validatedArgs.name !== undefined) updateData.name = validatedArgs.name;
+    if (validatedArgs.description !== null && validatedArgs.description !== undefined) updateData.description = validatedArgs.description;
+    if (validatedArgs.industry !== null && validatedArgs.industry !== undefined) updateData.industry = validatedArgs.industry;
+    if (validatedArgs.firstName !== null && validatedArgs.firstName !== undefined) updateData.firstName = validatedArgs.firstName;
+    if (validatedArgs.lastName !== null && validatedArgs.lastName !== undefined) updateData.lastName = validatedArgs.lastName;
+    if (validatedArgs.age !== null && validatedArgs.age !== undefined) updateData.age = validatedArgs.age;
+    if (validatedArgs.nationality !== null && validatedArgs.nationality !== undefined) updateData.nationality = validatedArgs.nationality;
+    if (validatedArgs.socialLinks !== null && validatedArgs.socialLinks !== undefined) updateData.socialLinks = validatedArgs.socialLinks;
+    if (validatedArgs.verifiedSocials !== null && validatedArgs.verifiedSocials !== undefined) updateData.verifiedSocials = validatedArgs.verifiedSocials;
 
     await db
       .update(stores)

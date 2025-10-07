@@ -18,9 +18,15 @@ export const stores = pgTable(
   {
     id: serial("id").primaryKey(),
     name: varchar("store_name", { length: 40 }),
-    industry: text("industry"),
+    industry: text("industry"), // Will be deprecated in favor of nationality
+    nationality: text("nationality"), // JSON array of countries
     description: text("description"),
     profileImage: text("profile_image"), // URL to profile image
+    firstName: varchar("first_name", { length: 50 }),
+    lastName: varchar("last_name", { length: 50 }),
+    age: integer("age"),
+    socialLinks: text("social_links"), // JSON object with YouTube, TikTok, Instagram URLs
+    verifiedSocials: text("verified_socials"), // JSON array of verified platforms
     slug: varchar("slug", { length: 50 }),
     userId: text("user_id"), // Clerk user ID
     currency: varchar("currency", { length: 3 }).default("USD"), // ISO currency code
