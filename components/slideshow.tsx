@@ -48,10 +48,10 @@ export const SlideShow = () => {
                 <p>Find a list that matches your style, download, sync to Google Maps and explore with ease!</p>
               </div>
               <div className="flex gap-4 justify-center flex-wrap">
-                <Link href="/">
+                <Link href={`${routes.helpCentre}?tab=buyers`}>
                   <Button variant="outline">How to Buy</Button>
                 </Link>
-                <Link href="/">
+                <Link href={`${routes.helpCentre}?tab=sellers`}>
                   <Button variant="outline">How to Sell</Button>
                 </Link>
                 <Link href={routes.lists}>

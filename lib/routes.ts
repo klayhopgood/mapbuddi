@@ -2,6 +2,7 @@ export const routes = {
   signIn: "/auth/sign-in",
   signUp: "/auth/sign-up",
   account: "/account",
+  helpCentre: "/help-centre",
   products: "/products",
   product: "/product",
   lists: "/lists",

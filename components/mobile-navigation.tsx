@@ -96,7 +96,7 @@ export const MobileNavigation = () => {
 
             <NavBarLink
               image={images[0]} // Using same image placeholder for now
-              href="/"
+              href={routes.helpCentre}
               name="Help Centre"
               setIsMobileNavOpen={setIsMobileNavOpen}
             />

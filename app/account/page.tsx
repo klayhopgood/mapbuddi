@@ -197,7 +197,7 @@ function SellingOverview() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/">
+            <Link href={routes.helpCentre}>
               <Button>Visit Help Center</Button>
             </Link>
           </CardContent>
@@ -358,7 +358,7 @@ function BuyingOverview() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/">
+            <Link href={routes.helpCentre}>
               <Button>Visit Help Center</Button>
             </Link>
           </CardContent>

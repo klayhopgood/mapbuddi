@@ -66,7 +66,7 @@ export const NavBar = ({
                   </div>
                 </div>
               </div>
-              <Link href="/" className="uppercase text-gray-700 text-sm hover:text-primary transition-colors">
+              <Link href={routes.helpCentre} className="uppercase text-gray-700 text-sm hover:text-primary transition-colors">
                 Help Centre
               </Link>
             </li>
