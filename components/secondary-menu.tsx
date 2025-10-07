@@ -2,14 +2,20 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export type MenuItems = { name: string; href: string; group: Groups }[];
 type Groups = "buying" | "selling";
 
 export const SecondaryMenu = (props: { menuItems: MenuItems }) => {
+  const pathname = usePathname();
+  
+  // Determine which tab should be active based on current path
+  const activeTab = pathname.includes('/buying/') ? 'buying' : 'selling';
+  
   return (
     <Tabs
-      defaultValue="selling"
+      value={activeTab}
       className="flex items-center justify-start gap-2"
     >
       <TabsList>

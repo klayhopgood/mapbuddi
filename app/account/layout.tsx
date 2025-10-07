@@ -67,7 +67,12 @@ const menuItems: MenuItems = [
     group: "selling",
   },
   {
-    name: "Your purchases",
+    name: "Your Lists",
+    href: "/account/buying/lists",
+    group: "buying",
+  },
+  {
+    name: "Order History",
     href: singleLevelNestedRoutes.account["your-purchases"],
     group: "buying",
   },
