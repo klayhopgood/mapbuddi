@@ -197,7 +197,6 @@ export async function cancelSubscription(storeId: number) {
 export async function handleSubscriptionWebhook(event: Stripe.Event) {
   console.log(`=== PROCESSING WEBHOOK: ${event.type} ===`);
   console.log(`Event ID: ${event.id}`);
-  console.log(`Event data:`, JSON.stringify(event.data.object, null, 2));
   
   try {
     switch (event.type) {
@@ -286,53 +285,32 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
             price_id: subscription.items.data[0]?.price.id
           });
           
-          // Add a small delay to avoid race conditions with other webhooks
-          console.log(`Waiting 1 second to avoid race conditions...`);
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // First, check if record exists
-          console.log(`Checking if subscription record exists for storeId: ${storeId}`);
-          const existingRecord = await db
-            .select()
-            .from(subscriptions)
-            .where(eq(subscriptions.storeId, storeId))
-            .limit(1);
-          
-          console.log(`Existing record found:`, JSON.stringify(existingRecord, null, 2));
+          // Remove delay that might be causing timeouts
           
           // Try to update existing record first, then insert if none exists
-          console.log(`About to execute UPDATE query for storeId: ${storeId}`);
-          console.log(`WHERE clause will match: subscriptions.storeId = ${storeId}`);
+          console.log(`Updating subscription for storeId: ${storeId}`);
           
-          let updateResult;
-          try {
-            updateResult = await db
-              .update(subscriptions)
-              .set({
-                stripeCustomerId: subscription.customer as string,
-                stripeSubscriptionId: subscription.id,
-                stripePriceId: subscription.items.data[0]?.price.id,
-                status: subscription.status,
-                currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-                currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-                cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
-                updatedAt: new Date(),
-              })
-              .where(eq(subscriptions.storeId, storeId))
-              .returning();
-              
-            console.log(`✅ UPDATE executed successfully`);
-            console.log(`Update result:`, JSON.stringify(updateResult, null, 2));
-            console.log(`Updated ${updateResult.length} records`);
-          } catch (updateError) {
-            console.error(`❌ UPDATE failed with error:`, updateError);
-            throw updateError;
-          }
+          const updateResult = await db
+            .update(subscriptions)
+            .set({
+              stripeCustomerId: subscription.customer as string,
+              stripeSubscriptionId: subscription.id,
+              stripePriceId: subscription.items.data[0]?.price.id,
+              status: subscription.status,
+              currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+              currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+              cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
+              updatedAt: new Date(),
+            })
+            .where(eq(subscriptions.storeId, storeId))
+            .returning();
+            
+          console.log(`Updated ${updateResult.length} records`);
 
           // If no record was updated, insert a new one
           if (updateResult.length === 0) {
             console.log(`No existing record found, inserting new subscription record`);
-            const insertResult = await db.insert(subscriptions).values({
+            await db.insert(subscriptions).values({
               storeId,
               stripeCustomerId: subscription.customer as string,
               stripeSubscriptionId: subscription.id,
@@ -341,11 +319,10 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
               currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
               currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
               cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
-            }).returning();
-            console.log(`Insert result:`, insertResult);
+            });
+            console.log(`New subscription record created`);
           } else {
-            console.log(`Updated existing subscription record successfully`);
-            console.log(`Final subscription record:`, updateResult[0]);
+            console.log(`Subscription record updated successfully`);
           }
         } else {
           console.log(`=== UPDATING SUBSCRIPTION RECORD ===`);
@@ -423,12 +400,7 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
       }
     }
   } catch (error) {
-    console.error(`❌❌❌ CRITICAL ERROR in handleSubscriptionWebhook ❌❌❌`);
-    console.error(`Event type: ${event.type}`);
-    console.error(`Event ID: ${event.id}`);
-    console.error(`Error details:`, error);
-    console.error(`Stack trace:`, (error as Error).stack);
-    
+    console.error(`ERROR in handleSubscriptionWebhook: ${event.type}`, error);
     // Re-throw the error so the webhook returns 500 and Stripe retries
     throw error;
   }
