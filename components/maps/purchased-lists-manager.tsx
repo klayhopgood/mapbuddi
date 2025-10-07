@@ -167,7 +167,8 @@ export function PurchasedListsManager({
                             </Link>
                           </div>
                           <div className="text-xs text-muted-foreground bg-blue-50 p-2 rounded">
-                            💡 Click &quot;Open My Maps&quot; → Click &quot;Create a New Map&quot; → Click &quot;Import&quot; → Select your KML file from Drive
+                            💡 <strong>Step 1:</strong> Click &quot;Open My Maps&quot; → &quot;Create a New Map&quot; → &quot;Import&quot; → Select your KML file<br/>
+                            💡 <strong>Step 2:</strong> Open Google Maps app → Tap &quot;You&quot; (bottom) → Tap &quot;Maps&quot; → Find your imported map
                           </div>
                         </div>
                       )}
