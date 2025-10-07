@@ -57,7 +57,7 @@ export default async function PaymentsPage() {
   return (
     <div className="space-y-8">
       <HeadingAndSubheading
-        heading="Payments & Payouts"
+        heading="Payouts"
         subheading="Manage how you receive payments from your location list sales"
       />
 

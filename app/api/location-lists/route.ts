@@ -3,6 +3,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { db } from '@/db/db';
 import { locationLists, listCategories, listPois, stores } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
+import { checkSubscriptionForListActivation } from '@/server-actions/subscription';
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,6 +43,22 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    // Check subscription status to determine if list can be active
+    const hasActiveSubscription = await checkSubscriptionForListActivation(storeId);
+    const shouldBeActive = list.isActive && hasActiveSubscription;
+    
+    console.log("Subscription check:", {
+      hasActiveSubscription,
+      requestedActive: list.isActive,
+      willBeActive: shouldBeActive
+    });
+
+    // If user tries to activate without subscription, inform them
+    let subscriptionMessage = null;
+    if (list.isActive && !hasActiveSubscription) {
+      subscriptionMessage = "List saved as draft. Subscribe to activate your lists and start selling.";
+    }
+
     // Start transaction
     console.log("Starting database transaction...");
     console.log("Database connection status: attempting transaction");
@@ -61,7 +78,7 @@ export async function POST(request: NextRequest) {
         description: list.description,
         price: list.price,
         currency: list.currency,
-        isActive: list.isActive,
+        isActive: shouldBeActive,
         storeId,
         totalPois: pois.length,
       });
@@ -75,7 +92,7 @@ export async function POST(request: NextRequest) {
           price: list.price,
           currency: list.currency,
           coverImage: list.coverImage,
-          isActive: list.isActive,
+          isActive: shouldBeActive,
           storeId,
           totalPois: pois.length,
           country: list.country,
@@ -144,7 +161,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true, 
       listId: result.id,
-      message: 'Location list created successfully' 
+      message: subscriptionMessage || 'Location list created successfully',
+      subscriptionRequired: !!subscriptionMessage
     });
 
   } catch (error) {

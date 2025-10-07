@@ -57,12 +57,17 @@ const menuItems: MenuItems = [
     group: "selling",
   },
   {
+    name: "Membership",
+    href: "/account/selling/membership",
+    group: "selling",
+  },
+  {
     name: "Orders",
     href: singleLevelNestedRoutes.account.orders,
     group: "selling",
   },
   {
-    name: "Payments",
+    name: "Payouts",
     href: singleLevelNestedRoutes.account.payments,
     group: "selling",
   },

@@ -3,6 +3,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { db } from '@/db/db';
 import { locationLists, listCategories, listPois } from '@/db/schema';
 import { eq, inArray } from 'drizzle-orm';
+import { checkSubscriptionForListActivation } from '@/server-actions/subscription';
 
 export async function PUT(
   request: NextRequest, 
@@ -32,6 +33,16 @@ export async function PUT(
       return NextResponse.json({ error: true, message: 'List not found' }, { status: 404 });
     }
 
+    // Check subscription status to determine if list can be active
+    const hasActiveSubscription = await checkSubscriptionForListActivation(storeId);
+    const shouldBeActive = list.isActive && hasActiveSubscription;
+    
+    // If user tries to activate without subscription, inform them
+    let subscriptionMessage = null;
+    if (list.isActive && !hasActiveSubscription) {
+      subscriptionMessage = "List saved as draft. Subscribe to activate your lists and start selling.";
+    }
+
     // Start transaction
     const result = await db.transaction(async (tx) => {
       // Update the location list - only include safe fields
@@ -43,7 +54,7 @@ export async function PUT(
           price: list.price,
           currency: list.currency,
           coverImage: list.coverImage,
-          isActive: list.isActive,
+          isActive: shouldBeActive,
           totalPois: pois.length,
           country: list.country,
           cities: list.cities,
@@ -109,7 +120,8 @@ export async function PUT(
     return NextResponse.json({ 
       success: true, 
       listId: result.id,
-      message: 'Location list updated successfully' 
+      message: subscriptionMessage || 'Location list updated successfully',
+      subscriptionRequired: !!subscriptionMessage
     });
 
   } catch (error) {

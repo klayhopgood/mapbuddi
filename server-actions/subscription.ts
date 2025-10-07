@@ -1,0 +1,315 @@
+"use server";
+
+import { db } from "@/db/db";
+import { subscriptions, stores, locationLists } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
+import { currentUser } from "@clerk/nextjs/server";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2025-08-27.basil",
+});
+
+const STRIPE_PRICE_ID = "price_1SFTH4BfpP8VYbV6Sk7Y2Jui";
+const STRIPE_PRODUCT_ID = "prod_TBqzJQuZY7HuBP";
+
+export async function getSubscriptionStatus(storeId: number) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+
+    // Get the subscription from database
+    const [subscription] = await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.storeId, storeId))
+      .limit(1);
+
+    if (!subscription) {
+      return {
+        isActive: false,
+        stripeSubscriptionId: null,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+      };
+    }
+
+    // Check if subscription is active
+    const isActive = subscription.status === "active" && 
+                    subscription.currentPeriodEnd && 
+                    new Date(subscription.currentPeriodEnd) > new Date();
+
+    return {
+      isActive,
+      stripeSubscriptionId: subscription.stripeSubscriptionId,
+      currentPeriodEnd: subscription.currentPeriodEnd?.toISOString(),
+      cancelAtPeriodEnd: subscription.cancelAtPeriodEnd || false,
+    };
+  } catch (error) {
+    console.error("Error getting subscription status:", error);
+    return {
+      isActive: false,
+      stripeSubscriptionId: null,
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+    };
+  }
+}
+
+export async function createSubscription(storeId: number) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+
+    // Get store details
+    const [store] = await db
+      .select()
+      .from(stores)
+      .where(eq(stores.id, storeId))
+      .limit(1);
+
+    if (!store) {
+      return { error: "Store not found" };
+    }
+
+    // Check if subscription already exists
+    const [existingSubscription] = await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.storeId, storeId))
+      .limit(1);
+
+    if (existingSubscription && existingSubscription.status === "active") {
+      return { error: "You already have an active subscription" };
+    }
+
+    // Create or get Stripe customer
+    let customerId = existingSubscription?.stripeCustomerId;
+    
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: user.emailAddresses[0]?.emailAddress,
+        name: `${user.firstName} ${user.lastName}`.trim(),
+        metadata: {
+          userId: user.id,
+          storeId: storeId.toString(),
+        },
+      });
+      customerId = customer.id;
+    }
+
+    // Create Stripe Checkout Session
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price: STRIPE_PRICE_ID,
+          quantity: 1,
+        },
+      ],
+      mode: "subscription",
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/account/selling/membership?success=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/account/selling/membership?canceled=true`,
+      metadata: {
+        storeId: storeId.toString(),
+        userId: user.id,
+      },
+    });
+
+    // Update or create subscription record with customer ID
+    if (existingSubscription) {
+      await db
+        .update(subscriptions)
+        .set({
+          stripeCustomerId: customerId,
+          updatedAt: new Date(),
+        })
+        .where(eq(subscriptions.id, existingSubscription.id));
+    } else {
+      await db
+        .insert(subscriptions)
+        .values({
+          storeId,
+          stripeCustomerId: customerId,
+          status: "pending",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+    }
+
+    return { url: session.url };
+  } catch (error) {
+    console.error("Error creating subscription:", error);
+    return { error: "Failed to create subscription. Please try again." };
+  }
+}
+
+export async function cancelSubscription(storeId: number) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+
+    // Get subscription
+    const [subscription] = await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.storeId, storeId))
+      .limit(1);
+
+    if (!subscription || !subscription.stripeSubscriptionId) {
+      return { error: "No active subscription found" };
+    }
+
+    // Cancel subscription at period end in Stripe
+    await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+      cancel_at_period_end: true,
+    });
+
+    // Update local database
+    await db
+      .update(subscriptions)
+      .set({
+        cancelAtPeriodEnd: true,
+        updatedAt: new Date(),
+      })
+      .where(eq(subscriptions.id, subscription.id));
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error cancelling subscription:", error);
+    return { error: "Failed to cancel subscription. Please try again." };
+  }
+}
+
+export async function handleSubscriptionWebhook(event: Stripe.Event) {
+  try {
+    switch (event.type) {
+      case "customer.subscription.created":
+      case "customer.subscription.updated": {
+        const subscription = event.data.object as Stripe.Subscription;
+        const storeId = parseInt(subscription.metadata.storeId || "0");
+        
+        if (!storeId) {
+          console.error("No storeId in subscription metadata");
+          return;
+        }
+
+        await db
+          .update(subscriptions)
+          .set({
+            stripeSubscriptionId: subscription.id,
+            stripePriceId: subscription.items.data[0]?.price.id,
+            status: subscription.status,
+            currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+            cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
+            updatedAt: new Date(),
+          })
+          .where(eq(subscriptions.storeId, storeId));
+
+        // If subscription is active, activate all draft lists
+        if (subscription.status === "active") {
+          await activateAllDraftLists(storeId);
+        }
+        break;
+      }
+
+      case "customer.subscription.deleted": {
+        const subscription = event.data.object as Stripe.Subscription;
+        const storeId = parseInt(subscription.metadata.storeId || "0");
+        
+        if (!storeId) {
+          console.error("No storeId in subscription metadata");
+          return;
+        }
+
+        await db
+          .update(subscriptions)
+          .set({
+            status: "canceled",
+            updatedAt: new Date(),
+          })
+          .where(eq(subscriptions.storeId, storeId));
+
+        // Deactivate all active lists (make them drafts)
+        await deactivateAllActiveLists(storeId);
+        break;
+      }
+
+      case "invoice.payment_failed": {
+        const invoice = event.data.object as Stripe.Invoice;
+        if ((invoice as any).subscription) {
+          const subscription = await stripe.subscriptions.retrieve((invoice as any).subscription as string);
+          const storeId = parseInt(subscription.metadata.storeId || "0");
+          
+          if (storeId) {
+            await db
+              .update(subscriptions)
+              .set({
+                status: "past_due",
+                updatedAt: new Date(),
+              })
+              .where(eq(subscriptions.storeId, storeId));
+
+            // Optionally deactivate lists for past due subscriptions
+            await deactivateAllActiveLists(storeId);
+          }
+        }
+        break;
+      }
+    }
+  } catch (error) {
+    console.error("Error handling subscription webhook:", error);
+  }
+}
+
+async function activateAllDraftLists(storeId: number) {
+  try {
+    await db
+      .update(locationLists)
+      .set({
+        isActive: true,
+        updatedAt: new Date(),
+      })
+      .where(and(
+        eq(locationLists.storeId, storeId),
+        eq(locationLists.isActive, false)
+      ));
+  } catch (error) {
+    console.error("Error activating draft lists:", error);
+  }
+}
+
+async function deactivateAllActiveLists(storeId: number) {
+  try {
+    await db
+      .update(locationLists)
+      .set({
+        isActive: false,
+        updatedAt: new Date(),
+      })
+      .where(and(
+        eq(locationLists.storeId, storeId),
+        eq(locationLists.isActive, true)
+      ));
+  } catch (error) {
+    console.error("Error deactivating active lists:", error);
+  }
+}
+
+export async function checkSubscriptionForListActivation(storeId: number): Promise<boolean> {
+  try {
+    const subscriptionStatus = await getSubscriptionStatus(storeId);
+    return subscriptionStatus.isActive || false;
+  } catch (error) {
+    console.error("Error checking subscription for list activation:", error);
+    return false;
+  }
+}

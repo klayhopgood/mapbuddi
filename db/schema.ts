@@ -43,6 +43,21 @@ export const stores = pgTable(
 
 export type Store = InferSelectModel<typeof stores>;
 
+export const subscriptions = pgTable("subscriptions", {
+  id: serial("id").primaryKey(),
+  storeId: integer("store_id").notNull(),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  stripePriceId: text("stripe_price_id"),
+  status: varchar("status", { length: 50 }), // active, canceled, past_due, etc.
+  currentPeriodStart: timestamp("current_period_start"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+export type Subscription = InferSelectModel<typeof subscriptions>;
+
 export const products = pgTable("products", {
   id: serial("id").primaryKey(),
   name: text("name"),
