@@ -15,7 +15,7 @@ import {
   removeSocialVerification,
   getUserSocialConnections 
 } from "@/server-actions/clerk-social-verification";
-import { useUser } from "@clerk/nextjs";
+import { useUser, useSignIn } from "@clerk/nextjs";
 
 // List of countries for nationality selection
 const COUNTRIES = [
@@ -40,6 +40,7 @@ export const EditStoreFields = (props: {
   const [isVerifying, setIsVerifying] = useState<string | null>(null);
   const [socialConnections, setSocialConnections] = useState<any>(null);
   const { user } = useUser();
+  const { signIn } = useSignIn();
   
   // Parse existing data
   const existingNationalities = props.storeDetails.nationality 
@@ -180,14 +181,26 @@ export const EditStoreFields = (props: {
     }
   };
 
-  const handleConnectSocialAccount = (provider: 'google' | 'facebook' | 'tiktok') => {
-    // Redirect to Clerk's social connection flow
-    const baseUrl = window.location.origin;
-    const returnUrl = `${baseUrl}/account/selling/profile`;
+  const handleConnectSocialAccount = async (provider: 'google' | 'facebook' | 'tiktok') => {
+    if (!signIn) return;
     
-    // Use Clerk's user profile URL to add social connections
-    if (user) {
-      window.location.href = `/user-profile#/security`;
+    try {
+      // Use Clerk's signIn to authenticate with OAuth provider
+      const result = await signIn.authenticateWithRedirect({
+        strategy: provider === 'google' ? 'oauth_google' : 
+                 provider === 'facebook' ? 'oauth_facebook' : 'oauth_tiktok',
+        redirectUrl: `${window.location.origin}/sso-callback`,
+        redirectUrlComplete: `${window.location.origin}/account/selling/profile`,
+      });
+      
+      console.log('OAuth result:', result);
+    } catch (error) {
+      console.error('OAuth connection error:', error);
+      toast({
+        title: "Connection Failed",
+        description: `Failed to connect ${provider} account. Please try again.`,
+        variant: "destructive",
+      });
     }
   };
 
@@ -489,10 +502,11 @@ export const EditStoreFields = (props: {
             </div>
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-medium text-blue-800 mb-2">How Verification Works</h4>
+              <h4 className="font-medium text-blue-800 mb-2">How Social Connection Works</h4>
               <ul className="text-sm text-blue-700 space-y-1">
-                <li>• Connect your social accounts through your profile settings</li>
-                <li>• Click &ldquo;Verify&rdquo; to confirm ownership of each account</li>
+                <li>• Click &ldquo;Connect&rdquo; to link your social account</li>
+                <li>• You&apos;ll be redirected to the social platform to authorize</li>
+                <li>• After authorization, click &ldquo;Verify&rdquo; to confirm ownership</li>
                 <li>• Your verified accounts will show on your public profile</li>
                 <li>• This builds trust with potential customers</li>
               </ul>
