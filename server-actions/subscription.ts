@@ -261,27 +261,50 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
         const subscription = event.data.object as Stripe.Subscription;
         const storeId = parseInt(subscription.metadata.storeId || "0");
         
+        console.log(`Processing ${event.type} for storeId: ${storeId}, status: ${subscription.status}`);
+        
         if (!storeId) {
           console.error("No storeId in subscription metadata");
           return;
         }
 
-        await db
-          .update(subscriptions)
-          .set({
+        // For subscription.created, we need to INSERT or UPDATE (upsert)
+        // For subscription.updated, we UPDATE
+        if (event.type === "customer.subscription.created") {
+          await db.insert(subscriptions).values({
+            storeId,
+            stripeCustomerId: subscription.customer as string,
             stripeSubscriptionId: subscription.id,
             stripePriceId: subscription.items.data[0]?.price.id,
             status: subscription.status,
             currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
             currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
             cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
-            updatedAt: new Date(),
-          })
-          .where(eq(subscriptions.storeId, storeId));
+          }).onConflictDoNothing(); // In case it already exists from checkout.session.completed
+        } else {
+          await db
+            .update(subscriptions)
+            .set({
+              stripeSubscriptionId: subscription.id,
+              stripePriceId: subscription.items.data[0]?.price.id,
+              status: subscription.status,
+              currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+              currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+              cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
+              updatedAt: new Date(),
+            })
+            .where(eq(subscriptions.storeId, storeId));
+        }
+
+        console.log(`Subscription record processed for store ${storeId}`);
 
         // If subscription is active, activate all draft lists
         if (subscription.status === "active") {
           await activateAllDraftLists(storeId);
+          console.log(`Activated all draft lists for store ${storeId}`);
+        } else {
+          await deactivateAllActiveLists(storeId);
+          console.log(`Deactivated all active lists for store ${storeId}`);
         }
         break;
       }
