@@ -124,8 +124,8 @@ export default async function StorefrontListDetails(props: {
           <Heading size="h2">{list.name}</Heading>
           <Text className="text-sm mt-2">
             Created by{" "}
-            <Link href={`/?seller=${store.slug}`}>
-              <span className="text-muted-foreground hover:underline">
+            <Link href={`/profile/${store.slug}`}>
+              <span className="text-blue-600 hover:text-blue-800 hover:underline">
                 {store.name}
               </span>
             </Link>

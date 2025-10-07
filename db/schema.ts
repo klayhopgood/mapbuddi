@@ -20,6 +20,7 @@ export const stores = pgTable(
     name: varchar("store_name", { length: 40 }),
     industry: text("industry"),
     description: text("description"),
+    profileImage: text("profile_image"), // URL to profile image
     slug: varchar("slug", { length: 50 }),
     userId: text("user_id"), // Clerk user ID
     currency: varchar("currency", { length: 3 }).default("USD"), // ISO currency code

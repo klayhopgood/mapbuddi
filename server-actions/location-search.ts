@@ -2,9 +2,11 @@
 
 import { db } from "@/db/db";
 import { locationLists, stores } from "@/db/schema";
-import { like, eq, or } from "drizzle-orm";
+import { like, eq, or, sql } from "drizzle-orm";
 
 export async function getLocationListsBySearchTerm(searchTerm: string) {
+  const searchTermLower = searchTerm.toLowerCase();
+  
   const results = await db
     .select({
       id: locationLists.id,
@@ -21,9 +23,9 @@ export async function getLocationListsBySearchTerm(searchTerm: string) {
     .leftJoin(stores, eq(locationLists.storeId, stores.id))
     .where(
       or(
-        like(locationLists.name, `%${searchTerm}%`),
-        like(locationLists.description, `%${searchTerm}%`),
-        like(stores.name, `%${searchTerm}%`)
+        sql`LOWER(${locationLists.name}) LIKE ${`%${searchTermLower}%`}`,
+        sql`LOWER(${locationLists.description}) LIKE ${`%${searchTermLower}%`}`,
+        sql`LOWER(${stores.name}) LIKE ${`%${searchTermLower}%`}`
       )
     )
     .limit(10);
@@ -32,6 +34,8 @@ export async function getLocationListsBySearchTerm(searchTerm: string) {
 }
 
 export async function getStoresBySearchTerm(searchTerm: string) {
+  const searchTermLower = searchTerm.toLowerCase();
+  
   const results = await db
     .select({
       id: stores.id,
@@ -42,8 +46,8 @@ export async function getStoresBySearchTerm(searchTerm: string) {
     .from(stores)
     .where(
       or(
-        like(stores.name, `%${searchTerm}%`),
-        like(stores.description, `%${searchTerm}%`)
+        sql`LOWER(${stores.name}) LIKE ${`%${searchTermLower}%`}`,
+        sql`LOWER(${stores.description}) LIKE ${`%${searchTermLower}%`}`
       )
     )
     .limit(5);

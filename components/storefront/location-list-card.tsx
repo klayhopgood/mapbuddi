@@ -81,7 +81,17 @@ export const LocationListCard = (props: {
 
         <div className="mt-2">
           <Text className="text-xs text-gray-500">
-            by {props.storeAndLocationList.store.name || "Unknown Seller"}
+            by{" "}
+            {props.storeAndLocationList.store.slug ? (
+              <Link 
+                href={`/profile/${props.storeAndLocationList.store.slug}`}
+                className="text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                {props.storeAndLocationList.store.name || "Unknown Seller"}
+              </Link>
+            ) : (
+              <span>{props.storeAndLocationList.store.name || "Unknown Seller"}</span>
+            )}
           </Text>
         </div>
       </div>
