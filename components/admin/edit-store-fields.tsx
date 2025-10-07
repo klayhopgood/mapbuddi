@@ -15,7 +15,7 @@ import {
   removeSocialVerification,
   getUserSocialConnections 
 } from "@/server-actions/clerk-social-verification";
-import { useUser, useSignIn } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 
 // List of countries for nationality selection
 const COUNTRIES = [
@@ -40,7 +40,6 @@ export const EditStoreFields = (props: {
   const [isVerifying, setIsVerifying] = useState<string | null>(null);
   const [socialConnections, setSocialConnections] = useState<any>(null);
   const { user } = useUser();
-  const { signIn } = useSignIn();
   
   // Parse existing data
   const existingNationalities = props.storeDetails.nationality 
@@ -181,27 +180,14 @@ export const EditStoreFields = (props: {
     }
   };
 
-  const handleConnectSocialAccount = async (provider: 'google' | 'facebook' | 'tiktok') => {
-    if (!signIn) return;
-    
-    try {
-      // Use Clerk's signIn to authenticate with OAuth provider
-      const result = await signIn.authenticateWithRedirect({
-        strategy: provider === 'google' ? 'oauth_google' : 
-                 provider === 'facebook' ? 'oauth_facebook' : 'oauth_tiktok',
-        redirectUrl: `${window.location.origin}/sso-callback`,
-        redirectUrlComplete: `${window.location.origin}/account/selling/profile`,
-      });
-      
-      console.log('OAuth result:', result);
-    } catch (error) {
-      console.error('OAuth connection error:', error);
-      toast({
-        title: "Connection Failed",
-        description: `Failed to connect ${provider} account. Please try again.`,
-        variant: "destructive",
-      });
-    }
+  const handleConnectSocialAccount = (provider: 'google' | 'facebook' | 'tiktok') => {
+    // For now, show a message that this feature is coming soon
+    // The actual implementation would require proper Clerk OAuth setup
+    toast({
+      title: "Social Connection",
+      description: `${provider.charAt(0).toUpperCase() + provider.slice(1)} connection is coming soon! Please check back later.`,
+      variant: "default",
+    });
   };
 
   const getSocialIcon = (platform: string) => {
@@ -501,14 +487,14 @@ export const EditStoreFields = (props: {
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-medium text-blue-800 mb-2">How Social Connection Works</h4>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>• Click &ldquo;Connect&rdquo; to link your social account</li>
-                <li>• You&apos;ll be redirected to the social platform to authorize</li>
-                <li>• After authorization, click &ldquo;Verify&rdquo; to confirm ownership</li>
-                <li>• Your verified accounts will show on your public profile</li>
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <h4 className="font-medium text-amber-800 mb-2">Social Verification - Coming Soon!</h4>
+              <ul className="text-sm text-amber-700 space-y-1">
+                <li>• Social account verification is currently being developed</li>
+                <li>• This will allow you to verify ownership of your social accounts</li>
+                <li>• Verified accounts will show on your public profile</li>
                 <li>• This builds trust with potential customers</li>
+                <li>• Check back soon for this feature!</li>
               </ul>
             </div>
           </div>

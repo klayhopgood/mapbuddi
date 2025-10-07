@@ -15,7 +15,7 @@ import { getCurrencySelectOptions, formatPrice } from "@/lib/currency";
 import { searchPlaces, PlaceSearchResult, getPlaceTypeEmoji } from "@/lib/google-places";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { LocationSelector } from "./location-selector";
+import { LocationSelector } from "./location-selector-new";
 import { EnhancedPOICreator } from "./enhanced-poi-creator";
 
 interface ListCategory {
