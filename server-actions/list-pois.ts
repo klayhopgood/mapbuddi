@@ -23,7 +23,7 @@ export async function getListPois(listId: number) {
         name: listPois.name,
         address: listPois.address,
         description: listPois.description,
-        notes: listPois.notes,
+        sellerNotes: listPois.sellerNotes, // Fixed: was trying to access non-existent 'notes' field
         categoryId: listPois.categoryId,
         latitude: listPois.latitude,
         longitude: listPois.longitude,
@@ -37,6 +37,7 @@ export async function getListPois(listId: number) {
       const category = categories.find(cat => cat.id === poi.categoryId);
       return {
         ...poi,
+        notes: poi.sellerNotes, // Map sellerNotes to notes for component compatibility
         categoryName: category?.name || 'Unknown',
         categoryEmoji: category?.emoji || '📍',
       };
