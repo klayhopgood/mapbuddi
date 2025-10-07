@@ -271,16 +271,35 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
         // For subscription.created, we need to INSERT or UPDATE (upsert)
         // For subscription.updated, we UPDATE
         if (event.type === "customer.subscription.created") {
-          await db.insert(subscriptions).values({
-            storeId,
-            stripeCustomerId: subscription.customer as string,
-            stripeSubscriptionId: subscription.id,
-            stripePriceId: subscription.items.data[0]?.price.id,
-            status: subscription.status,
-            currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-            cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
-          }).onConflictDoNothing(); // In case it already exists from checkout.session.completed
+          // Try to update existing record first, then insert if none exists
+          const updateResult = await db
+            .update(subscriptions)
+            .set({
+              stripeCustomerId: subscription.customer as string,
+              stripeSubscriptionId: subscription.id,
+              stripePriceId: subscription.items.data[0]?.price.id,
+              status: subscription.status,
+              currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+              currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+              cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
+              updatedAt: new Date(),
+            })
+            .where(eq(subscriptions.storeId, storeId))
+            .returning();
+
+          // If no record was updated, insert a new one
+          if (updateResult.length === 0) {
+            await db.insert(subscriptions).values({
+              storeId,
+              stripeCustomerId: subscription.customer as string,
+              stripeSubscriptionId: subscription.id,
+              stripePriceId: subscription.items.data[0]?.price.id,
+              status: subscription.status,
+              currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+              currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+              cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
+            });
+          }
         } else {
           await db
             .update(subscriptions)
