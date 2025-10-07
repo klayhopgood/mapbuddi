@@ -53,7 +53,7 @@ export default function HelpCentre({
                     <AccordionTrigger>Getting Started</AccordionTrigger>
                     <AccordionContent>
                       <div className="space-y-4">
-                        <p>Welcome to MapBuddi! Here's how to get started as a buyer:</p>
+                        <p>Welcome to MapBuddi! Here&apos;s how to get started as a buyer:</p>
                         <ul className="list-disc list-inside space-y-2">
                           <li>Browse our collection of location lists from local experts</li>
                           <li>Use filters to find lists that match your interests</li>
@@ -337,7 +337,7 @@ export default function HelpCentre({
           <CardHeader>
             <CardTitle>Still Need Help?</CardTitle>
             <CardDescription>
-              Can't find what you're looking for? Get in touch with our support team.
+              Can&apos;t find what you&apos;re looking for? Get in touch with our support team.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex gap-4">
