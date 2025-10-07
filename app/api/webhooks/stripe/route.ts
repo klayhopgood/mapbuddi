@@ -78,7 +78,7 @@ export async function POST(request: Request) {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
       // Skip subscription-related payment intents - they're handled by subscription webhooks
-      if (paymentIntent.invoice) {
+      if ((paymentIntent as any).invoice) {
         console.log("Skipping subscription payment_intent - handled by subscription webhooks");
         break;
       }
