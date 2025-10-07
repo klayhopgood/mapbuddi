@@ -1,5 +1,3 @@
-"use client";
-
 import { ContentWrapper } from "@/components/content-wrapper";
 import { Footer } from "@/components/footer";
 import { NavBar } from "@/components/navbar";
@@ -9,12 +7,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { MapPin, ShoppingCart, CreditCard, Map, Download, Smartphone, Users, DollarSign, BarChart3 } from "lucide-react";
 
-export default function HelpCentre() {
-  const searchParams = useSearchParams();
-  const defaultTab = searchParams.get('tab') || 'buyers';
+export default function HelpCentre({
+  searchParams,
+}: {
+  searchParams: { tab?: string };
+}) {
+  const defaultTab = searchParams.tab || 'buyers';
 
   return (
     <div className="min-h-screen w-full flex flex-col">
