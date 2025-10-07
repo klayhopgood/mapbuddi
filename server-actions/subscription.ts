@@ -188,18 +188,17 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
       return;
     }
 
-    // Debug what we're actually receiving
-    console.log(`Raw subscription object:`, JSON.stringify(subscription, null, 2));
-    console.log(`Period start type: ${typeof subscription.current_period_start}, value: ${subscription.current_period_start}`);
-    console.log(`Period end type: ${typeof subscription.current_period_end}, value: ${subscription.current_period_end}`);
-    
-    if (!subscription.current_period_start || !subscription.current_period_end) {
-      console.error("Missing period timestamps in subscription object");
+    // Get timestamps from the subscription item (they're not on the main subscription object)
+    const subscriptionItem = subscription.items?.data?.[0];
+    if (!subscriptionItem?.current_period_start || !subscriptionItem?.current_period_end) {
+      console.error("Missing period timestamps in subscription item");
       return;
     }
     
-    const startDate = new Date(subscription.current_period_start * 1000);
-    const endDate = new Date(subscription.current_period_end * 1000);
+    console.log(`Found timestamps - start: ${subscriptionItem.current_period_start}, end: ${subscriptionItem.current_period_end}`);
+    
+    const startDate = new Date(subscriptionItem.current_period_start * 1000);
+    const endDate = new Date(subscriptionItem.current_period_end * 1000);
     
     await db.insert(subscriptions).values({
       storeId: storeId,
