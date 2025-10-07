@@ -6,6 +6,11 @@ import { Toaster } from "@/components/ui/Toaster";
 export const metadata = {
   title: "MapBuddi - Online marketplace",
   description: "Online marketplace",
+  icons: {
+    icon: "https://52cbfztl89.ufs.sh/f/VxEv67daUjR4qaHzWA7GWGiPb30BOxEIS2D1Mh4kLQlYAC8r",
+    shortcut: "https://52cbfztl89.ufs.sh/f/VxEv67daUjR4qaHzWA7GWGiPb30BOxEIS2D1Mh4kLQlYAC8r",
+    apple: "https://52cbfztl89.ufs.sh/f/VxEv67daUjR4qaHzWA7GWGiPb30BOxEIS2D1Mh4kLQlYAC8r",
+  },
 };
 
 export default async function RootLayout({

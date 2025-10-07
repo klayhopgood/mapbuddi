@@ -47,6 +47,16 @@ export default async function AdminLayout({ children }: PropsWithChildren) {
 
 const menuItems: MenuItems = [
   {
+    name: "Selling",
+    href: "/account/selling",
+    group: "selling",
+  },
+  {
+    name: "Buying", 
+    href: "/account/buying",
+    group: "buying",
+  },
+  {
     name: "Profile",
     href: singleLevelNestedRoutes.account.profile,
     group: "selling",

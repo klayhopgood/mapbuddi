@@ -43,9 +43,9 @@ export const SlideShow = () => {
               <p className="uppercase font-medium tracking-wide">Location Lists</p>
               <div className="flex flex-col gap-2 mb-2">
                 <p className="text-3xl font-bold">
-                  Discover curated places worth visiting
+                  Personalised Lists of the best places from the best Travellers
                 </p>
-                <p>Expertly crafted location lists from local experts</p>
+                <p>Find a list that matches your style, download, sync to Google Maps and explore with ease!</p>
               </div>
               <Link href={routes.lists}>
                 <Button>Explore Lists</Button>
