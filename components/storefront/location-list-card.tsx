@@ -16,6 +16,7 @@ export const LocationListCard = (props: {
   storeAndLocationList: LocationListAndStore;
   hideButtonActions?: boolean;
   cartItems?: CartItem[];
+  reviewCount?: number; // Optional review count
 }) => {
   const { formatDisplayPrice } = useCurrency();
   const listPageLink = `/list/${props.storeAndLocationList.locationList.id}`;
@@ -57,9 +58,12 @@ export const LocationListCard = (props: {
             
             {props.storeAndLocationList.locationList.avgRating && (
               <div className="flex items-center space-x-1">
-                <Star size={14} className="text-yellow-400 fill-current" />
+                <span className="text-sm">⭐️</span>
                 <Text className="text-sm">
                   {parseFloat(props.storeAndLocationList.locationList.avgRating).toFixed(1)}
+                  {props.reviewCount !== undefined && (
+                    <span className="text-muted-foreground"> ({props.reviewCount})</span>
+                  )}
                 </Text>
               </div>
             )}

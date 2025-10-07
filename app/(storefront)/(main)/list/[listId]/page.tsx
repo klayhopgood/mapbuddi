@@ -5,15 +5,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Text } from "@/components/ui/text";
 import { Badge } from "@/components/ui/badge";
 import { db } from "@/db/db";
-import { LocationList, locationLists, stores, listCategories, listPois } from "@/db/schema";
+import { LocationList, locationLists, stores, listCategories, listPois, listReviews } from "@/db/schema";
 import { formatPrice } from "@/lib/currency";
-import { eq, and } from "drizzle-orm";
+import { eq, and, count } from "drizzle-orm";
 import Image from "next/image";
 import Link from "next/link";
 import { routes } from "@/lib/routes";
 import { ProductImage } from "@/components/product-image";
 import { addToCart } from "@/server-actions/add-to-cart";
 import { MapPin, Star } from "lucide-react";
+import { getReviewsForList } from "@/server-actions/reviews";
+import { currentUser } from "@clerk/nextjs/server";
 
 export default async function StorefrontListDetails(props: {
   params: { listId: string };
@@ -68,6 +70,17 @@ export default async function StorefrontListDetails(props: {
     .where(eq(listPois.categoryId, categories[0]?.id || 0))
     .limit(3);
 
+  // Get review count for this list
+  const reviewCountResult = await db
+    .select({ count: count() })
+    .from(listReviews)
+    .where(eq(listReviews.listId, list.id));
+
+  const reviewCount = reviewCountResult[0]?.count || 0;
+
+  // Get reviews for the Reviews tab
+  const reviews = await getReviewsForList(list.id);
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col items-center md:items-start justify-start md:grid md:grid-cols-9 gap-8">
@@ -113,11 +126,10 @@ export default async function StorefrontListDetails(props: {
                 {list.totalPois} locations
               </Text>
             </div>
-            {list.avgRating && (
+            {list.avgRating && reviewCount > 0 && (
               <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 text-yellow-500 fill-current" />
                 <Text className="text-sm text-muted-foreground">
-                  {Number(list.avgRating).toFixed(1)}
+                  ⭐️ {Number(list.avgRating).toFixed(1)} ({reviewCount})
                 </Text>
               </div>
             )}
@@ -140,6 +152,7 @@ export default async function StorefrontListDetails(props: {
           <TabsList>
             <TabsTrigger value="list">List Details</TabsTrigger>
             <TabsTrigger value="preview">Preview Categories</TabsTrigger>
+            <TabsTrigger value="reviews">Reviews ({reviewCount})</TabsTrigger>
             <TabsTrigger value="seller">About the Creator</TabsTrigger>
           </TabsList>
         </div>
@@ -179,6 +192,55 @@ export default async function StorefrontListDetails(props: {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+        <TabsContent value="reviews" className="pt-2">
+          <div className="space-y-4">
+            {reviews.length > 0 ? (
+              <>
+                <Text className="text-muted-foreground">
+                  {reviewCount} review{reviewCount !== 1 ? 's' : ''} with an average rating of {list.avgRating ? Number(list.avgRating).toFixed(1) : 'N/A'} stars
+                </Text>
+                
+                <div className="space-y-4">
+                  {reviews.map((review) => (
+                    <div key={review.id} className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Text className="font-medium">
+                            {review.userId.split('_')[1] || 'Anonymous'} {/* Show partial user ID as name */}
+                          </Text>
+                          <div className="flex items-center">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`h-4 w-4 ${
+                                  star <= review.rating
+                                    ? "fill-yellow-400 text-yellow-400"
+                                    : "text-gray-300"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <Text className="text-sm text-muted-foreground">
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </Text>
+                      </div>
+                      {review.review && (
+                        <Text className="text-sm">{review.review}</Text>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-8">
+                <Star className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
+                <Text className="text-muted-foreground">No reviews yet</Text>
+                <Text className="text-sm text-muted-foreground">Be the first to review this location list!</Text>
               </div>
             )}
           </div>
