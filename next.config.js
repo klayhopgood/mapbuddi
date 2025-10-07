@@ -22,6 +22,12 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "52cbfztl89.ufs.sh",
+        port: "",
+        pathname: "/f/**",
+      },
+      {
+        protocol: "https",
         hostname: "maps.googleapis.com",
         port: "",
         pathname: "/maps/api/place/photo**",
