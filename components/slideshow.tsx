@@ -47,12 +47,15 @@ export const SlideShow = () => {
                 </p>
                 <p>Find a list that matches your style, download, sync to Google Maps and explore with ease!</p>
               </div>
-              <div className="flex gap-4 justify-center">
+              <div className="flex gap-4 justify-center flex-wrap">
                 <Link href="/">
                   <Button variant="outline">How to Buy</Button>
                 </Link>
                 <Link href="/">
-                  <Button>How to Sell</Button>
+                  <Button variant="outline">How to Sell</Button>
+                </Link>
+                <Link href={routes.lists}>
+                  <Button>Explore Lists</Button>
                 </Link>
               </div>
             </div>
