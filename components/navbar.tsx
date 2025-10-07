@@ -21,20 +21,7 @@ export const NavBar = ({
       <AnnouncementBar
         columns={2}
         description=""
-      >
-        <div className="items-center justify-end gap-6 hidden sm:flex">
-          <CurrencySelector />
-          <Link
-            href={routes.account}
-            className="uppercase text-secondary text-sm"
-          >
-            Account
-          </Link>
-          <Link href="/" className="uppercase text-secondary text-sm">
-            Help Centre
-          </Link>
-        </div>
-      </AnnouncementBar>
+      />
       <nav
         className={cn(
           "pb-1 sticky top-0 bg-white z-10 shadow-sm",
@@ -57,6 +44,36 @@ export const NavBar = ({
             </li>
             <li className="flex-1">
               <ProductSearch />
+            </li>
+            <li className="flex items-center gap-6">
+              <CurrencySelector />
+              <div className="relative group">
+                <Link
+                  href={routes.account}
+                  className="uppercase text-secondary text-sm hover:text-primary transition-colors"
+                >
+                  Account
+                </Link>
+                <div className="absolute right-0 top-full mt-2 w-32 bg-white border border-border shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  <div className="py-2">
+                    <Link
+                      href={`${routes.account}/selling`}
+                      className="block px-4 py-2 text-sm text-secondary hover:bg-gray-50 hover:text-primary transition-colors"
+                    >
+                      Selling
+                    </Link>
+                    <Link
+                      href={`${routes.account}/buying`}
+                      className="block px-4 py-2 text-sm text-secondary hover:bg-gray-50 hover:text-primary transition-colors"
+                    >
+                      Buying
+                    </Link>
+                  </div>
+                </div>
+              </div>
+              <Link href="/" className="uppercase text-secondary text-sm hover:text-primary transition-colors">
+                Help Centre
+              </Link>
             </li>
             <li>
               <ShoppingCartHeader />
