@@ -224,9 +224,11 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
 
         {/* Location Lists Section */}
         <div>
-          <Heading size="h2" className="mb-6">
-            Location Lists by {store.name}
-          </Heading>
+          <div className="mb-6">
+            <Heading size="h2">
+              Location Lists by {store.name}
+            </Heading>
+          </div>
           
           {storeAndLocationList.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -241,7 +243,9 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
           ) : (
             <div className="text-center py-12">
               <MapPin size={48} className="mx-auto mb-4 text-gray-400" />
-              <Heading size="h3" className="mb-2">No location lists yet</Heading>
+              <div className="mb-2">
+                <Heading size="h3">No location lists yet</Heading>
+              </div>
               <Text className="text-gray-600">
                 {store.name} hasn&apos;t published any location lists yet.
               </Text>
