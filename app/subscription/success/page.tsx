@@ -22,9 +22,9 @@ function SuccessContent() {
           </CardHeader>
           <CardContent className="space-y-6 text-center">
             <div className="space-y-3">
-              <Heading size="h3" className="text-gray-800">
+              <div className="text-xl font-semibold text-gray-800">
                 Your subscription is now active
-              </Heading>
+              </div>
               <Text className="text-gray-600">
                 You can now create unlimited active location lists and start earning money from your expertise.
               </Text>

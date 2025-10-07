@@ -225,7 +225,6 @@ export function SubscriptionCard({
         
         <div className="text-sm text-gray-600">
           <p>Billing: $19.00 USD charged monthly via Stripe</p>
-          <p>Next charge: {subscriptionStatus.currentPeriodEnd ? new Date(subscriptionStatus.currentPeriodEnd).toLocaleDateString() : 'Unknown'}</p>
         </div>
       </CardContent>
     </Card>

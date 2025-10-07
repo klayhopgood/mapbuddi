@@ -72,7 +72,11 @@ export default async function MembershipPage() {
               
               {subscriptionStatus?.isActive ? (
                 <div className="text-sm text-gray-600">
-                  <p>Next billing date: {subscriptionStatus.currentPeriodEnd ? new Date(subscriptionStatus.currentPeriodEnd).toLocaleDateString() : 'Unknown'}</p>
+                  {subscriptionStatus.cancelAtPeriodEnd ? (
+                    <p>Ends {subscriptionStatus.currentPeriodEnd ? new Date(subscriptionStatus.currentPeriodEnd).toLocaleDateString() : 'soon'}</p>
+                  ) : (
+                    <p>Renews {subscriptionStatus.currentPeriodEnd ? new Date(subscriptionStatus.currentPeriodEnd).toLocaleDateString() : 'automatically'}</p>
+                  )}
                   <p className="font-medium text-lg">$19.00 USD/month</p>
                 </div>
               ) : (
