@@ -1,16 +1,22 @@
 "use client";
 
 import { Store } from "@/db/schema";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TextInputWithLabel } from "../text-input-with-label";
 import { Button } from "../ui/button";
 import { toast } from "../ui/use-toast";
-import { Loader2, Copy, ExternalLink, CheckCircle, Youtube, Instagram } from "lucide-react";
+import { Loader2, Copy, ExternalLink, CheckCircle, Youtube, Instagram, X } from "lucide-react";
 import { type updateStore } from "@/server-actions/store";
 import { Badge } from "../ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Checkbox } from "../ui/checkbox";
+import { 
+  initiateYouTubeVerification, 
+  initiateInstagramVerification, 
+  initiateTikTokVerification,
+  removeVerification 
+} from "@/server-actions/social-verification";
+import { useSearchParams } from "next/navigation";
 
 // List of countries for nationality selection
 const COUNTRIES = [
@@ -27,28 +33,27 @@ const COUNTRIES = [
   "Cuba", "Jamaica", "Trinidad and Tobago", "Barbados", "Bahamas", "Haiti"
 ];
 
-interface SocialLinks {
-  youtube?: string;
-  tiktok?: string;
-  instagram?: string;
-}
-
 export const EditStoreFields = (props: {
   storeDetails: Store;
   updateStore: typeof updateStore;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState<string | null>(null);
+  const searchParams = useSearchParams();
   
   // Parse existing data
   const existingNationalities = props.storeDetails.nationality 
     ? JSON.parse(props.storeDetails.nationality) 
     : [];
-  const existingSocialLinks: SocialLinks = props.storeDetails.socialLinks 
+  const existingSocialLinks = props.storeDetails.socialLinks 
     ? JSON.parse(props.storeDetails.socialLinks) 
     : {};
   const existingVerifiedSocials = props.storeDetails.verifiedSocials 
     ? JSON.parse(props.storeDetails.verifiedSocials) 
     : [];
+  const existingSocialData = props.storeDetails.socialData 
+    ? JSON.parse(props.storeDetails.socialData) 
+    : {};
 
   const [formValues, setFormValues] = useState<Record<string, string | null>>({
     name: props.storeDetails.name,
@@ -59,12 +64,75 @@ export const EditStoreFields = (props: {
   });
 
   const [selectedNationalities, setSelectedNationalities] = useState<string[]>(existingNationalities);
-  const [socialLinks, setSocialLinks] = useState<SocialLinks>(existingSocialLinks);
-  const [verifiedSocials] = useState<string[]>(existingVerifiedSocials);
 
   const profileUrl = typeof window !== 'undefined' 
     ? `${window.location.origin}/profile/${props.storeDetails.slug}` 
     : '';
+
+  // Handle OAuth callback results
+  useEffect(() => {
+    const success = searchParams.get('success');
+    const error = searchParams.get('error');
+    
+    if (success) {
+      let message = '';
+      switch (success) {
+        case 'youtube_verified':
+          message = 'YouTube channel verified successfully!';
+          break;
+        case 'instagram_verified':
+          message = 'Instagram account verified successfully!';
+          break;
+        case 'tiktok_verified':
+          message = 'TikTok account verified successfully!';
+          break;
+      }
+      
+      if (message) {
+        toast({
+          title: "Verification Successful",
+          description: message,
+        });
+        // Refresh the page to show updated verification status
+        window.location.replace('/account/selling/profile');
+      }
+    }
+    
+    if (error) {
+      let message = '';
+      switch (error) {
+        case 'oauth_cancelled':
+          message = 'Verification was cancelled.';
+          break;
+        case 'oauth_failed':
+          message = 'OAuth authorization failed.';
+          break;
+        case 'token_failed':
+          message = 'Failed to exchange authorization code.';
+          break;
+        case 'no_youtube_channel':
+          message = 'No YouTube channel found for this Google account.';
+          break;
+        case 'no_instagram_business':
+          message = 'No Instagram business account found. Please convert to a business account first.';
+          break;
+        case 'verification_failed':
+          message = 'Verification process failed. Please try again.';
+          break;
+        default:
+          message = 'Verification failed. Please try again.';
+      }
+      
+      toast({
+        title: "Verification Failed",
+        description: message,
+        variant: "destructive",
+      });
+      
+      // Clean up URL
+      window.history.replaceState({}, '', '/account/selling/profile');
+    }
+  }, [searchParams]);
 
   const handleUpdateDetails = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -78,9 +146,6 @@ export const EditStoreFields = (props: {
         lastName: formValues.lastName,
         age: formValues.age ? parseInt(formValues.age) : null,
         nationality: JSON.stringify(selectedNationalities),
-        socialLinks: JSON.stringify(socialLinks),
-        // Keep existing verified socials - they can only be changed through verification process
-        verifiedSocials: JSON.stringify(verifiedSocials),
       })
       .then((res) => {
         setIsLoading(false);
@@ -119,19 +184,63 @@ export const EditStoreFields = (props: {
     }
   };
 
-  const handleSocialLinkChange = (platform: keyof SocialLinks, value: string) => {
-    setSocialLinks({
-      ...socialLinks,
-      [platform]: value.trim() || undefined,
-    });
+  const handleVerifyPlatform = async (platform: 'youtube' | 'instagram' | 'tiktok') => {
+    setIsVerifying(platform);
+    try {
+      switch (platform) {
+        case 'youtube':
+          await initiateYouTubeVerification();
+          break;
+        case 'instagram':
+          await initiateInstagramVerification();
+          break;
+        case 'tiktok':
+          await initiateTikTokVerification();
+          break;
+      }
+    } catch (error) {
+      setIsVerifying(null);
+      toast({
+        title: "Verification Failed",
+        description: "Failed to start verification process. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRemoveVerification = async (platform: 'youtube' | 'instagram' | 'tiktok') => {
+    try {
+      await removeVerification(platform);
+      toast({
+        title: "Verification Removed",
+        description: `${platform.charAt(0).toUpperCase() + platform.slice(1)} verification has been removed.`,
+      });
+      // Refresh to show updated state
+      window.location.reload();
+    } catch (error) {
+      toast({
+        title: "Failed to Remove",
+        description: "Failed to remove verification. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const getSocialIcon = (platform: string) => {
     switch (platform) {
       case 'youtube': return <Youtube size={16} className="text-red-600" />;
       case 'instagram': return <Instagram size={16} className="text-pink-600" />;
+      case 'tiktok': return (
+        <div className="w-4 h-4 bg-black rounded-sm flex items-center justify-center">
+          <span className="text-white text-xs font-bold">T</span>
+        </div>
+      );
       default: return null;
     }
+  };
+
+  const getPlatformDisplayName = (platform: string) => {
+    return platform.charAt(0).toUpperCase() + platform.slice(1);
   };
 
   return (
@@ -156,14 +265,14 @@ export const EditStoreFields = (props: {
             </Button>
           </div>
           
-          {verifiedSocials.length > 0 && (
+          {existingVerifiedSocials.length > 0 && (
             <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="flex items-center gap-1">
+              <Badge variant="secondary" className="flex items-center gap-1 bg-green-100 text-green-800">
                 <CheckCircle size={14} className="text-green-600" />
                 Verified Socials
               </Badge>
               <div className="flex gap-1">
-                {verifiedSocials.map(platform => (
+                {existingVerifiedSocials.map((platform: string) => (
                   <span key={platform} className="flex items-center gap-1">
                     {getSocialIcon(platform)}
                   </span>
@@ -280,81 +389,6 @@ export const EditStoreFields = (props: {
           </CardContent>
         </Card>
 
-        {/* Social Links */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Social Media Links</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">YouTube Channel</label>
-                <div className="flex items-center gap-2 mt-1">
-                  <Youtube size={20} className="text-red-600" />
-                  <input
-                    type="url"
-                    placeholder="https://youtube.com/@yourchannel"
-                    value={socialLinks.youtube || ''}
-                    onChange={(e) => handleSocialLinkChange('youtube', e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  {verifiedSocials.includes('youtube') && (
-                    <CheckCircle size={20} className="text-green-600" />
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">TikTok Profile</label>
-                <div className="flex items-center gap-2 mt-1">
-                  <div className="w-5 h-5 bg-black rounded-sm flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">T</span>
-                  </div>
-                  <input
-                    type="url"
-                    placeholder="https://tiktok.com/@yourusername"
-                    value={socialLinks.tiktok || ''}
-                    onChange={(e) => handleSocialLinkChange('tiktok', e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  {verifiedSocials.includes('tiktok') && (
-                    <CheckCircle size={20} className="text-green-600" />
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">Instagram Profile</label>
-                <div className="flex items-center gap-2 mt-1">
-                  <Instagram size={20} className="text-pink-600" />
-                  <input
-                    type="url"
-                    placeholder="https://instagram.com/yourusername"
-                    value={socialLinks.instagram || ''}
-                    onChange={(e) => handleSocialLinkChange('instagram', e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  {verifiedSocials.includes('instagram') && (
-                    <CheckCircle size={20} className="text-green-600" />
-                  )}
-                </div>
-              </div>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-medium text-blue-800 mb-2">Social Verification</h4>
-                <p className="text-sm text-blue-700 mb-3">
-                  Verify your social media accounts to get a &ldquo;Verified Socials&rdquo; badge on your profile and location lists. 
-                  This builds trust with potential customers.
-                </p>
-                <Button variant="outline" size="sm" disabled>
-                  <CheckCircle size={16} className="mr-2" />
-                  Verify Social Accounts (Coming Soon)
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         <div className="flex items-center justify-end">
           <Button className="flex gap-2" disabled={isLoading}>
             {!!isLoading && <Loader2 size={18} className="animate-spin" />}
@@ -362,6 +396,130 @@ export const EditStoreFields = (props: {
           </Button>
         </div>
       </form>
+
+      {/* Social Verification Section - Separate from main form */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Social Media Verification</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            <p className="text-sm text-muted-foreground">
+              Verify your social media accounts to build trust with customers. Only verified social accounts will be displayed on your profile.
+            </p>
+
+            {/* Verified Accounts */}
+            {existingVerifiedSocials.length > 0 && (
+              <div>
+                <h4 className="font-medium mb-3">Verified Accounts</h4>
+                <div className="space-y-3">
+                  {existingVerifiedSocials.map((platform: string) => {
+                    const socialData = existingSocialData[platform];
+                    const socialLink = existingSocialLinks[platform];
+                    
+                    return (
+                      <div key={platform} className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          {getSocialIcon(platform)}
+                          <div>
+                            <div className="font-medium">{getPlatformDisplayName(platform)}</div>
+                            {socialData && (
+                              <div className="text-sm text-gray-600">
+                                {platform === 'youtube' && socialData.channelName && (
+                                  <span>{socialData.channelName} • {socialData.subscriberCount?.toLocaleString()} subscribers</span>
+                                )}
+                                {platform === 'instagram' && socialData.username && (
+                                  <span>@{socialData.username} • {socialData.followersCount?.toLocaleString()} followers</span>
+                                )}
+                                {platform === 'tiktok' && socialData.username && (
+                                  <span>@{socialData.username} • {socialData.followerCount?.toLocaleString()} followers</span>
+                                )}
+                              </div>
+                            )}
+                            {socialLink && (
+                              <a href={socialLink} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">
+                                {socialLink}
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className="bg-green-100 text-green-800">
+                            <CheckCircle size={12} className="mr-1" />
+                            Verified
+                          </Badge>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleRemoveVerification(platform as 'youtube' | 'instagram' | 'tiktok')}
+                          >
+                            <X size={14} />
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Available Verifications */}
+            <div>
+              <h4 className="font-medium mb-3">Available Verifications</h4>
+              <div className="space-y-3">
+                {['youtube', 'instagram', 'tiktok'].map((platform) => {
+                  const isVerified = existingVerifiedSocials.includes(platform);
+                  if (isVerified) return null;
+
+                  return (
+                    <div key={platform} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        {getSocialIcon(platform)}
+                        <div>
+                          <div className="font-medium">{getPlatformDisplayName(platform)}</div>
+                          <div className="text-sm text-gray-600">
+                            {platform === 'youtube' && 'Verify your YouTube channel'}
+                            {platform === 'instagram' && 'Verify your Instagram business account'}
+                            {platform === 'tiktok' && 'Verify your TikTok creator account'}
+                          </div>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleVerifyPlatform(platform as 'youtube' | 'instagram' | 'tiktok')}
+                        disabled={isVerifying === platform}
+                      >
+                        {isVerifying === platform ? (
+                          <>
+                            <Loader2 size={14} className="mr-2 animate-spin" />
+                            Verifying...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle size={14} className="mr-2" />
+                            Verify
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-medium text-blue-800 mb-2">How Verification Works</h4>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• Click &ldquo;Verify&rdquo; to connect your social account</li>
+                <li>• You&apos;ll be redirected to login with the platform</li>
+                <li>• We&apos;ll automatically verify account ownership</li>
+                <li>• Your verified accounts will show on your public profile</li>
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

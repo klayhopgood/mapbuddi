@@ -11,6 +11,7 @@ import { useCurrency } from "@/hooks/use-currency";
 import { LocationListForm } from "./location-list-form";
 import { CartItem } from "@/lib/types";
 import { addToCart } from "@/server-actions/add-to-cart";
+import { LocationTags } from "@/components/ui/location-tags";
 
 export const LocationListCard = (props: {
   storeAndLocationList: LocationListAndStore;
@@ -94,6 +95,14 @@ export const LocationListCard = (props: {
             )}
           </Text>
         </div>
+
+        {/* Location Tags */}
+        <LocationTags
+          country={props.storeAndLocationList.locationList.country}
+          cities={props.storeAndLocationList.locationList.cities}
+          variant="card"
+          className="mt-2"
+        />
       </div>
 
       {!props.hideButtonActions && (

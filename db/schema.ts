@@ -3,6 +3,7 @@ import { InferSelectModel } from "drizzle-orm";
 import {
   boolean,
   decimal,
+  index,
   integer,
   json,
   pgTable,
@@ -27,6 +28,7 @@ export const stores = pgTable(
     age: integer("age"),
     socialLinks: text("social_links"), // JSON object with YouTube, TikTok, Instagram URLs
     verifiedSocials: text("verified_socials"), // JSON array of verified platforms
+    socialData: text("social_data"), // JSON object with detailed platform data (follower counts, etc.)
     slug: varchar("slug", { length: 50 }),
     userId: text("user_id"), // Clerk user ID
     currency: varchar("currency", { length: 3 }).default("USD"), // ISO currency code
@@ -122,11 +124,60 @@ export const locationLists = pgTable("location_lists", {
   isActive: boolean("is_active").default(true),
   totalPois: integer("total_pois").default(0),
   avgRating: decimal("avg_rating", { precision: 3, scale: 2 }),
+  country: varchar("country", { length: 100 }), // Country name
+  cities: text("cities"), // JSON array of city names
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export type LocationList = InferSelectModel<typeof locationLists>;
+
+// Countries reference table
+export const countries = pgTable("countries", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  code: varchar("code", { length: 2 }).notNull(), // ISO country code (US, GB, etc.)
+  region: varchar("region", { length: 50 }), // Continent/region
+});
+
+export type Country = InferSelectModel<typeof countries>;
+
+// States/Provinces reference table
+export const states = pgTable("states", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  code: varchar("code", { length: 10 }), // State/province code (CA, NY, ON, etc.)
+  countryCode: varchar("country_code", { length: 2 }).notNull(),
+  countryName: varchar("country_name", { length: 100 }).notNull(),
+}, (table) => {
+  return {
+    countryIndex: index("states_country_index").on(table.countryCode),
+    nameIndex: index("states_name_index").on(table.name),
+  };
+});
+
+export type State = InferSelectModel<typeof states>;
+
+// Cities reference table
+export const cities = pgTable("cities", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  countryCode: varchar("country_code", { length: 2 }).notNull(),
+  countryName: varchar("country_name", { length: 100 }).notNull(),
+  stateCode: varchar("state_code", { length: 10 }), // Can be null for countries without states
+  stateName: varchar("state_name", { length: 100 }), // Can be null
+  population: integer("population"),
+  latitude: decimal("latitude", { precision: 10, scale: 7 }),
+  longitude: decimal("longitude", { precision: 10, scale: 7 }),
+}, (table) => {
+  return {
+    countryIndex: index("cities_country_index").on(table.countryCode),
+    stateIndex: index("cities_state_index").on(table.stateCode),
+    nameIndex: index("cities_name_index").on(table.name),
+  };
+});
+
+export type City = InferSelectModel<typeof cities>;
 
 export const listCategories = pgTable("list_categories", {
   id: serial("id").primaryKey(),

@@ -16,6 +16,7 @@ import { addToCart } from "@/server-actions/add-to-cart";
 import { MapPin, Star } from "lucide-react";
 import { getReviewsForList } from "@/server-actions/reviews";
 import { currentUser } from "@clerk/nextjs/server";
+import { LocationTags } from "@/components/ui/location-tags";
 
 // Utility function to format email for display (first 3 chars + *** until @)
 function formatEmailForDisplay(email: string): string {
@@ -150,6 +151,14 @@ export default async function StorefrontListDetails(props: {
           <Text className="text-xl my-4">
             {formatPrice(Number(list.price), list.currency || "USD")}
           </Text>
+          
+          {/* Location Tags */}
+          <LocationTags
+            country={list.country}
+            cities={list.cities}
+            variant="page"
+            className="mb-4"
+          />
           
           <ProductForm
             addToCartAction={addToCart}

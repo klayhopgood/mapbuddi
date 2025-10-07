@@ -169,10 +169,10 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
                 </Text>
               )}
 
-              {/* Social Links */}
-              {Object.keys(socialLinks).length > 0 && (
+              {/* Social Links - Only show verified accounts */}
+              {verifiedSocials.length > 0 && (
                 <div className="flex gap-3">
-                  {socialLinks.youtube && (
+                  {verifiedSocials.includes('youtube') && socialLinks.youtube && (
                     <a
                       href={socialLinks.youtube}
                       target="_blank"
@@ -181,12 +181,10 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
                     >
                       <Youtube size={16} />
                       <span className="text-sm">YouTube</span>
-                      {verifiedSocials.includes('youtube') && (
-                        <CheckCircle size={14} className="text-green-600" />
-                      )}
+                      <CheckCircle size={14} className="text-green-600" />
                     </a>
                   )}
-                  {socialLinks.instagram && (
+                  {verifiedSocials.includes('instagram') && socialLinks.instagram && (
                     <a
                       href={socialLinks.instagram}
                       target="_blank"
@@ -195,12 +193,10 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
                     >
                       <Instagram size={16} />
                       <span className="text-sm">Instagram</span>
-                      {verifiedSocials.includes('instagram') && (
-                        <CheckCircle size={14} className="text-green-600" />
-                      )}
+                      <CheckCircle size={14} className="text-green-600" />
                     </a>
                   )}
-                  {socialLinks.tiktok && (
+                  {verifiedSocials.includes('tiktok') && socialLinks.tiktok && (
                     <a
                       href={socialLinks.tiktok}
                       target="_blank"
@@ -211,9 +207,7 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
                         <span className="text-white text-xs font-bold">T</span>
                       </div>
                       <span className="text-sm">TikTok</span>
-                      {verifiedSocials.includes('tiktok') && (
-                        <CheckCircle size={14} className="text-green-600" />
-                      )}
+                      <CheckCircle size={14} className="text-green-600" />
                     </a>
                   )}
                 </div>

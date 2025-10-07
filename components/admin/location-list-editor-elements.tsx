@@ -15,7 +15,7 @@ import { getCurrencySelectOptions, formatPrice } from "@/lib/currency";
 import { searchPlaces, PlaceSearchResult, getPlaceTypeEmoji } from "@/lib/google-places";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { EnhancedPOICreator, ListPOI as EnhancedListPOI, ListCategory as EnhancedListCategory } from "./enhanced-poi-creator";
+import { LocationSelector } from "./location-selector";
 
 interface ListCategory {
   id?: number;
@@ -42,6 +42,8 @@ const defaultValues = {
   description: "",
   price: "0",
   currency: "USD",
+  country: undefined,
+  cities: undefined,
   coverImage: null,
   isActive: true, // New lists should be active by default
 };
@@ -67,6 +69,14 @@ export const LocationListEditorElements = (props: {
     props.initialValues ?? defaultValues
   );
 
+  // Location state
+  const [selectedCountry, setSelectedCountry] = useState<string | undefined>(
+    props.initialValues?.country || undefined
+  );
+  const [selectedCities, setSelectedCities] = useState<string[]>(
+    props.initialValues?.cities ? JSON.parse(props.initialValues.cities) : []
+  );
+
   const [categories, setCategories] = useState<ListCategory[]>(
     props.initialCategories?.map(cat => ({
       id: cat.id || Math.random(),
@@ -90,6 +100,17 @@ export const LocationListEditorElements = (props: {
     })) ?? []
   );
   const [activeTab, setActiveTab] = useState("basic");
+
+  // Handle location changes
+  const handleLocationChange = (country: string | undefined, cities: string[]) => {
+    setSelectedCountry(country);
+    setSelectedCities(cities);
+    setFormValues({
+      ...formValues,
+      country: country || null,
+      cities: cities.length > 0 ? JSON.stringify(cities) : null,
+    });
+  };
 
   const dismissModal = useCallback(() => {
     if (props.displayType === "modal") {
@@ -257,6 +278,13 @@ export const LocationListEditorElements = (props: {
                     <p className="text-xs text-gray-500 mt-1">All prices are stored in USD. Buyers will see prices in their preferred currency.</p>
                   </div>
                 </div>
+
+                {/* Location Selector */}
+                <LocationSelector
+                  selectedCountry={selectedCountry}
+                  selectedCities={selectedCities}
+                  onLocationChange={handleLocationChange}
+                />
 
                 <div className="flex items-center space-x-2">
                   <input
