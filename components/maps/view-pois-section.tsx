@@ -14,8 +14,8 @@ interface Poi {
   description: string | null;
   notes: string | null;
   categoryId: number;
-  latitude: number | null;
-  longitude: number | null;
+  latitude: string | null; // Changed from number to string (decimal from DB)
+  longitude: string | null; // Changed from number to string (decimal from DB)
   createdAt: Date | null;
   categoryName: string;
   categoryEmoji: string;
@@ -47,9 +47,16 @@ export function ViewPoisSection({ listId }: ViewPoisSectionProps) {
 
   const openInMaps = (poi: Poi) => {
     if (poi.latitude && poi.longitude) {
-      const url = `https://www.google.com/maps/search/?api=1&query=${poi.latitude},${poi.longitude}`;
-      window.open(url, '_blank');
-    } else if (poi.address) {
+      const lat = parseFloat(poi.latitude);
+      const lng = parseFloat(poi.longitude);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+        window.open(url, '_blank');
+        return;
+      }
+    }
+    
+    if (poi.address) {
       const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(poi.address)}`;
       window.open(url, '_blank');
     }
