@@ -181,13 +181,12 @@ export const EditStoreFields = (props: {
   };
 
   const handleConnectSocialAccount = (provider: 'google' | 'facebook' | 'tiktok') => {
-    // For now, show a message that this feature is coming soon
-    // The actual implementation would require proper Clerk OAuth setup
-    toast({
-      title: "Social Connection",
-      description: `${provider.charAt(0).toUpperCase() + provider.slice(1)} connection is coming soon! Please check back later.`,
-      variant: "default",
-    });
+    // Redirect to Clerk's account connection page
+    const baseUrl = window.location.origin;
+    const returnUrl = encodeURIComponent(`${baseUrl}/account/selling/profile`);
+    
+    // Use Clerk's account management URL for social connections
+    window.open(`/user-profile?redirect_url=${returnUrl}`, '_blank');
   };
 
   const getSocialIcon = (platform: string) => {
@@ -487,14 +486,13 @@ export const EditStoreFields = (props: {
               </div>
             </div>
 
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-              <h4 className="font-medium text-amber-800 mb-2">Social Verification - Coming Soon!</h4>
-              <ul className="text-sm text-amber-700 space-y-1">
-                <li>• Social account verification is currently being developed</li>
-                <li>• This will allow you to verify ownership of your social accounts</li>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-medium text-blue-800 mb-2">Social Verification</h4>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• Click &ldquo;Connect&rdquo; to link your social accounts</li>
+                <li>• After connecting, click &ldquo;Verify&rdquo; to confirm ownership</li>
                 <li>• Verified accounts will show on your public profile</li>
                 <li>• This builds trust with potential customers</li>
-                <li>• Check back soon for this feature!</li>
               </ul>
             </div>
           </div>
