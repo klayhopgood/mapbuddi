@@ -173,11 +173,15 @@ export async function POST(request: Request) {
     case "customer.subscription.deleted":
     case "invoice.payment_failed":
       console.log(`=== SUBSCRIPTION EVENT: ${event.type} ===`);
+      console.log(`Event ID: ${event.id}`);
+      console.log(`Event created: ${new Date(event.created * 1000).toISOString()}`);
+      console.log(`Event data preview:`, JSON.stringify(event.data.object, null, 2).substring(0, 500) + '...');
       try {
         await handleSubscriptionWebhook(event);
-        console.log(`Successfully processed ${event.type}`);
+        console.log(`✅ Successfully processed ${event.type} for event ${event.id}`);
       } catch (error) {
-        console.error(`Error processing subscription event ${event.type}:`, error);
+        console.error(`❌ Error processing subscription event ${event.type}:`, error);
+        console.error(`Event that failed:`, JSON.stringify(event, null, 2));
         return NextResponse.json(
           { error: `Failed to process ${event.type}` },
           { status: 500 }
