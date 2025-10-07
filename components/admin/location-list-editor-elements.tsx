@@ -16,6 +16,7 @@ import { searchPlaces, PlaceSearchResult, getPlaceTypeEmoji } from "@/lib/google
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { LocationSelector } from "./location-selector";
+import { EnhancedPOICreator } from "./enhanced-poi-creator";
 
 interface ListCategory {
   id?: number;
@@ -42,8 +43,8 @@ const defaultValues = {
   description: "",
   price: "0",
   currency: "USD",
-  country: undefined,
-  cities: undefined,
+  country: null,
+  cities: null,
   coverImage: null,
   isActive: true, // New lists should be active by default
 };

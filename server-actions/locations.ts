@@ -2,7 +2,7 @@
 
 import { db } from "@/db/db";
 import { countries, states, cities } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export async function getCountries() {
   try {
@@ -35,16 +35,17 @@ export async function getStatesByCountry(countryCode: string) {
 
 export async function getCitiesByState(countryCode: string, stateCode?: string) {
   try {
-    let query = db
-      .select()
-      .from(cities)
-      .where(eq(cities.countryCode, countryCode));
+    const conditions = [eq(cities.countryCode, countryCode)];
     
     if (stateCode) {
-      query = query.where(eq(cities.stateCode, stateCode));
+      conditions.push(eq(cities.stateCode, stateCode));
     }
     
-    const citiesList = await query.orderBy(cities.name);
+    const citiesList = await db
+      .select()
+      .from(cities)
+      .where(and(...conditions))
+      .orderBy(cities.name);
     
     return citiesList;
   } catch (error) {
