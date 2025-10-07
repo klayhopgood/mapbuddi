@@ -34,8 +34,8 @@ export const CollectionBody = (
   const Sidebar = (
     <ProductSidebar
       uniqueStoresList={props.activeSellers
-        .map((item) => item.name ?? "")
-        .filter((item) => item !== "")}
+        .map((item) => ({ name: item.name ?? "", slug: item.slug ?? "" }))
+        .filter((item) => item.name !== "")}
       selectedSellers={selectedSellers}
     />
   );

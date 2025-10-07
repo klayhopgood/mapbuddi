@@ -1,6 +1,5 @@
 import { ParagraphFormatter } from "@/components/paragraph-formatter";
 import { ProductForm } from "@/components/storefront/product-form";
-import { FeatureIcons } from "@/components/storefront/feature-icons";
 import { Heading } from "@/components/ui/heading";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Text } from "@/components/ui/text";
@@ -133,7 +132,6 @@ export default async function StorefrontListDetails(props: {
             productName={list.name}
             productId={list.id}
           />
-          <FeatureIcons className="mt-8" />
         </div>
       </div>
       

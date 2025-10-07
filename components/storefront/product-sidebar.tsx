@@ -2,14 +2,13 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Heading } from "../ui/heading";
 import React, { useState } from "react";
-import { createSlug } from "@/lib/createSlug";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "../ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { anchorTags } from "@/lib/routes";
 
 export const ProductSidebar = (props: {
-  uniqueStoresList: string[];
+  uniqueStoresList: { name: string; slug: string }[];
   selectedSellers: string[];
 }) => {
   const [isSellerListExpanded, setIsSellerListExpanded] = useState(false);
@@ -40,8 +39,8 @@ export const ProductSidebar = (props: {
         {props.uniqueStoresList.slice(0, 5).map((store, i) => (
           <ProductSidebar.Checkbox
             key={i}
-            label={store}
-            id={createSlug(store)}
+            label={store.name}
+            id={store.slug}
             selectedSellers={props.selectedSellers}
           />
         ))}
@@ -51,8 +50,8 @@ export const ProductSidebar = (props: {
             .map((store, i) => (
               <ProductSidebar.Checkbox
                 key={i}
-                label={store}
-                id={createSlug(store)}
+                label={store.name}
+                id={store.slug}
                 selectedSellers={props.selectedSellers}
               />
             ))}

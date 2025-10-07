@@ -7,27 +7,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Product } from "@/db/schema";
 import { routes } from "@/lib/routes";
-import { getProductsBySearchTerm } from "@/server-actions/product-search";
+import { searchAll } from "@/server-actions/location-search";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import { ListImages } from "@/lib/types";
-import { ImageOff } from "lucide-react";
-import { currencyFormatter } from "@/lib/currency";
+import { ImageOff, MapPin, Store } from "lucide-react";
+import { useCurrency } from "@/hooks/use-currency";
 import { LoadingSkeleton } from "../ui/loading-skeleton";
 import { ProductImage } from "../product-image";
 
 export function ProductSearch() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [results, setResults] = useState<
-    (Pick<Product, "id" | "name" | "price"> & { images: ListImages[] })[]
-  >([]);
+  const [results, setResults] = useState<{
+    lists: any[];
+    stores: any[];
+  }>({ lists: [], stores: [] });
   const [isLoadingResults, setIsLoadingResults] = useState(false);
   const [confirmedHasNoResults, setConfirmedHasNoResults] = useState(false);
+  const { formatDisplayPrice } = useCurrency();
 
   const [open, setOpen] = useState(false);
 
@@ -43,21 +44,24 @@ export function ProductSearch() {
   }, []);
 
   useEffect(() => {
-    if (searchTerm === "") return setResults([]);
+    if (searchTerm === "") return setResults({ lists: [], stores: [] });
     const getData = setTimeout(async () => {
       if (searchTerm === "") return;
       setIsLoadingResults(true);
       setConfirmedHasNoResults(false);
-      setResults(
-        await getProductsBySearchTerm(searchTerm)
-          .then((res) => {
-            if (!res.length) setConfirmedHasNoResults(true);
-            return res as unknown as (Pick<Product, "id" | "name" | "price"> & {
-              images: ListImages[];
-            })[];
-          })
-          .finally(() => setIsLoadingResults(false))
-      );
+      try {
+        const searchResults = await searchAll(searchTerm);
+        setResults(searchResults);
+        if (searchResults.lists.length === 0 && searchResults.stores.length === 0) {
+          setConfirmedHasNoResults(true);
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+        setResults({ lists: [], stores: [] });
+        setConfirmedHasNoResults(true);
+      } finally {
+        setIsLoadingResults(false);
+      }
     }, 500);
     return () => clearTimeout(getData);
   }, [searchTerm]);
@@ -85,9 +89,9 @@ export function ProductSearch() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Search for a product</DialogTitle>
+            <DialogTitle>Search for a list or store</DialogTitle>
             <DialogDescription>
-              Search our entire product catalogue
+              Search our entire List and Traveller Store catalogue
             </DialogDescription>
           </DialogHeader>
           <Input
@@ -97,39 +101,86 @@ export function ProductSearch() {
           />
           <div className="flex flex-col gap-2 items-start justify-start">
             {isLoadingResults && <LoadingSkeleton className="w-full h-12" />}
-            {!results.length &&
+            {results.lists.length === 0 && results.stores.length === 0 &&
               searchTerm !== "" &&
               !isLoadingResults &&
               confirmedHasNoResults && <p>No results found.</p>}
-            {results.map((product) => (
-              <Link
-                href={`${routes.product}/${product.id}`}
-                onClick={() => setOpen(false)}
-                key={product.id}
-                className="w-full bg-secondary p-2 rounded-md"
-              >
-                <div className="flex items-center justify-start gap-2">
-                  <ProductImage
-                    src={product.images[0]?.url}
-                    alt={product.images[0]?.alt}
-                    sizes="50px"
-                    height="h-12"
-                    width="w-14"
-                  />
-                  <div className="flex items-center justify-between w-full pr-4">
-                    <Button
-                      variant="link"
-                      className="flex items-center justify-start w-full text-left"
-                    >
-                      {product.name}
-                    </Button>
-                    <p className="text-muted-foreground text-sm">
-                      {currencyFormatter(Number(product.price))}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            ))}
+            
+            {/* Location Lists Results */}
+            {results.lists.length > 0 && (
+              <div className="w-full">
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">Location Lists</h3>
+                {results.lists.map((list) => (
+                  <Link
+                    href={`/list/${list.id}`}
+                    onClick={() => setOpen(false)}
+                    key={`list-${list.id}`}
+                    className="w-full bg-secondary p-2 rounded-md mb-2 block"
+                  >
+                    <div className="flex items-center justify-start gap-2">
+                      {list.coverImage && JSON.parse(list.coverImage).length > 0 ? (
+                        <ProductImage
+                          src={JSON.parse(list.coverImage)[0]?.url}
+                          alt={JSON.parse(list.coverImage)[0]?.alt || list.name}
+                          sizes="50px"
+                          height="h-12"
+                          width="w-14"
+                        />
+                      ) : (
+                        <div className="h-12 w-14 bg-gray-100 rounded-md flex items-center justify-center">
+                          <MapPin size={16} className="text-gray-400" />
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between w-full pr-4">
+                        <div className="flex flex-col items-start">
+                          <Button
+                            variant="link"
+                            className="flex items-center justify-start w-full text-left p-0 h-auto"
+                          >
+                            {list.name}
+                          </Button>
+                          <p className="text-xs text-muted-foreground">
+                            by {list.storeName} • {list.totalPois || 0} places
+                          </p>
+                        </div>
+                        <p className="text-muted-foreground text-sm">
+                          {formatDisplayPrice(Number(list.price))}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+            
+            {/* Stores Results */}
+            {results.stores.length > 0 && (
+              <div className="w-full">
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">Stores</h3>
+                {results.stores.map((store) => (
+                  <Link
+                    href={`/lists?seller=${store.slug}`}
+                    onClick={() => setOpen(false)}
+                    key={`store-${store.id}`}
+                    className="w-full bg-secondary p-2 rounded-md mb-2 block"
+                  >
+                    <div className="flex items-center justify-start gap-2">
+                      <div className="h-12 w-14 bg-gray-100 rounded-md flex items-center justify-center">
+                        <Store size={16} className="text-gray-400" />
+                      </div>
+                      <div className="flex items-center justify-between w-full pr-4">
+                        <Button
+                          variant="link"
+                          className="flex items-center justify-start w-full text-left p-0 h-auto"
+                        >
+                          {store.name}
+                        </Button>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
