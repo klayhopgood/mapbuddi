@@ -14,8 +14,18 @@ export const OwnerAwareCartForm = (props: {
 }) => {
   const { user } = useUser();
   
+  // Debug logging
+  console.log("OwnerAwareCartForm Debug:", {
+    userId: user?.id,
+    ownerId: props.ownerId,
+    productId: props.productId,
+    productName: props.productName
+  });
+  
   // Check if current user owns this list
   const isOwnList = user?.id === props.ownerId;
+  
+  console.log("Ownership check:", { isOwnList, comparison: `${user?.id} === ${props.ownerId}` });
 
   if (isOwnList) {
     return (

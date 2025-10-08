@@ -99,6 +99,7 @@ export default async function LocationListsPage(context: {
         id: stores.id,
         name: stores.name,
         slug: stores.slug,
+        userId: stores.userId,
       },
     })
     .from(locationLists)
