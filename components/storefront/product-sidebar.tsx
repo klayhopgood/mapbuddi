@@ -121,10 +121,10 @@ export const ProductSidebar = (props: {
 
       {/* Price Filter */}
       <div className="mt-4">
-        <Heading size="h4">Price Range</Heading>
+        <Heading size="h4">Price Range (USD)</Heading>
         <div className="flex gap-2 mt-2">
           <Input
-            placeholder="Min"
+            placeholder="Min USD"
             type="number"
             min="0"
             step="0.01"
@@ -133,7 +133,7 @@ export const ProductSidebar = (props: {
             className="flex-1"
           />
           <Input
-            placeholder="Max"
+            placeholder="Max USD"
             type="number"
             min="0"
             step="0.01"
@@ -152,7 +152,7 @@ export const ProductSidebar = (props: {
         </Button>
         {(priceMin || priceMax) && (
           <p className="text-xs text-muted-foreground mt-1">
-            Price: {priceMin || "0"}+ to {priceMax || "∞"}
+            Price: ${priceMin || "0"}+ to ${priceMax || "∞"} USD
           </p>
         )}
       </div>

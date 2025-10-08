@@ -6,10 +6,7 @@ import Image from "next/image";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { anchorTags } from "@/lib/routes";
-import { LoadingSkeleton } from "../ui/loading-skeleton";
-
-const mockImage =
-  "https://images.unsplash.com/photo-1524758631624-e2822e304c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80";
+import { images } from "@/lib/assets";
 
 export const CollectionHeaderWrapper = (
   props: PropsWithChildren<{ heading: string }>
@@ -23,8 +20,8 @@ export const CollectionHeaderWrapper = (
     >
       <div className="relative w-full h-36">
         <Image
-          src={mockImage}
-          alt="mock image"
+          src={images[1]} 
+          alt="Travel destination"
           fill
           className="object-cover w-full h-36"
         />

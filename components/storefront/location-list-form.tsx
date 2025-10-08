@@ -45,23 +45,34 @@ export const LocationListForm = (props: {
 
     try {
       startTransition(async () => {
-        await props.addToCartAction({
-          id: props.listId,
-          qty: 1, // Always quantity 1 for location lists
-        });
-        setIsInCart(true);
-      });
-      
-      toast({
-        title: "Added to cart",
-        description: `${props.listName} has been added to your cart.`,
-        action: (
-          <Link href={routes.cart}>
-            <ToastAction altText="View cart">View Cart</ToastAction>
-          </Link>
-        ),
+        try {
+          await props.addToCartAction({
+            id: props.listId,
+            qty: 1, // Always quantity 1 for location lists
+          });
+          
+          // Only update state and show success toast if the action succeeds
+          setIsInCart(true);
+          toast({
+            title: "Added to cart",
+            description: `${props.listName} has been added to your cart.`,
+            action: (
+              <Link href={routes.cart}>
+                <ToastAction altText="View cart">View Cart</ToastAction>
+              </Link>
+            ),
+          });
+        } catch (error) {
+          console.error("Add to cart error:", error);
+          toast({
+            title: "Error",
+            description: error instanceof Error ? error.message : "Failed to add to cart",
+            variant: "destructive",
+          });
+        }
       });
     } catch (error) {
+      console.error("Outer add to cart error:", error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to add to cart",
