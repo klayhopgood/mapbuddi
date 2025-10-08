@@ -42,7 +42,7 @@ export function generateStaticMapUrl(pois: POICoordinate[], apiKey: string): str
   return `https://maps.googleapis.com/maps/api/staticmap?` +
     `center=${centerLat},${centerLng}` +
     `&zoom=${zoom}` +
-    `&size=600x400` +
+    `&size=400x300` +
     `&maptype=roadmap` +
     `&${markers}` +
     `&key=${apiKey}`;

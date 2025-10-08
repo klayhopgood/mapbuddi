@@ -51,12 +51,12 @@ export const StaticMapPreview = ({ pois, listName, mapUrl, className }: StaticMa
 
   return (
     <div className={`space-y-4 ${className}`}>
-      <div className="relative rounded-lg overflow-hidden border border-gray-200">
+      <div className="relative rounded-lg overflow-hidden border border-gray-200 max-w-md mx-auto">
         <Image
           src={mapUrl}
           alt={`Map preview of ${listName} locations`}
-          width={600}
-          height={400}
+          width={400}
+          height={300}
           className="w-full h-auto"
           unoptimized // Important for external API images
         />
@@ -70,23 +70,6 @@ export const StaticMapPreview = ({ pois, listName, mapUrl, className }: StaticMa
             </span>
           </div>
         </div>
-      </div>
-
-      {/* Location list */}
-      <div className="grid gap-2 max-h-64 overflow-y-auto">
-        {coordinates.map((coord, index) => (
-          <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-            <div className="flex-shrink-0 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-              {index + 1}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm truncate">{coord.name}</p>
-              <p className="text-xs text-gray-500">
-                {coord.lat.toFixed(6)}, {coord.lng.toFixed(6)}
-              </p>
-            </div>
-          </div>
-        ))}
       </div>
 
       <p className="text-xs text-gray-500 text-center">

@@ -4,7 +4,7 @@ import { Heading } from "@/components/ui/heading";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { db } from "@/db/db";
 import { locationLists, stores, listReviews } from "@/db/schema";
-import { eq, inArray, count } from "drizzle-orm";
+import { eq, inArray, count, desc, sql } from "drizzle-orm";
 import { PropsWithChildren } from "react";
 import { LocationListCard } from "@/components/storefront/location-list-card";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,14 @@ export default async function Home() {
     .from(locationLists)
     .leftJoin(stores, eq(locationLists.storeId, stores.id))
     .where(eq(locationLists.isActive, true))
+    .orderBy(
+      desc(sql`(
+        SELECT COUNT(*)::int 
+        FROM ${listReviews} 
+        WHERE ${listReviews.listId} = ${locationLists.id}
+      )`),
+      desc(locationLists.avgRating)
+    )
     .limit(8);
 
   // Transform coverImage from string to parsed object

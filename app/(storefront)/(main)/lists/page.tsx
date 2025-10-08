@@ -4,7 +4,7 @@ import { CollectionPagePagination } from "@/components/storefront/collection-pag
 import { db } from "@/db/db";
 import { locationLists, stores, listReviews } from "@/db/schema";
 import { LocationListAndStore } from "@/lib/collection-types";
-import { eq, inArray, count, and, or, gte, lte, ilike, sql } from "drizzle-orm";
+import { eq, inArray, count, and, or, gte, lte, ilike, sql, desc } from "drizzle-orm";
 import { getCart } from "@/server-actions/get-cart-details";
 import { cookies } from "next/headers";
 
@@ -101,10 +101,23 @@ export default async function LocationListsPage(context: {
         slug: stores.slug,
         userId: stores.userId,
       },
+      reviewCount: sql<number>`(
+        SELECT COUNT(*)::int 
+        FROM ${listReviews} 
+        WHERE ${listReviews.listId} = ${locationLists.id}
+      )`,
     })
     .from(locationLists)
     .leftJoin(stores, eq(locationLists.storeId, stores.id))
     .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
+    .orderBy(
+      desc(sql`(
+        SELECT COUNT(*)::int 
+        FROM ${listReviews} 
+        WHERE ${listReviews.listId} = ${locationLists.id}
+      )`),
+      desc(locationLists.avgRating)
+    )
     .limit(LISTS_PER_PAGE)
     .offset((page - 1) * LISTS_PER_PAGE);
 
