@@ -174,7 +174,7 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
                 <div className="flex flex-wrap gap-3">
                   {socialLinks.youtube && (
                     <a
-                      href={socialLinks.youtube.startsWith('@') ? `https://youtube.com/${socialLinks.youtube}` : socialLinks.youtube}
+                      href={`https://youtube.com/@${socialLinks.youtube.replace('@', '')}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
@@ -185,7 +185,7 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
                   )}
                   {socialLinks.instagram && (
                     <a
-                      href={socialLinks.instagram.startsWith('@') ? `https://instagram.com/${socialLinks.instagram.slice(1)}` : socialLinks.instagram}
+                      href={`https://instagram.com/${socialLinks.instagram.replace('@', '')}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 px-3 py-2 bg-pink-100 text-pink-700 rounded-lg hover:bg-pink-200 transition-colors"
@@ -196,7 +196,7 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
                   )}
                   {socialLinks.tiktok && (
                     <a
-                      href={socialLinks.tiktok.startsWith('@') ? `https://tiktok.com/${socialLinks.tiktok}` : socialLinks.tiktok}
+                      href={`https://tiktok.com/@${socialLinks.tiktok.replace('@', '')}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 px-3 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
