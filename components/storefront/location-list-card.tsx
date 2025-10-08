@@ -26,17 +26,6 @@ export const LocationListCard = (props: {
   
   // Check if current user owns this list
   const isOwnList = user?.id === props.storeAndLocationList.store.userId;
-  
-  // Debug logging
-  console.log("LocationListCard Debug:", {
-    listId: props.storeAndLocationList.locationList.id,
-    listName: props.storeAndLocationList.locationList.name,
-    userId: user?.id,
-    storeUserId: props.storeAndLocationList.store.userId,
-    storeName: props.storeAndLocationList.store.name,
-    isOwnList,
-    comparison: `${user?.id} === ${props.storeAndLocationList.store.userId}`
-  });
 
   return (
     <div key={props.storeAndLocationList.locationList.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
