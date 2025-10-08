@@ -32,22 +32,30 @@ export const ProductForm = (props: {
       return;
     }
 
-    startTransition(
-      () =>
-        void props.addToCartAction({
+    startTransition(async () => {
+      try {
+        await props.addToCartAction({
           id: props.productId,
           qty: 1, // Always quantity 1 for location lists
-        })
-    );
-    
-    toast({
-      title: "Added to cart",
-      description: `${props.productName} has been added to your cart.`,
-      action: (
-        <Link href={routes.cart}>
-          <ToastAction altText="View cart">View</ToastAction>
-        </Link>
-      ),
+        });
+        
+        toast({
+          title: "Added to cart",
+          description: `${props.productName} has been added to your cart.`,
+          action: (
+            <Link href={routes.cart}>
+              <ToastAction altText="View cart">View</ToastAction>
+            </Link>
+          ),
+        });
+      } catch (error) {
+        console.error("Add to cart error:", error);
+        toast({
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to add to cart",
+          variant: "destructive",
+        });
+      }
     });
   };
 

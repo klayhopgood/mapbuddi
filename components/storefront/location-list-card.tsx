@@ -12,6 +12,7 @@ import { LocationListForm } from "./location-list-form";
 import { CartItem } from "@/lib/types";
 import { addToCart } from "@/server-actions/add-to-cart";
 import { LocationTags } from "@/components/ui/location-tags";
+import { useUser } from "@clerk/nextjs";
 
 export const LocationListCard = (props: {
   storeAndLocationList: LocationListAndStore;
@@ -20,7 +21,11 @@ export const LocationListCard = (props: {
   reviewCount?: number; // Optional review count
 }) => {
   const { formatDisplayPrice } = useCurrency();
+  const { user } = useUser();
   const listPageLink = `/list/${props.storeAndLocationList.locationList.id}`;
+  
+  // Check if current user owns this list
+  const isOwnList = user?.id === props.storeAndLocationList.store.userId;
 
   return (
     <div key={props.storeAndLocationList.locationList.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
@@ -108,13 +113,19 @@ export const LocationListCard = (props: {
       {!props.hideButtonActions && (
         <div className="flex gap-2 items-center justify-between mt-4">
           <div className="flex-1">
-            <LocationListForm
-              addToCartAction={addToCart}
-              listId={props.storeAndLocationList.locationList.id}
-              listName={props.storeAndLocationList.locationList.name}
-              buttonSize="sm"
-              cartItems={props.cartItems}
-            />
+            {isOwnList ? (
+              <Button size="sm" variant="secondary" className="w-full" disabled>
+                Your List
+              </Button>
+            ) : (
+              <LocationListForm
+                addToCartAction={addToCart}
+                listId={props.storeAndLocationList.locationList.id}
+                listName={props.storeAndLocationList.locationList.name}
+                buttonSize="sm"
+                cartItems={props.cartItems}
+              />
+            )}
           </div>
           <Link href={listPageLink} className="flex-1">
             <Button size="sm" className="w-full">

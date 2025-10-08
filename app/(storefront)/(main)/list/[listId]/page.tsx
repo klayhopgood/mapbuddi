@@ -1,5 +1,6 @@
 import { ParagraphFormatter } from "@/components/paragraph-formatter";
 import { ProductForm } from "@/components/storefront/product-form";
+import { OwnerAwareCartForm } from "@/components/storefront/owner-aware-cart-form";
 import { Heading } from "@/components/ui/heading";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Text } from "@/components/ui/text";
@@ -63,6 +64,7 @@ export default async function StorefrontListDetails(props: {
       name: stores.name,
       description: stores.description,
       slug: stores.slug,
+      userId: stores.userId,
     })
     .from(stores)
     .where(eq(stores.id, Number(list.storeId)))
@@ -160,10 +162,11 @@ export default async function StorefrontListDetails(props: {
             className="mb-4"
           />
           
-          <ProductForm
+          <OwnerAwareCartForm
             addToCartAction={addToCart}
             productName={list.name}
             productId={list.id}
+            ownerId={store.userId}
           />
         </div>
       </div>
