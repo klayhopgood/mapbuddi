@@ -27,6 +27,8 @@ export const CollectionBody = (
     }[];
     cartItems?: CartItem[];
     reviewCountMap?: Map<number, number>;
+    uniqueCountries: string[];
+    uniqueCities: string[];
   }>
 ) => {
   const searchParams = useSearchParams();
@@ -39,6 +41,8 @@ export const CollectionBody = (
         .map((item) => ({ name: item.name ?? "", slug: item.slug ?? "" }))
         .filter((item) => item.name !== "")}
       selectedSellers={selectedSellers}
+      uniqueCountries={props.uniqueCountries}
+      uniqueCities={props.uniqueCities}
     />
   );
 
