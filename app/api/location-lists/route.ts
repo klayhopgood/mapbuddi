@@ -92,6 +92,7 @@ export async function POST(request: NextRequest) {
           price: list.price,
           currency: list.currency,
           coverImage: list.coverImage,
+          images: list.images,
           isActive: shouldBeActive,
           storeId,
           totalPois: pois.length,

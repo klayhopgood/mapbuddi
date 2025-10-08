@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { Text } from "../ui/text";
 import { MapPin, Star } from "lucide-react";
 import Link from "next/link";
@@ -13,6 +12,7 @@ import { CartItem } from "@/lib/types";
 import { addToCart } from "@/server-actions/add-to-cart";
 import { LocationTags } from "@/components/ui/location-tags";
 import { useUser } from "@clerk/nextjs";
+import { ImageCarousel } from "@/components/ui/image-carousel";
 
 export const LocationListCard = (props: {
   storeAndLocationList: LocationListAndStore;
@@ -27,22 +27,29 @@ export const LocationListCard = (props: {
   // Check if current user owns this list
   const isOwnList = user?.id === props.storeAndLocationList.store.userId;
 
+  // Parse images from the new images field
+  const listImages = props.storeAndLocationList.locationList.images 
+    ? JSON.parse(props.storeAndLocationList.locationList.images) 
+    : [];
+
+  // Fallback to coverImage if no images in new field (for backward compatibility)
+  const displayImages = listImages.length > 0 
+    ? listImages 
+    : (props.storeAndLocationList.locationList.coverImage && props.storeAndLocationList.locationList.coverImage.length > 0
+        ? [props.storeAndLocationList.locationList.coverImage[0].url]
+        : []);
+
   return (
     <div key={props.storeAndLocationList.locationList.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
       <Link href={listPageLink}>
-        {props.storeAndLocationList.locationList.coverImage && props.storeAndLocationList.locationList.coverImage.length > 0 ? (
-          <Image
-            src={props.storeAndLocationList.locationList.coverImage[0].url}
-            alt={props.storeAndLocationList.locationList.coverImage[0].alt || props.storeAndLocationList.locationList.name || "Location list"}
-            width={300}
-            height={200}
-            className="w-full h-48 object-cover rounded-md"
-          />
-        ) : (
-          <div className="w-full h-48 bg-gray-100 rounded-md flex items-center justify-center">
-            <MapPin size={48} className="text-gray-400" />
-          </div>
-        )}
+        <ImageCarousel
+          images={displayImages}
+          altText={props.storeAndLocationList.locationList.name || "Location list"}
+          aspectRatio="video"
+          className="w-full h-48"
+          showCounter={displayImages.length > 1}
+          showThumbnails={false}
+        />
       </Link>
       
       <div className="mt-3">

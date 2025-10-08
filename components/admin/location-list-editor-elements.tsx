@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { LocationSelector } from "./location-selector-api";
 import { EnhancedPOICreator } from "./enhanced-poi-creator";
 import { SubscriptionPrompt } from "./subscription-prompt";
+import { ListImageUploader } from "./list-image-uploader";
 
 interface ListCategory {
   id?: number;
@@ -77,6 +78,11 @@ export const LocationListEditorElements = (props: {
   );
   const [selectedCities, setSelectedCities] = useState<string[]>(
     props.initialValues?.cities ? JSON.parse(props.initialValues.cities) : []
+  );
+
+  // Images state
+  const [listImages, setListImages] = useState<string[]>(
+    props.initialValues?.images ? JSON.parse(props.initialValues.images) : []
   );
 
   const [categories, setCategories] = useState<ListCategory[]>(
@@ -166,6 +172,9 @@ export const LocationListEditorElements = (props: {
         ...formValues,
         currency: "USD", // Always store in USD
         totalPois: pois.length,
+        country: selectedCountry,
+        cities: JSON.stringify(selectedCities),
+        images: JSON.stringify(listImages),
       };
 
       const method = props.listStatus === "existing-list" ? "PUT" : "POST";
@@ -293,6 +302,17 @@ export const LocationListEditorElements = (props: {
                   selectedCities={selectedCities}
                   onLocationChange={handleLocationChange}
                 />
+
+                {/* List Images */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">List Images</label>
+                  <ListImageUploader
+                    currentImages={listImages}
+                    onImagesUpdate={setListImages}
+                    maxImages={10}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Upload up to 10 images to showcase your location list. These will be displayed on list cards and the list detail page.</p>
+                </div>
 
                 <div className="flex items-center space-x-2">
                   <input

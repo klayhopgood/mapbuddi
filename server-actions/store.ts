@@ -87,6 +87,7 @@ export async function updateStore(args: {
   socialLinks?: string | null; // JSON string
   website?: string | null;
   verifiedSocials?: string | null; // JSON string
+  profileImage?: string | null;
 }) {
   const inputSchema = z.object({
     storeId: z.number().optional(),
@@ -100,6 +101,7 @@ export async function updateStore(args: {
     socialLinks: z.string().nullable().optional(),
     website: z.string().nullable().optional(),
     verifiedSocials: z.string().nullable().optional(),
+    profileImage: z.string().nullable().optional(),
   });
 
   try {
@@ -124,6 +126,7 @@ export async function updateStore(args: {
     if (validatedArgs.socialLinks !== null && validatedArgs.socialLinks !== undefined) updateData.socialLinks = validatedArgs.socialLinks;
     if (validatedArgs.website !== null && validatedArgs.website !== undefined) updateData.website = validatedArgs.website;
     if (validatedArgs.verifiedSocials !== null && validatedArgs.verifiedSocials !== undefined) updateData.verifiedSocials = validatedArgs.verifiedSocials;
+    if (validatedArgs.profileImage !== null && validatedArgs.profileImage !== undefined) updateData.profileImage = validatedArgs.profileImage;
 
     const storeId = validatedArgs.storeId || Number(user?.privateMetadata.storeId);
     

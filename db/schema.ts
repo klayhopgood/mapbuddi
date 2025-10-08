@@ -135,6 +135,7 @@ export const locationLists = pgTable("location_lists", {
   price: decimal("price", { precision: 10, scale: 2 }).default("0").notNull(),
   currency: varchar("currency", { length: 3 }).default("USD"), // ISO currency code
   coverImage: text("cover_image"),
+  images: text("images"), // JSON array of image URLs
   storeId: integer("store_id").notNull(),
   isActive: boolean("is_active").default(true),
   totalPois: integer("total_pois").default(0),

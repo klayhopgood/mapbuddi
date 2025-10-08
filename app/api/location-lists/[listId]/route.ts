@@ -54,6 +54,7 @@ export async function PUT(
           price: list.price,
           currency: list.currency,
           coverImage: list.coverImage,
+          images: list.images,
           isActive: shouldBeActive,
           totalPois: pois.length,
           country: list.country,

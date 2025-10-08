@@ -9,6 +9,7 @@ import { type updateStore } from "@/server-actions/store";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
+import { ProfileImageUploader } from "./profile-image-uploader";
 
 // List of countries for nationality selection
 const COUNTRIES = [
@@ -47,6 +48,7 @@ export const EditStoreFields = (props: {
   const [age, setAge] = useState(props.storeDetails.age?.toString() || "");
   const [selectedNationalities, setSelectedNationalities] = useState<string[]>(existingNationalities);
   const [website, setWebsite] = useState(props.storeDetails.website || "");
+  const [profileImage, setProfileImage] = useState(props.storeDetails.profileImage || "");
   
   // Individual social link states
   const [youtubeHandle, setYoutubeHandle] = useState(existingSocialLinks.youtube || "");
@@ -83,6 +85,7 @@ export const EditStoreFields = (props: {
         nationality: JSON.stringify(selectedNationalities),
         socialLinks: JSON.stringify(socialLinksObject),
         website,
+        profileImage,
       });
 
       toast({
@@ -145,6 +148,19 @@ export const EditStoreFields = (props: {
                 placeholder="Tell customers about your store and what makes your location lists special..."
               />
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Profile Image */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Profile Image</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ProfileImageUploader
+              currentImage={profileImage}
+              onImageUpdate={setProfileImage}
+            />
           </CardContent>
         </Card>
 

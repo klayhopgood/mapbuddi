@@ -9,15 +9,14 @@ import { db } from "@/db/db";
 import { LocationList, locationLists, stores, listCategories, listPois, listReviews } from "@/db/schema";
 import { formatPrice } from "@/lib/currency";
 import { eq, and, count } from "drizzle-orm";
-import Image from "next/image";
 import Link from "next/link";
 import { routes } from "@/lib/routes";
-import { ProductImage } from "@/components/product-image";
 import { addToCart } from "@/server-actions/add-to-cart";
 import { MapPin, Star } from "lucide-react";
 import { getReviewsForList } from "@/server-actions/reviews";
 import { currentUser } from "@clerk/nextjs/server";
 import { LocationTags } from "@/components/ui/location-tags";
+import { ImageCarousel } from "@/components/ui/image-carousel";
 
 // Utility function to format email for display (first 3 chars + *** until @)
 function formatEmailForDisplay(email: string): string {
@@ -51,13 +50,23 @@ export default async function StorefrontListDetails(props: {
       throw new Error("List not found");
     });
 
-  // Parse the coverImage
+  // Parse the coverImage and images
   const list = {
     ...listFromDb,
     coverImage: typeof listFromDb.coverImage === 'string' 
       ? JSON.parse(listFromDb.coverImage) 
       : listFromDb.coverImage || []
   };
+
+  // Parse images from the new images field
+  const listImages = list.images 
+    ? JSON.parse(list.images) 
+    : [];
+
+  // Use new images field if available, otherwise fallback to coverImage for backward compatibility
+  const displayImages = listImages.length > 0 
+    ? listImages 
+    : (list.coverImage.length > 0 ? list.coverImage.map((img: any) => img.url) : []);
 
   const store = await db
     .select({
@@ -117,28 +126,14 @@ export default async function StorefrontListDetails(props: {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col items-center md:items-start justify-start md:grid md:grid-cols-9 gap-8">
         <div className="col-span-4 w-full">
-          <ProductImage
-            src={list.coverImage[0]?.url}
-            alt={list.coverImage[0]?.alt || `${list.name} cover`}
-            height="h-96"
-            width="w-full"
+          <ImageCarousel
+            images={displayImages}
+            altText={list.name}
+            aspectRatio="auto"
+            className="h-96"
+            showCounter={displayImages.length > 1}
+            showThumbnails={displayImages.length > 1}
           />
-          {list.coverImage.length > 1 && (
-            <>
-              <div className="flex items-center justify-start gap-2 mt-2 overflow-auto flex-nowrap">
-                {list.coverImage.slice(1).map((image: any) => (
-                  <div key={image.id} className="relative h-24 w-24">
-                    <Image
-                      src={image.url}
-                      alt={image.alt}
-                      fill
-                      className="object-cover h-24 w-24 rounded-md"
-                    />
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
         </div>
         <div className="md:col-span-5 w-full">
           <Heading size="h2">{list.name}</Heading>
