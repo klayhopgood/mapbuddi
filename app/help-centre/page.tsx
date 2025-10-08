@@ -22,7 +22,9 @@ export default function HelpCentre({
       
       <ContentWrapper className="max-w-4xl mx-auto py-12 flex-1">
         <div className="text-center mb-12">
-          <Heading size="h1" className="mb-4">Help Centre</Heading>
+          <div className="mb-4">
+            <Heading size="h1">Help Centre</Heading>
+          </div>
           <p className="text-lg text-muted-foreground">
             Everything you need to know about buying and selling location lists on MapBuddi
           </p>
