@@ -1,8 +1,6 @@
-"use client";
-
 import * as React from "react";
 import Link from "next/link";
-
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
@@ -14,35 +12,22 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { routes } from "@/lib/routes";
+import { db } from "@/db/db";
+import { stores } from "@/db/schema";
 
-const components: { title: string; href: string; description: string }[] = [
-  {
-    title: "Tim's Toys",
-    href: "/",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod lorem ipsum dolor sit amet.",
-  },
-  {
-    title: "James' Jackpots",
-    href: "/",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod lorem ipsum dolor sit amet.",
-  },
-  {
-    title: "Dave's Deals",
-    href: "/",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod lorem ipsum dolor sit amet.",
-  },
-  {
-    title: "Tim's Trainers",
-    href: "/",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod lorem ipsum dolor sit amet.",
-  },
-];
+export async function MenuItems() {
+  // Fetch first 4 stores for Featured Travellers
+  const featuredTravellers = await db
+    .select({
+      id: stores.id,
+      name: stores.name,
+      slug: stores.slug,
+      description: stores.description,
+      profileImage: stores.profileImage,
+    })
+    .from(stores)
+    .limit(4);
 
-export function MenuItems() {
   return (
     <NavigationMenu>
       <NavigationMenuList>
@@ -54,50 +39,17 @@ export function MenuItems() {
           </Link>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Collections</NavigationMenuTrigger>
+          <NavigationMenuTrigger>Featured Travellers</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-              <li className="row-span-3">
-                <NavigationMenuLink asChild>
-                  <a
-                    className="flex h-full w-full select-none flex-col justify-end rounded-md no-underline outline-none focus:shadow-md bg-sport overflow-hidden"
-                    href="/"
-                  >
-                    <div className="relative top-0 bg-secondary border border-border w-full h-full p-6 pt-24">
-                      <div className="mb-2 mt-4 text-lg font-medium text-primary">
-                        Here to help
-                      </div>
-                      <p className="text-sm leading-tight text-muted-foreground text-gray-100">
-                        Contact our customer support team 24/7
-                      </p>
-                    </div>
-                  </a>
-                </NavigationMenuLink>
-              </li>
-              <ListItem href={routes.lists} title="New Arrivals">
-                Shop our new arrivals and exclusive collections.
-              </ListItem>
-              <ListItem href={routes.lists} title="Popular Lists">
-                Discover our new location lists range.
-              </ListItem>
-              <ListItem href={routes.lists} title="Featured">
-                Grab a bargain with our featured lists.
-              </ListItem>
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>Featured Sellers</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-              {components.map((component) => (
-                <ListItem
-                  key={component.title}
-                  title={component.title}
-                  href={component.href}
-                >
-                  {component.description}
-                </ListItem>
+            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+              {featuredTravellers.map((traveller) => (
+                <TravellerItem
+                  key={traveller.id}
+                  name={traveller.name || "Unknown Traveller"}
+                  slug={traveller.slug || ""}
+                  description={traveller.description || "Passionate traveller sharing amazing locations"}
+                  profileImage={traveller.profileImage}
+                />
               ))}
             </ul>
           </NavigationMenuContent>
@@ -106,6 +58,56 @@ export function MenuItems() {
     </NavigationMenu>
   );
 }
+
+const TravellerItem = ({
+  name,
+  slug,
+  description,
+  profileImage,
+}: {
+  name: string;
+  slug: string;
+  description: string;
+  profileImage: string | null;
+}) => {
+  const profileLink = `/profile/${slug}`;
+  
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <Link
+          href={profileLink}
+          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+        >
+          <div className="flex items-center gap-3">
+            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+              {profileImage ? (
+                <Image
+                  src={profileImage}
+                  alt={`${name} profile`}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-semibold text-sm">
+                  {name.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium leading-none mb-1">
+                {name}
+              </div>
+              <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
+                {description.length > 60 ? `${description.substring(0, 60)}...` : description}
+              </p>
+            </div>
+          </div>
+        </Link>
+      </NavigationMenuLink>
+    </li>
+  );
+};
 
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,

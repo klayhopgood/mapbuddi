@@ -10,7 +10,7 @@ import { ShoppingCartHeader } from "./shopping-cart-header";
 import { ProductSearch } from "./storefront/product-search";
 import { CurrencySelector } from "./currency-selector";
 
-export const NavBar = ({
+export const NavBar = async ({
   showSecondAnnouncementBar,
 }: {
   showSecondAnnouncementBar: boolean;
