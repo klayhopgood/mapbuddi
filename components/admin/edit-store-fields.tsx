@@ -210,6 +210,90 @@ export const EditStoreFields = (props: {
           </CardContent>
         </Card>
 
+        {/* Social Links Section - Now inside the form */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Social Links & Website</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              <p className="text-sm text-muted-foreground">
+                Add your social media handles and website. These will be displayed on your public profile.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium block mb-2">
+                    <Youtube size={16} className="inline mr-2 text-red-600" />
+                    YouTube Handle
+                  </label>
+                  <Input
+                    placeholder="@yourusername"
+                    value={existingSocialLinks.youtube || ""}
+                    onChange={(e) => {
+                      const newSocialLinks = { ...existingSocialLinks, youtube: e.target.value };
+                      setSocialLinks(JSON.stringify(newSocialLinks));
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium block mb-2">
+                    <Instagram size={16} className="inline mr-2 text-pink-600" />
+                    Instagram Handle
+                  </label>
+                  <Input
+                    placeholder="@yourusername"
+                    value={existingSocialLinks.instagram || ""}
+                    onChange={(e) => {
+                      const newSocialLinks = { ...existingSocialLinks, instagram: e.target.value };
+                      setSocialLinks(JSON.stringify(newSocialLinks));
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium block mb-2">
+                    <div className="inline-block w-4 h-4 mr-2 bg-black text-white text-xs font-bold text-center leading-4 rounded">T</div>
+                    TikTok Handle
+                  </label>
+                  <Input
+                    placeholder="@yourusername"
+                    value={existingSocialLinks.tiktok || ""}
+                    onChange={(e) => {
+                      const newSocialLinks = { ...existingSocialLinks, tiktok: e.target.value };
+                      setSocialLinks(JSON.stringify(newSocialLinks));
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium block mb-2">
+                    <ExternalLink size={16} className="inline mr-2 text-blue-600" />
+                    Website
+                  </label>
+                  <Input
+                    placeholder="https://yourwebsite.com"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                  />
+                </div>
+              </div>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-medium text-blue-800 mb-2">Social Links Display</h4>
+                <ul className="text-sm text-blue-700 space-y-1">
+                  <li>• Your social handles will appear on your public profile</li>
+                  <li>• Use the format @username for social platforms</li>
+                  <li>• Include https:// for website URLs</li>
+                  <li>• All fields are optional</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Save button moved to the bottom */}
         <div className="flex justify-end">
           <Button type="submit" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -218,97 +302,22 @@ export const EditStoreFields = (props: {
         </div>
       </form>
 
-      {/* Social Links Section */}
+      {/* Profile actions outside the form */}
       <Card>
         <CardHeader>
-          <CardTitle>Social Links & Website</CardTitle>
+          <CardTitle>Profile Actions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
-            <p className="text-sm text-muted-foreground">
-              Add your social media handles and website. These will be displayed on your public profile.
-            </p>
+          <div className="flex gap-4">
+            <Button type="button" variant="outline" onClick={copyProfileUrl}>
+              <Copy size={16} className="mr-2" />
+              Copy Profile URL
+            </Button>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium block mb-2">
-                  <Youtube size={16} className="inline mr-2 text-red-600" />
-                  YouTube Handle
-                </label>
-                <Input
-                  placeholder="@yourusername"
-                  value={existingSocialLinks.youtube || ""}
-                  onChange={(e) => {
-                    const newSocialLinks = { ...existingSocialLinks, youtube: e.target.value };
-                    setSocialLinks(JSON.stringify(newSocialLinks));
-                  }}
-                />
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium block mb-2">
-                  <Instagram size={16} className="inline mr-2 text-pink-600" />
-                  Instagram Handle
-                </label>
-                <Input
-                  placeholder="@yourusername"
-                  value={existingSocialLinks.instagram || ""}
-                  onChange={(e) => {
-                    const newSocialLinks = { ...existingSocialLinks, instagram: e.target.value };
-                    setSocialLinks(JSON.stringify(newSocialLinks));
-                  }}
-                />
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium block mb-2">
-                  <div className="inline-block w-4 h-4 mr-2 bg-black text-white text-xs font-bold text-center leading-4 rounded">T</div>
-                  TikTok Handle
-                </label>
-                <Input
-                  placeholder="@yourusername"
-                  value={existingSocialLinks.tiktok || ""}
-                  onChange={(e) => {
-                    const newSocialLinks = { ...existingSocialLinks, tiktok: e.target.value };
-                    setSocialLinks(JSON.stringify(newSocialLinks));
-                  }}
-                />
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium block mb-2">
-                  <ExternalLink size={16} className="inline mr-2 text-blue-600" />
-                  Website
-                </label>
-                <Input
-                  placeholder="https://yourwebsite.com"
-                  value={website}
-                  onChange={(e) => setWebsite(e.target.value)}
-                />
-              </div>
-            </div>
-            
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-medium text-blue-800 mb-2">Social Links Display</h4>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>• Your social handles will appear on your public profile</li>
-                <li>• Use the format @username for social platforms</li>
-                <li>• Include https:// for website URLs</li>
-                <li>• All fields are optional</li>
-              </ul>
-            </div>
-
-            <div className="flex gap-4">
-              <Button type="button" variant="outline" onClick={copyProfileUrl}>
-                <Copy size={16} className="mr-2" />
-                Copy Profile URL
-              </Button>
-              
-              <Button type="button" variant="outline" onClick={viewProfile}>
-                <ExternalLink size={16} className="mr-2" />
-                View Profile
-              </Button>
-            </div>
+            <Button type="button" variant="outline" onClick={viewProfile}>
+              <ExternalLink size={16} className="mr-2" />
+              View Profile
+            </Button>
           </div>
         </CardContent>
       </Card>
