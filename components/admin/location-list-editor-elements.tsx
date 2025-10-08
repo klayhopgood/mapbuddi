@@ -187,10 +187,10 @@ export const LocationListEditorElements = (props: {
         return;
       }
 
-      if (!formValues.price || formValues.price === "0" || parseFloat(formValues.price) <= 0) {
+      if (!formValues.price || formValues.price === "0" || parseFloat(formValues.price) < 5) {
         toast({
           title: "Error", 
-          description: "List price must be greater than $0",
+          description: "List price must be at least $5.00",
           variant: "destructive",
         });
         setIsLoading(false);
@@ -274,11 +274,8 @@ export const LocationListEditorElements = (props: {
               : "Location list created successfully!",
           });
           
-          // Add a small delay to ensure database write completes
-          setTimeout(() => {
-            router.push("/account/selling/lists");
-            router.refresh();
-          }, 500);
+          // Don't redirect - keep user on the edit page
+          // User can navigate away manually if they want to
         }
       }
     } catch (error) {

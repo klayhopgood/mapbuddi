@@ -33,6 +33,21 @@ export async function PUT(
       return NextResponse.json({ error: true, message: 'List not found' }, { status: 404 });
     }
 
+    // Validate required fields
+    if (!list.name || !list.name.trim()) {
+      return NextResponse.json({ 
+        error: true, 
+        message: 'List name is required' 
+      }, { status: 400 });
+    }
+
+    if (!list.price || list.price === "0" || parseFloat(list.price) < 5) {
+      return NextResponse.json({ 
+        error: true, 
+        message: 'List price must be at least $5.00' 
+      }, { status: 400 });
+    }
+
     // Check subscription status to determine if list can be active
     const hasActiveSubscription = await checkSubscriptionForListActivation(storeId);
     const shouldBeActive = list.isActive && hasActiveSubscription;

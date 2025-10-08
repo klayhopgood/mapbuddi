@@ -56,11 +56,11 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    if (!list.price || list.price === "0" || parseFloat(list.price) <= 0) {
-      console.log("ERROR: Missing or invalid price:", list.price);
+    if (!list.price || list.price === "0" || parseFloat(list.price) < 5) {
+      console.log("ERROR: Invalid price - must be at least $5:", list.price);
       return NextResponse.json({ 
         error: true, 
-        message: 'List price must be greater than 0' 
+        message: 'List price must be at least $5.00' 
       }, { status: 400 });
     }
 
