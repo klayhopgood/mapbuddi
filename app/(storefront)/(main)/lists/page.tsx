@@ -100,6 +100,15 @@ export default async function LocationListsPage(context: {
         name: stores.name,
         slug: stores.slug,
         userId: stores.userId,
+        currency: stores.currency,
+        website: stores.website,
+        nationality: stores.nationality,
+        profileImage: stores.profileImage,
+        firstName: stores.firstName,
+        lastName: stores.lastName,
+        age: stores.age,
+        socialLinks: stores.socialLinks,
+        verifiedSocials: stores.verifiedSocials,
       },
       reviewCount: sql<number>`(
         SELECT COUNT(*)::int 
@@ -121,32 +130,21 @@ export default async function LocationListsPage(context: {
     .limit(LISTS_PER_PAGE)
     .offset((page - 1) * LISTS_PER_PAGE);
 
-  // Transform coverImage from string to parsed object
+  // Transform coverImage from string to parsed object and create review count map
   const storeAndLocationList = rawData.map(item => ({
-    ...item,
     locationList: {
       ...item.locationList,
       coverImage: typeof item.locationList.coverImage === 'string' 
         ? JSON.parse(item.locationList.coverImage) 
         : item.locationList.coverImage || []
-    }
+    },
+    store: item.store
   })) as LocationListAndStore[];
 
-  // Get review counts for all lists
-  const listIds = storeAndLocationList.map(item => item.locationList.id);
-  const reviewCounts = await db
-    .select({
-      listId: listReviews.listId,
-      count: count(listReviews.id),
-    })
-    .from(listReviews)
-    .where(inArray(listReviews.listId, listIds))
-    .groupBy(listReviews.listId);
-
-  // Create a map for quick lookup
+  // Create review count map from the query results
   const reviewCountMap = new Map<number, number>();
-  reviewCounts.forEach(rc => {
-    reviewCountMap.set(rc.listId, Number(rc.count));
+  rawData.forEach(item => {
+    reviewCountMap.set(item.locationList.id, item.reviewCount || 0);
   });
 
   // Get unique countries and cities for filter options
