@@ -169,6 +169,54 @@ export const LocationListEditorElements = (props: {
     setIsLoading(true);
 
     try {
+      // Frontend validation
+      console.log("Frontend validation:", {
+        name: formValues.name,
+        price: formValues.price,
+        categoriesCount: categories.length,
+        poisCount: pois.length
+      });
+
+      if (!formValues.name || !formValues.name.trim()) {
+        toast({
+          title: "Error",
+          description: "List name is required",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (!formValues.price || formValues.price === "0" || parseFloat(formValues.price) <= 0) {
+        toast({
+          title: "Error", 
+          description: "List price must be greater than $0",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (categories.length === 0) {
+        toast({
+          title: "Error",
+          description: "At least one category is required. Please add a category first.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (pois.length === 0) {
+        toast({
+          title: "Error",
+          description: "At least one location (POI) is required. Please add some locations to your list.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       const listData = {
         ...formValues,
         currency: "USD", // Always store in USD
@@ -182,6 +230,14 @@ export const LocationListEditorElements = (props: {
       const url = props.listStatus === "existing-list" 
         ? `/api/location-lists/${props.initialValues?.id}` 
         : "/api/location-lists";
+
+      console.log("Submitting list data:", {
+        listData,
+        categoriesCount: categories.length,
+        poisCount: pois.length,
+        method,
+        url
+      });
 
       const response = await fetch(url, {
         method,
@@ -226,9 +282,10 @@ export const LocationListEditorElements = (props: {
         }
       }
     } catch (error) {
+      console.error("Frontend error during list submission:", error);
       toast({
         title: "Error",
-        description: "Failed to save location list",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {

@@ -35,11 +35,42 @@ export async function POST(request: NextRequest) {
     console.log("Request data:", { list, categories: categories.length, pois: pois.length });
 
     // Validate required fields
-    if (!list.name || !list.price) {
-      console.log("ERROR: Missing required fields - name or price");
+    console.log("Validating required fields:", {
+      name: list.name,
+      price: list.price,
+      categoriesCount: categories?.length || 0,
+      poisCount: pois?.length || 0
+    });
+
+    if (!list.name || !list.name.trim()) {
+      console.log("ERROR: Missing or empty list name");
       return NextResponse.json({ 
         error: true, 
-        message: 'List name and price are required' 
+        message: 'List name is required' 
+      }, { status: 400 });
+    }
+
+    if (!list.price || list.price === "0" || parseFloat(list.price) <= 0) {
+      console.log("ERROR: Missing or invalid price:", list.price);
+      return NextResponse.json({ 
+        error: true, 
+        message: 'List price must be greater than 0' 
+      }, { status: 400 });
+    }
+
+    if (!categories || categories.length === 0) {
+      console.log("ERROR: No categories provided");
+      return NextResponse.json({ 
+        error: true, 
+        message: 'At least one category is required' 
+      }, { status: 400 });
+    }
+
+    if (!pois || pois.length === 0) {
+      console.log("ERROR: No POIs provided");
+      return NextResponse.json({ 
+        error: true, 
+        message: 'At least one location (POI) is required' 
       }, { status: 400 });
     }
 
@@ -103,6 +134,11 @@ export async function POST(request: NextRequest) {
 
       console.log("Location list created with ID:", newList.id);
 
+      if (!newList || !newList.id) {
+        console.error("ERROR: List creation returned null or invalid result:", newList);
+        throw new Error("Failed to create location list - database returned invalid result");
+      }
+
       // Create categories
       console.log("Creating categories...");
       const categoryIds: number[] = [];
@@ -120,12 +156,20 @@ export async function POST(request: NextRequest) {
             displayOrder: category.displayOrder,
           })
           .returning();
+        
+        if (!newCategory || !newCategory.id) {
+          console.error("ERROR: Category creation failed for:", category.name);
+          throw new Error(`Failed to create category: ${category.name}`);
+        }
+        
         categoryIds.push(newCategory.id);
         console.log(`Category created with ID: ${newCategory.id}`);
       }
 
       // Create POIs
       console.log("Creating POIs...");
+      let poisCreated = 0;
+      
       for (const poi of pois) {
         // Fix: Use poi.categoryId as array index to get the actual database category ID
         const categoryIndex = poi.categoryId || 0;
@@ -145,11 +189,19 @@ export async function POST(request: NextRequest) {
             address: poi.address,
             displayOrder: 0,
           });
+          poisCreated++;
           console.log(`POI created successfully: ${poi.name}`);
         } else {
           console.log(`WARNING: Invalid category index ${categoryIndex} for POI: ${poi.name}. Available categories: ${categoryIds.length}`);
         }
       }
+
+      if (poisCreated === 0) {
+        console.error("ERROR: No POIs were successfully created");
+        throw new Error("Failed to create any POIs - check category mapping");
+      }
+
+      console.log(`Successfully created ${poisCreated} POIs out of ${pois.length} requested`);
 
       console.log("Transaction completed successfully");
       return newList;
