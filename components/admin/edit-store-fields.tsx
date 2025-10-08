@@ -46,8 +46,12 @@ export const EditStoreFields = (props: {
   const [lastName, setLastName] = useState(props.storeDetails.lastName || "");
   const [age, setAge] = useState(props.storeDetails.age?.toString() || "");
   const [selectedNationalities, setSelectedNationalities] = useState<string[]>(existingNationalities);
-  const [socialLinks, setSocialLinks] = useState(JSON.stringify(existingSocialLinks));
   const [website, setWebsite] = useState(props.storeDetails.website || "");
+  
+  // Individual social link states
+  const [youtubeHandle, setYoutubeHandle] = useState(existingSocialLinks.youtube || "");
+  const [instagramHandle, setInstagramHandle] = useState(existingSocialLinks.instagram || "");
+  const [tiktokHandle, setTiktokHandle] = useState(existingSocialLinks.tiktok || "");
 
   const handleNationalityChange = (country: string, checked: boolean) => {
     if (checked) {
@@ -62,6 +66,13 @@ export const EditStoreFields = (props: {
     setIsLoading(true);
 
     try {
+      // Build social links object from individual states
+      const socialLinksObject = {
+        youtube: youtubeHandle,
+        instagram: instagramHandle,
+        tiktok: tiktokHandle,
+      };
+
       await props.updateStore({
         storeId: props.storeDetails.id,
         name,
@@ -70,7 +81,7 @@ export const EditStoreFields = (props: {
         lastName,
         age: age ? parseInt(age) : null,
         nationality: JSON.stringify(selectedNationalities),
-        socialLinks,
+        socialLinks: JSON.stringify(socialLinksObject),
         website,
       });
 
@@ -229,11 +240,8 @@ export const EditStoreFields = (props: {
                   </label>
                   <Input
                     placeholder="@yourusername"
-                    value={existingSocialLinks.youtube || ""}
-                    onChange={(e) => {
-                      const newSocialLinks = { ...existingSocialLinks, youtube: e.target.value };
-                      setSocialLinks(JSON.stringify(newSocialLinks));
-                    }}
+                    value={youtubeHandle}
+                    onChange={(e) => setYoutubeHandle(e.target.value)}
                   />
                 </div>
                 
@@ -244,11 +252,8 @@ export const EditStoreFields = (props: {
                   </label>
                   <Input
                     placeholder="@yourusername"
-                    value={existingSocialLinks.instagram || ""}
-                    onChange={(e) => {
-                      const newSocialLinks = { ...existingSocialLinks, instagram: e.target.value };
-                      setSocialLinks(JSON.stringify(newSocialLinks));
-                    }}
+                    value={instagramHandle}
+                    onChange={(e) => setInstagramHandle(e.target.value)}
                   />
                 </div>
                 
@@ -259,11 +264,8 @@ export const EditStoreFields = (props: {
                   </label>
                   <Input
                     placeholder="@yourusername"
-                    value={existingSocialLinks.tiktok || ""}
-                    onChange={(e) => {
-                      const newSocialLinks = { ...existingSocialLinks, tiktok: e.target.value };
-                      setSocialLinks(JSON.stringify(newSocialLinks));
-                    }}
+                    value={tiktokHandle}
+                    onChange={(e) => setTiktokHandle(e.target.value)}
                   />
                 </div>
                 

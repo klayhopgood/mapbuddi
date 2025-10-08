@@ -179,6 +179,13 @@ export default async function StorefrontListDetails(props: {
             className="mb-4"
           />
           
+          {/* Description moved from List Details tab */}
+          {list.description && (
+            <div className="mb-6">
+              <ParagraphFormatter paragraphs={list.description} />
+            </div>
+          )}
+          
           <OwnerAwareCartForm
             addToCartAction={addToCart}
             productName={list.name}
@@ -188,18 +195,14 @@ export default async function StorefrontListDetails(props: {
         </div>
       </div>
       
-      <Tabs defaultValue="list">
+      <Tabs defaultValue="preview">
         <div className="overflow-auto">
           <TabsList>
-            <TabsTrigger value="list">List Details</TabsTrigger>
             <TabsTrigger value="preview">Preview Categories</TabsTrigger>
             <TabsTrigger value="reviews">Reviews ({reviewCount})</TabsTrigger>
             <TabsTrigger value="seller">About the Creator</TabsTrigger>
           </TabsList>
         </div>
-        <TabsContent value="list" className="pt-2">
-          <ParagraphFormatter paragraphs={list.description || ""} />
-        </TabsContent>
         <TabsContent value="preview" className="pt-2">
           <div className="space-y-4">
             <Text className="text-muted-foreground">
@@ -356,7 +359,7 @@ export default async function StorefrontListDetails(props: {
                             
                             {socialLinks.tiktok && (
                               <a
-                                href={`https://tiktok.com/${socialLinks.tiktok.replace('@', '')}`}
+                                href={`https://tiktok.com/@${socialLinks.tiktok.replace('@', '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-2 px-3 py-2 bg-black hover:bg-gray-800 text-white rounded-md text-sm transition-colors"
@@ -368,7 +371,7 @@ export default async function StorefrontListDetails(props: {
                             
                             {socialLinks.youtube && (
                               <a
-                                href={`https://youtube.com/${socialLinks.youtube.replace('@', '')}`}
+                                href={`https://youtube.com/@${socialLinks.youtube.replace('@', '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-2 px-3 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-md text-sm transition-colors"
