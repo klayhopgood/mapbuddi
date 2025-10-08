@@ -32,7 +32,13 @@ export async function POST(request: NextRequest) {
     }
 
     const { list, categories, pois } = await request.json();
-    console.log("Request data:", { list, categories: categories.length, pois: pois.length });
+    console.log("Request data:", { 
+      list, 
+      categoriesCount: categories?.length || 0, 
+      poisCount: pois?.length || 0,
+      categoriesPreview: categories?.slice(0, 2).map(c => c.name) || [],
+      poisPreview: pois?.slice(0, 2).map(p => p.name) || []
+    });
 
     // Validate required fields
     console.log("Validating required fields:", {
@@ -103,7 +109,9 @@ export async function POST(request: NextRequest) {
       throw new Error("Database connection failed");
     }
     
-    const result = await db.transaction(async (tx) => {
+    let result;
+    try {
+      result = await db.transaction(async (tx) => {
       console.log("Creating location list with data:", {
         name: list.name,
         description: list.description,
@@ -206,10 +214,35 @@ export async function POST(request: NextRequest) {
       console.log("Transaction completed successfully");
       return newList;
     });
+    
+    console.log("Transaction result:", result);
+    } catch (transactionError) {
+      console.error("=== TRANSACTION ERROR ===");
+      console.error("Transaction failed:", transactionError);
+      console.error("Error details:", {
+        message: transactionError instanceof Error ? transactionError.message : 'Unknown transaction error',
+        stack: transactionError instanceof Error ? transactionError.stack : undefined,
+      });
+      throw transactionError;
+    }
 
     console.log("=== LOCATION LIST CREATION SUCCESS ===");
     console.log("Created list ID:", result.id);
     console.log("Transaction completed successfully");
+    
+    // Verify the list was actually created
+    try {
+      const verificationQuery = await db.select().from(locationLists).where(eq(locationLists.id, result.id));
+      if (verificationQuery.length === 0) {
+        console.error("=== VERIFICATION FAILED ===");
+        console.error("List was not found in database after transaction completion!");
+        throw new Error("List creation verification failed - data not persisted");
+      }
+      console.log("Verification successful: List exists in database");
+    } catch (verificationError) {
+      console.error("Verification query failed:", verificationError);
+      throw new Error("Failed to verify list creation");
+    }
     
     // Force a small delay to ensure database write is fully committed
     await new Promise(resolve => setTimeout(resolve, 100));
