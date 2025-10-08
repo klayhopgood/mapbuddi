@@ -99,8 +99,13 @@ export async function PUT(
 
       // Create new POIs
       for (const poi of pois) {
-        const categoryId = categoryIds[poi.categoryId || 0];
-        if (categoryId) {
+        // Fix: Use poi.categoryId as array index to get the actual database category ID
+        const categoryIndex = poi.categoryId || 0;
+        const categoryId = categoryIds[categoryIndex];
+        console.log(`Creating POI: ${poi.name} with categoryIndex ${categoryIndex} -> categoryId ${categoryId}`);
+        console.log(`Available categoryIds:`, categoryIds);
+        
+        if (categoryId && categoryIndex < categoryIds.length) {
           await tx.insert(listPois).values({
             categoryId,
             name: poi.name,
@@ -112,6 +117,9 @@ export async function PUT(
             address: poi.address,
             displayOrder: 0,
           });
+          console.log(`POI created successfully: ${poi.name}`);
+        } else {
+          console.log(`WARNING: Invalid category index ${categoryIndex} for POI: ${poi.name}. Available categories: ${categoryIds.length}`);
         }
       }
 

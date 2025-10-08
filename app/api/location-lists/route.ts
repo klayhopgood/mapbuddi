@@ -127,10 +127,13 @@ export async function POST(request: NextRequest) {
       // Create POIs
       console.log("Creating POIs...");
       for (const poi of pois) {
-        const categoryId = categoryIds[poi.categoryId || 0];
-        console.log(`Creating POI: ${poi.name} in category ${categoryId}`);
+        // Fix: Use poi.categoryId as array index to get the actual database category ID
+        const categoryIndex = poi.categoryId || 0;
+        const categoryId = categoryIds[categoryIndex];
+        console.log(`Creating POI: ${poi.name} with categoryIndex ${categoryIndex} -> categoryId ${categoryId}`);
+        console.log(`Available categoryIds:`, categoryIds);
         
-        if (categoryId) {
+        if (categoryId && categoryIndex < categoryIds.length) {
           await tx.insert(listPois).values({
             categoryId,
             name: poi.name,
@@ -144,7 +147,7 @@ export async function POST(request: NextRequest) {
           });
           console.log(`POI created successfully: ${poi.name}`);
         } else {
-          console.log(`WARNING: No category ID found for POI: ${poi.name}`);
+          console.log(`WARNING: Invalid category index ${categoryIndex} for POI: ${poi.name}. Available categories: ${categoryIds.length}`);
         }
       }
 
