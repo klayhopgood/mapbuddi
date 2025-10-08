@@ -129,8 +129,7 @@ export default async function StorefrontListDetails(props: {
           <ImageCarousel
             images={displayImages}
             altText={list.name}
-            aspectRatio="auto"
-            className="h-96"
+            aspectRatio="video"
             showCounter={displayImages.length > 1}
             showThumbnails={displayImages.length > 1}
           />

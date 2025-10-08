@@ -42,14 +42,15 @@ export const LocationListCard = (props: {
   return (
     <div key={props.storeAndLocationList.locationList.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
       <Link href={listPageLink}>
-        <ImageCarousel
-          images={displayImages}
-          altText={props.storeAndLocationList.locationList.name || "Location list"}
-          aspectRatio="video"
-          className="w-full h-48"
-          showCounter={displayImages.length > 1}
-          showThumbnails={false}
-        />
+        <div className="w-full h-48">
+          <ImageCarousel
+            images={displayImages}
+            altText={props.storeAndLocationList.locationList.name || "Location list"}
+            aspectRatio="video"
+            showCounter={displayImages.length > 1}
+            showThumbnails={false}
+          />
+        </div>
       </Link>
       
       <div className="mt-3">

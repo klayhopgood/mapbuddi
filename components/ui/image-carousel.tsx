@@ -52,6 +52,24 @@ export const ImageCarousel = ({
     setCurrentIndex(index);
   };
 
+  const handlePrevious = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    previousImage();
+  };
+
+  const handleNext = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    nextImage();
+  };
+
+  const handleThumbnailClick = (e: React.MouseEvent, index: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    goToImage(index);
+  };
+
   return (
     <div className={cn("space-y-2", className)}>
       {/* Main Image Display */}
@@ -71,14 +89,14 @@ export const ImageCarousel = ({
           {images.length > 1 && (
             <>
               <button
-                onClick={previousImage}
+                onClick={handlePrevious}
                 className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
                 aria-label="Previous image"
               >
                 <ChevronLeft size={16} />
               </button>
               <button
-                onClick={nextImage}
+                onClick={handleNext}
                 className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
                 aria-label="Next image"
               >
@@ -102,7 +120,7 @@ export const ImageCarousel = ({
           {images.map((image, index) => (
             <button
               key={index}
-              onClick={() => goToImage(index)}
+              onClick={(e) => handleThumbnailClick(e, index)}
               className={cn(
                 "relative flex-shrink-0 w-16 h-16 rounded border-2 overflow-hidden transition-all",
                 index === currentIndex 
@@ -127,7 +145,7 @@ export const ImageCarousel = ({
           {images.map((_, index) => (
             <button
               key={index}
-              onClick={() => goToImage(index)}
+              onClick={(e) => handleThumbnailClick(e, index)}
               className={cn(
                 "w-2 h-2 rounded-full transition-all",
                 index === currentIndex 
