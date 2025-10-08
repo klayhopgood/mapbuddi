@@ -48,6 +48,7 @@ const defaultValues = {
   country: null,
   cities: null,
   coverImage: null,
+  images: null,
   isActive: true, // New lists should be active by default
 };
 

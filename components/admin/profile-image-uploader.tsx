@@ -103,18 +103,15 @@ export const ProfileImageUploader = ({ currentImage, onImageUpdate }: ProfileIma
         {/* Upload Controls */}
         <div className="flex-1">
           <div className="space-y-2">
-            <label htmlFor="profile-image-upload">
+            <label htmlFor="profile-image-upload" className="cursor-pointer">
               <Button
                 type="button"
                 variant="outline"
                 disabled={isUploading}
-                className="cursor-pointer"
-                asChild
+                className="pointer-events-none"
               >
-                <span>
-                  {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {currentImage ? "Change Image" : "Upload Image"}
-                </span>
+                {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {currentImage ? "Change Image" : "Upload Image"}
               </Button>
             </label>
             <input

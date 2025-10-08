@@ -210,19 +210,16 @@ export const ListImageUploader = ({
 
         {canUploadMore && (
           <div>
-            <label htmlFor="list-images-upload">
+            <label htmlFor="list-images-upload" className="cursor-pointer">
               <Button
                 type="button"
                 variant="outline"
                 disabled={isUploading}
-                className="cursor-pointer"
-                asChild
+                className="pointer-events-none"
               >
-                <span>
-                  {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Images
-                </span>
+                {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Plus className="mr-2 h-4 w-4" />
+                Add Images
               </Button>
             </label>
             <input
