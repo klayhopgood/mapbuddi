@@ -17,6 +17,8 @@ import { getReviewsForList } from "@/server-actions/reviews";
 import { currentUser } from "@clerk/nextjs/server";
 import { LocationTags } from "@/components/ui/location-tags";
 import { ImageCarousel } from "@/components/ui/image-carousel";
+import { StaticMapPreview } from "@/components/ui/static-map-preview";
+import { generateStaticMapUrl } from "@/lib/static-map-utils";
 
 // Utility function to format email for display (first 3 chars + *** until @)
 function formatEmailForDisplay(email: string): string {
@@ -111,6 +113,19 @@ export default async function StorefrontListDetails(props: {
     .where(eq(listPois.categoryId, categories[0]?.id || 0))
     .limit(3);
 
+  // Get all POIs for map preview
+  const allPois = await db
+    .select({
+      id: listPois.id,
+      name: listPois.name,
+      latitude: listPois.latitude,
+      longitude: listPois.longitude,
+      address: listPois.address,
+    })
+    .from(listPois)
+    .innerJoin(listCategories, eq(listPois.categoryId, listCategories.id))
+    .where(eq(listCategories.listId, list.id));
+
   // Get review count for this list
   const reviewCountResult = await db
     .select({ count: count() })
@@ -121,6 +136,17 @@ export default async function StorefrontListDetails(props: {
 
   // Get reviews for the Reviews tab
   const reviews = await getReviewsForList(list.id);
+
+  // Generate static map URL for POI preview
+  const mapUrl = allPois.length > 0 
+    ? generateStaticMapUrl(
+        allPois.map(poi => ({
+          lat: parseFloat(poi.latitude),
+          lng: parseFloat(poi.longitude)
+        })),
+        process.env.GOOGLE_PLACES_API_KEY || ''
+      )
+    : '';
 
   return (
     <div className="flex flex-col gap-8">
@@ -193,6 +219,7 @@ export default async function StorefrontListDetails(props: {
         <div className="overflow-auto">
           <TabsList>
             <TabsTrigger value="preview">Preview Categories</TabsTrigger>
+            <TabsTrigger value="location">Preview Location</TabsTrigger>
             <TabsTrigger value="reviews">Reviews ({reviewCount})</TabsTrigger>
             <TabsTrigger value="seller">About the Creator</TabsTrigger>
           </TabsList>
@@ -235,6 +262,19 @@ export default async function StorefrontListDetails(props: {
                 </div>
               </div>
             )}
+          </div>
+        </TabsContent>
+        <TabsContent value="location" className="pt-2">
+          <div className="space-y-4">
+            <Text className="text-muted-foreground">
+              Map preview showing all {allPois.length} location{allPois.length !== 1 ? 's' : ''} in this list
+            </Text>
+            
+            <StaticMapPreview 
+              pois={allPois}
+              listName={list.name}
+              mapUrl={mapUrl}
+            />
           </div>
         </TabsContent>
         <TabsContent value="reviews" className="pt-2">
