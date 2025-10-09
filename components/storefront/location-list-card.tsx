@@ -14,6 +14,7 @@ import { addToCart } from "@/server-actions/add-to-cart";
 import { LocationTags } from "@/components/ui/location-tags";
 import { useUser } from "@clerk/nextjs";
 import { ImageCarousel } from "@/components/ui/image-carousel";
+import { getWanderListUrl } from "@/lib/wanderlist-utils";
 
 export const LocationListCard = (props: {
   storeAndLocationList: LocationListAndStore;
@@ -23,7 +24,7 @@ export const LocationListCard = (props: {
 }) => {
   const { formatDisplayPrice } = useCurrency();
   const { user } = useUser();
-  const listPageLink = `/list/${props.storeAndLocationList.locationList.id}`;
+  const listPageLink = getWanderListUrl(props.storeAndLocationList.locationList.name);
   
   // Check if current user owns this list
   const isOwnList = user?.id === props.storeAndLocationList.store.userId;
@@ -137,7 +138,7 @@ export const LocationListCard = (props: {
           <div className="flex-1">
             {isOwnList ? (
               <Button size="sm" variant="secondary" className="w-full" disabled>
-                Your List
+                Your WanderList
               </Button>
             ) : (
               <LocationListForm
@@ -151,7 +152,7 @@ export const LocationListCard = (props: {
           </div>
           <Link href={listPageLink} className="flex-1">
             <Button size="sm" className="w-full">
-              View List
+              View WanderList
             </Button>
           </Link>
         </div>

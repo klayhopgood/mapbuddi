@@ -32,9 +32,9 @@ export async function MenuItems() {
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <Link href={routes.lists} legacyBehavior passHref>
+          <Link href={routes.wanderlists} legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Location Lists
+              WanderLists
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>

@@ -5,8 +5,10 @@ export const routes = {
   helpCentre: "/help-centre",
   products: "/products",
   product: "/product",
-  lists: "/lists",
-  list: "/list",
+  lists: "/lists", // Keep for backwards compatibility
+  list: "/list",   // Keep for backwards compatibility
+  wanderlists: "/wanderlists",
+  wanderlist: "/wanderlists",
   productQuickView: "/quickview/product",
   seller: "/seller",
   cart: "/cart",
