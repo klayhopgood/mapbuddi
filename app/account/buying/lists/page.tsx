@@ -82,14 +82,14 @@ async function getUserListsData(userId: string, userEmail: string) {
   }
 }
 
-export default async function YourListsPage() {
+export default async function YourWanderListsPage() {
   const user = await currentUser();
   
   if (!user) {
     return (
       <InfoCard
         heading="Authentication Required"
-        subheading="Please sign in to view your lists."
+        subheading="Please sign in to view your WanderLists."
         icon={<Box size={30} />}
       />
     );
@@ -116,8 +116,8 @@ export default async function YourListsPage() {
       {/* Header */}
       <div>
         <HeadingAndSubheading
-          heading="Your Lists"
-          subheading="Manage your purchased location lists and sync them to your maps"
+          heading="Your WanderLists"
+          subheading="Manage your purchased WanderLists and sync them to your maps"
         />
       </div>
 
@@ -131,9 +131,9 @@ export default async function YourListsPage() {
       {purchasedLists.length > 0 ? (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-semibold mb-2">Your Location Lists</h2>
+            <h2 className="text-2xl font-semibold mb-2">Your WanderLists</h2>
             <p className="text-muted-foreground">
-              Toggle sync for each list to add them to your connected maps apps
+              Toggle sync for each WanderList to add them to your connected maps apps
             </p>
           </div>
           
@@ -146,8 +146,8 @@ export default async function YourListsPage() {
         </div>
       ) : (
         <InfoCard
-          heading="No Location Lists"
-          subheading="You haven't purchased any location lists yet. Browse our marketplace to discover curated POI collections."
+          heading="No WanderLists"
+          subheading="You haven't purchased any WanderLists yet. Browse our marketplace to discover curated POI collections."
           icon={<MapPin size={30} />}
         />
       )}

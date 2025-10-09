@@ -33,12 +33,12 @@ export function SubscriptionPrompt({ isOpen, onClose, listName }: SubscriptionPr
               <strong>&ldquo;{listName}&rdquo;</strong> has been saved as a draft.
             </p>
             <p>
-              To make your location lists visible to customers and start earning money, you need an active MapBuddi membership. You can then manually activate each list when it&apos;s ready.
+              To make your WanderLists visible to customers and start earning money, you need an active MapBuddi membership. You can then manually activate each WanderList when it&apos;s ready.
             </p>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
               <h4 className="font-medium text-blue-900 mb-1">MapBuddi Membership - $19/month</h4>
               <ul className="text-sm text-blue-800 space-y-1">
-                <li>• Unlimited active location lists</li>
+                <li>• Unlimited active WanderLists</li>
                 <li>• Full selling capabilities</li>
                 <li>• Automatic payout processing</li>
                 <li>• Cancel anytime</li>

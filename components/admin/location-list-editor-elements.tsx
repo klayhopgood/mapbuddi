@@ -281,7 +281,7 @@ export const LocationListEditorElements = (props: {
       if (data.error) {
         toast({
           title: "Error",
-          description: data.message || "Failed to save location list",
+          description: data.message || "Failed to save WanderList",
           variant: "destructive",
         });
       } else {
@@ -292,8 +292,8 @@ export const LocationListEditorElements = (props: {
           toast({
             title: "Success",
             description: props.listStatus === "existing-list" 
-              ? "Location list updated successfully!" 
-              : "Location list created successfully!",
+              ? "WanderList updated successfully!" 
+              : "WanderList created successfully!",
           });
           
           // Don't redirect - keep user on the edit page
@@ -315,10 +315,10 @@ export const LocationListEditorElements = (props: {
   return (
     <div className="max-w-4xl">
       <HeadingAndSubheading
-        heading={props.listStatus === "new-list" ? "Create Location List" : "Edit Location List"}
+        heading={props.listStatus === "new-list" ? "Create WanderList" : "Edit WanderList"}
         subheading={props.listStatus === "new-list" 
-          ? "Create a curated list of locations for your customers" 
-          : "Update your location list details and POIs"
+          ? "Create a curated WanderList for your customers" 
+          : "Update your WanderList details and POIs"
         }
       />
 
@@ -334,12 +334,12 @@ export const LocationListEditorElements = (props: {
             <Card>
               <CardHeader>
                 <CardTitle>Basic Information</CardTitle>
-                <CardDescription>Set up the basic details for your location list</CardDescription>
+                <CardDescription>Set up the basic details for your WanderList</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    List Name <span className="text-red-500">*</span>
+                    WanderList Name <span className="text-red-500">*</span>
                   </label>
                   <Input
                     placeholder="e.g., Best of Lisbon"
@@ -354,7 +354,7 @@ export const LocationListEditorElements = (props: {
                     Description <span className="text-red-500">*</span>
                   </label>
                   <Textarea
-                    placeholder="Describe what makes this location list special..."
+                    placeholder="Describe what makes this WanderList special..."
                     value={formValues.description || ""}
                     onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
                     rows={3}
@@ -398,7 +398,7 @@ export const LocationListEditorElements = (props: {
                     maxImages={10}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Upload at least 3 images from your trip to showcase your location list. These will be displayed on list cards and the list detail page.
+                    Upload at least 3 images from your trip to showcase your WanderList. These will be displayed on WanderList cards and the WanderList detail page.
                   </p>
                   {listImages.length < 3 && (
                     <p className="text-xs text-red-500 mt-1">
@@ -415,7 +415,7 @@ export const LocationListEditorElements = (props: {
                     onChange={(e) => setFormValues({ ...formValues, isActive: e.target.checked })}
                   />
                   <label htmlFor="isActive" className="text-sm">
-                    Publish list (make it available for purchase)
+                    Publish WanderList (make it available for purchase)
                   </label>
                 </div>
               </CardContent>
@@ -512,7 +512,7 @@ export const LocationListEditorElements = (props: {
           </Button>
           <Button type="submit" disabled={isLoading}>
             {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-            {props.listStatus === "new-list" ? "Create List" : "Update List"}
+            {props.listStatus === "new-list" ? "Create WanderList" : "Update WanderList"}
           </Button>
         </div>
       </form>

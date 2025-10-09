@@ -37,30 +37,30 @@ async function getData(): Promise<LocationListData[]> {
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export default async function LocationListsPage() {
+export default async function WanderListsPage() {
   const listsList = await getData();
 
   return (
     <>
       <div className="flex items-start justify-between">
         <HeadingAndSubheading
-          heading="Location Lists"
-          subheading="View and manage your curated location lists"
+          heading="WanderLists"
+          subheading="View and manage your curated WanderLists"
         />
         <Link href="/account/selling/lists/new">
           <Button>
-            New List <Plus size={18} className="ml-2" />
+            New WanderList <Plus size={18} className="ml-2" />
           </Button>
         </Link>
       </div>
       {listsList.length === 0 ? (
         <InfoCard
-          heading="You don't have any location lists yet"
-          subheading="Create your first curated location list to get started"
+          heading="You don't have any WanderLists yet"
+          subheading="Create your first curated WanderList to get started"
           icon={<MapPin size={36} className="text-gray-600" />}
           button={
             <Link href="/account/selling/lists/new">
-              <Button size="sm">Create List</Button>
+              <Button size="sm">Create WanderList</Button>
             </Link>
           }
         />

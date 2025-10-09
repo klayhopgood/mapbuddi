@@ -23,7 +23,7 @@ export type LocationListData = {
 export const columns: ColumnDef<LocationListData>[] = [
   {
     accessorKey: "name",
-    header: "List Name",
+    header: "WanderList Name",
     cell: ({ row }) => {
       return (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 min-w-0">

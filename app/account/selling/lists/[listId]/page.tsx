@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-async function getLocationList(listId: number) {
+async function getWanderList(listId: number) {
   const user = await currentUser();
   if (!user) {
     redirect('/auth/sign-in');
@@ -16,7 +16,7 @@ async function getLocationList(listId: number) {
     redirect('/account/selling');
   }
 
-  // Get the location list
+  // Get the WanderList
   const [list] = await db
     .select()
     .from(locationLists)
@@ -46,13 +46,13 @@ async function getLocationList(listId: number) {
   };
 }
 
-export default async function EditLocationListPage({ 
+export default async function EditWanderListPage({ 
   params 
 }: { 
   params: { listId: string } 
 }) {
   const listId = parseInt(params.listId);
-  const { list, categories, pois } = await getLocationList(listId);
+  const { list, categories, pois } = await getWanderList(listId);
 
   return (
     <LocationListEditor 
