@@ -10,6 +10,7 @@ import { LocationList, locationLists, stores, listCategories, listPois, listRevi
 import { formatPrice } from "@/lib/currency";
 import { eq, and, count } from "drizzle-orm";
 import Link from "next/link";
+import Image from "next/image";
 import { routes } from "@/lib/routes";
 import { addToCart } from "@/server-actions/add-to-cart";
 import { MapPin, Star } from "lucide-react";
@@ -173,10 +174,12 @@ export default async function StorefrontListDetails(props: {
             </Link>
           </Text>
             {store.profileImage && (
-              <img
+              <Image
                 src={store.profileImage}
                 alt={`${store.name} profile`}
-                className="w-5 h-5 rounded-full object-cover flex-shrink-0"
+                width={20}
+                height={20}
+                className="rounded-full object-cover flex-shrink-0"
               />
             )}
           </div>
@@ -349,10 +352,12 @@ export default async function StorefrontListDetails(props: {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   {store.profileImage && (
-                    <img
+                    <Image
                       src={store.profileImage}
                       alt={`${store.name} profile`}
-                      className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                      width={48}
+                      height={48}
+                      className="rounded-full object-cover flex-shrink-0"
                     />
                   )}
                   <div>

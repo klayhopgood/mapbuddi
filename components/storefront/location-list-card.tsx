@@ -3,6 +3,7 @@
 import { Text } from "../ui/text";
 import { MapPin, Star } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "../ui/button";
 import { LocationListAndStore } from "@/lib/collection-types";
 import { Badge } from "../ui/badge";
@@ -109,10 +110,12 @@ export const LocationListCard = (props: {
               )}
             </Text>
             {props.storeAndLocationList.store.profileImage && (
-              <img
+              <Image
                 src={props.storeAndLocationList.store.profileImage}
                 alt={`${props.storeAndLocationList.store.name} profile`}
-                className="w-4 h-4 rounded-full object-cover flex-shrink-0"
+                width={16}
+                height={16}
+                className="rounded-full object-cover flex-shrink-0"
               />
             )}
           </div>

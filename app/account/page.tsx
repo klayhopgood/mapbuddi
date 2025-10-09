@@ -36,7 +36,7 @@ function SellingOverview() {
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4">Share Your Travel Stories</h1>
         <p className="text-lg text-muted-foreground mb-8">
-          You've wandered through hidden alleyways, discovered that perfect sunset spot, and found the café locals actually visit. Your adventures have given you something precious—authentic knowledge that can transform someone else's journey.
+          You&apos;ve wandered through hidden alleyways, discovered that perfect sunset spot, and found the café locals actually visit. Your adventures have given you something precious—authentic knowledge that can transform someone else&apos;s journey.
         </p>
         <div className="flex gap-4 justify-center">
           <Link href="/account/selling/lists">
@@ -101,7 +101,7 @@ function SellingOverview() {
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>Share the magic of places you've loved</span>
+                <span>Share the magic of places you&apos;ve loved</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
