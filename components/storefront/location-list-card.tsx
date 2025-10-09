@@ -110,13 +110,15 @@ export const LocationListCard = (props: {
               )}
             </Text>
             {props.storeAndLocationList.store.profileImage && (
-              <Image
-                src={props.storeAndLocationList.store.profileImage}
-                alt={`${props.storeAndLocationList.store.name} profile`}
-                width={24}
-                height={24}
-                className="rounded-full object-cover flex-shrink-0"
-              />
+              <div className="w-[30px] h-[30px] rounded-full overflow-hidden flex-shrink-0">
+                <Image
+                  src={props.storeAndLocationList.store.profileImage}
+                  alt={`${props.storeAndLocationList.store.name} profile`}
+                  width={30}
+                  height={30}
+                  className="w-full h-full object-cover"
+                />
+              </div>
             )}
           </div>
         </div>

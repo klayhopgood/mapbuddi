@@ -174,13 +174,15 @@ export default async function StorefrontListDetails(props: {
             </Link>
           </Text>
             {store.profileImage && (
-              <Image
-                src={store.profileImage}
-                alt={`${store.name} profile`}
-                width={32}
-                height={32}
-                className="rounded-full object-cover flex-shrink-0"
-              />
+              <div className="w-[30px] h-[30px] rounded-full overflow-hidden flex-shrink-0">
+                <Image
+                  src={store.profileImage}
+                  alt={`${store.name} profile`}
+                  width={30}
+                  height={30}
+                  className="w-full h-full object-cover"
+                />
+              </div>
             )}
           </div>
           
@@ -352,13 +354,15 @@ export default async function StorefrontListDetails(props: {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   {store.profileImage && (
-                    <Image
-                      src={store.profileImage}
-                      alt={`${store.name} profile`}
-                      width={64}
-                      height={64}
-                      className="rounded-full object-cover flex-shrink-0"
-                    />
+                    <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                      <Image
+                        src={store.profileImage}
+                        alt={`${store.name} profile`}
+                        width={64}
+                        height={64}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   )}
                   <div>
                     <Heading size="h3">{store.name}</Heading>
