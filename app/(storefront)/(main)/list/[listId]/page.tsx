@@ -177,8 +177,8 @@ export default async function StorefrontListDetails(props: {
               <Image
                 src={store.profileImage}
                 alt={`${store.name} profile`}
-                width={20}
-                height={20}
+                width={32}
+                height={32}
                 className="rounded-full object-cover flex-shrink-0"
               />
             )}
@@ -355,8 +355,8 @@ export default async function StorefrontListDetails(props: {
                     <Image
                       src={store.profileImage}
                       alt={`${store.name} profile`}
-                      width={48}
-                      height={48}
+                      width={64}
+                      height={64}
                       className="rounded-full object-cover flex-shrink-0"
                     />
                   )}

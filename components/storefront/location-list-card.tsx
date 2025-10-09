@@ -113,8 +113,8 @@ export const LocationListCard = (props: {
               <Image
                 src={props.storeAndLocationList.store.profileImage}
                 alt={`${props.storeAndLocationList.store.name} profile`}
-                width={16}
-                height={16}
+                width={24}
+                height={24}
                 className="rounded-full object-cover flex-shrink-0"
               />
             )}
