@@ -7,6 +7,7 @@ import { MapPin, Star } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DeleteListButton } from "@/components/admin/delete-list-button";
+import { ListActionButtons } from "@/components/admin/copy-list-link-button";
 
 export type LocationListData = {
   id: number;
@@ -25,14 +26,23 @@ export const columns: ColumnDef<LocationListData>[] = [
     header: "List Name",
     cell: ({ row }) => {
       return (
-        <div className="flex items-center space-x-2">
-          <MapPin size={16} className="text-gray-500" />
-          <Link 
-            href={`/account/selling/lists/${row.original.id}`}
-            className="font-medium hover:text-blue-600"
-          >
-            {row.getValue("name")}
-          </Link>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 min-w-0">
+          <div className="flex items-center space-x-2 min-w-0">
+            <MapPin size={16} className="text-gray-500 flex-shrink-0" />
+            <Link 
+              href={`/account/selling/lists/${row.original.id}`}
+              className="font-medium hover:text-blue-600 truncate"
+            >
+              {row.getValue("name")}
+            </Link>
+          </div>
+          <div className="flex-shrink-0">
+            <ListActionButtons
+              listId={row.original.id}
+              listName={row.original.name}
+              isActive={row.original.isActive}
+            />
+          </div>
         </div>
       );
     },
@@ -57,7 +67,10 @@ export const columns: ColumnDef<LocationListData>[] = [
       const count = row.getValue("totalPois") as number;
       return (
         <div className="text-center">
-          <Badge variant="secondary">{count} places</Badge>
+          <Badge variant="secondary" className="text-xs">
+            <span className="sm:hidden">{count}</span>
+            <span className="hidden sm:inline">{count} places</span>
+          </Badge>
         </div>
       );
     },
@@ -95,7 +108,7 @@ export const columns: ColumnDef<LocationListData>[] = [
     header: "Created",
     cell: ({ row }) => {
       const date = row.getValue("createdAt") as Date;
-      return <div>{date.toLocaleDateString()}</div>;
+      return <div className="hidden md:block">{date.toLocaleDateString()}</div>;
     },
   },
   {
@@ -103,9 +116,9 @@ export const columns: ColumnDef<LocationListData>[] = [
     header: "Actions",
     cell: ({ row }) => {
       return (
-        <div className="flex space-x-2">
+        <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
           <Link href={`/account/selling/lists/${row.original.id}`}>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto text-xs">
               Edit
             </Button>
           </Link>

@@ -78,6 +78,7 @@ export default async function StorefrontListDetails(props: {
       userId: stores.userId,
       website: stores.website,
       socialLinks: stores.socialLinks,
+      profileImage: stores.profileImage,
     })
     .from(stores)
     .where(eq(stores.id, Number(list.storeId)))
@@ -162,7 +163,8 @@ export default async function StorefrontListDetails(props: {
         </div>
         <div className="md:col-span-5 w-full">
           <Heading size="h2">{list.name}</Heading>
-          <Text className="text-sm mt-2">
+          <div className="flex items-center gap-2 text-sm mt-2">
+            <Text>
             Created by{" "}
             <Link href={`/profile/${store.slug}`}>
               <span className="text-blue-600 hover:text-blue-800 hover:underline">
@@ -170,6 +172,14 @@ export default async function StorefrontListDetails(props: {
               </span>
             </Link>
           </Text>
+            {store.profileImage && (
+              <img
+                src={store.profileImage}
+                alt={`${store.name} profile`}
+                className="w-5 h-5 rounded-full object-cover flex-shrink-0"
+              />
+            )}
+          </div>
           
           <div className="flex items-center gap-4 my-3">
             <div className="flex items-center gap-1">
@@ -215,37 +225,44 @@ export default async function StorefrontListDetails(props: {
         </div>
       </div>
       
-      <Tabs defaultValue="preview">
+      <Tabs defaultValue="location">
         <div className="overflow-auto">
           <TabsList>
-            <TabsTrigger value="preview">Preview Categories</TabsTrigger>
             <TabsTrigger value="location">Preview Location</TabsTrigger>
             <TabsTrigger value="reviews">Reviews ({reviewCount})</TabsTrigger>
+            <TabsTrigger value="preview">Preview Categories</TabsTrigger>
             <TabsTrigger value="seller">About the Creator</TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="preview" className="pt-2">
           <div className="space-y-4">
+            {(() => {
+              const categoriesWithPois = categoryPoisCounts.filter(category => category.poiCount > 0);
+              return (
+                <>
             <Text className="text-muted-foreground">
-              This location list contains {categoryPoisCounts.length} categories with {list.totalPois} total locations.
+                    This location list contains {categoriesWithPois.length} categories with {list.totalPois} total locations.
             </Text>
             
             <div className="grid gap-3">
-              {categoryPoisCounts.map((category) => (
+                    {categoriesWithPois.map((category) => (
                 <div key={category.id} className="flex items-center gap-3 p-3 border rounded-lg">
                   <span className="text-2xl">{category.emoji}</span>
-                  <div className="flex-1">
+                        <div className="flex-1">
                     <Text className="font-medium">{category.name}</Text>
                     <Text className="text-sm text-muted-foreground">
-                      {category.poiCount} location{category.poiCount !== 1 ? 's' : ''} in this category
+                            {category.poiCount} location{category.poiCount !== 1 ? 's' : ''} in this category
                     </Text>
                   </div>
-                  <Badge variant="secondary" className="ml-auto">
-                    {category.poiCount}
-                  </Badge>
+                        <Badge variant="secondary" className="ml-auto">
+                          {category.poiCount}
+                        </Badge>
                 </div>
               ))}
             </div>
+                </>
+              );
+            })()}
 
             {samplePois.length > 0 && (
               <div className="mt-6">
@@ -330,9 +347,18 @@ export default async function StorefrontListDetails(props: {
           <div className="space-y-6">
             <div className="border rounded-lg p-6">
               <div className="flex items-start justify-between mb-4">
-                <div>
-                  <Heading size="h3">{store.name}</Heading>
-                  <Text className="text-muted-foreground mt-1">Location List Creator</Text>
+                <div className="flex items-center gap-3">
+                  {store.profileImage && (
+                    <img
+                      src={store.profileImage}
+                      alt={`${store.name} profile`}
+                      className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                    />
+                  )}
+                  <div>
+                    <Heading size="h3">{store.name}</Heading>
+                    <Text className="text-muted-foreground mt-1">Location List Creator</Text>
+                  </div>
                 </div>
                 <Link 
                   href={`/profile/${store.slug}`}

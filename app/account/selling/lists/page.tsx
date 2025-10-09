@@ -66,8 +66,10 @@ export default async function LocationListsPage() {
         />
       ) : (
         <>
-          <div className="pt-4">
-            <DataTable columns={columns} data={listsList} />
+          <div className="pt-4 overflow-x-auto">
+            <div className="min-w-full">
+              <DataTable columns={columns} data={listsList} />
+            </div>
           </div>
         </>
       )}

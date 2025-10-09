@@ -34,15 +34,15 @@ function SellingOverview() {
   return (
     <div className="max-w-4xl mx-auto space-y-12">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Start Selling Location Lists</h1>
+        <h1 className="text-4xl font-bold mb-4">Share Your Travel Stories</h1>
         <p className="text-lg text-muted-foreground mb-8">
-          Turn your local knowledge into income by creating and selling curated location lists to travelers and locals alike.
+          You've wandered through hidden alleyways, discovered that perfect sunset spot, and found the café locals actually visit. Your adventures have given you something precious—authentic knowledge that can transform someone else's journey.
         </p>
         <div className="flex gap-4 justify-center">
           <Link href="/account/selling/lists">
-            <Button size="lg">Create Your First List</Button>
+            <Button size="lg">Create Your First Guide</Button>
           </Link>
-          <Link href="/">
+          <Link href={routes.helpCentre}>
             <Button variant="outline" size="lg">Learn More</Button>
           </Link>
         </div>
@@ -53,30 +53,30 @@ function SellingOverview() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MapPin className="h-5 w-5" />
-              What You Can Sell
+              Your Experiences Matter
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>Best restaurants in your city</span>
+                <span>That neighborhood bistro where you became a regular</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>Hidden gems and local favorites</span>
+                <span>The viewpoint you stumbled upon at golden hour</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>Tourist attractions and activities</span>
+                <span>Markets where vendors remember your name</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>Shopping districts and markets</span>
+                <span>Secret spots that made your heart skip</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>Entertainment and nightlife spots</span>
+                <span>Cultural experiences that changed your perspective</span>
               </li>
             </ul>
           </CardContent>
@@ -85,31 +85,31 @@ function SellingOverview() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5" />
-              Earning Potential
+              <Users className="h-5 w-5" />
+              Join Our Travel Community
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>Set your own prices</span>
+                <span>Connect with fellow wanderers worldwide</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>Earn from multiple list sales</span>
+                <span>Help others discover authentic experiences</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>Build a passive income stream</span>
+                <span>Share the magic of places you've loved</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>Monthly subscription revenue</span>
+                <span>Build lasting connections through travel stories</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>Keep 85% of your sales</span>
+                <span>Become part of a trusted traveler network</span>
               </li>
             </ul>
           </CardContent>
@@ -117,21 +117,21 @@ function SellingOverview() {
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold mb-6 text-center">Getting Started in 4 Steps</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">Your Journey to Sharing in 4 Steps</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="text-center">
             <CardHeader>
               <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-2">
                 <Users className="h-6 w-6 text-primary-foreground" />
               </div>
-              <CardTitle className="text-lg">1. Set Up Profile</CardTitle>
+              <CardTitle className="text-lg">1. Introduce Yourself</CardTitle>
             </CardHeader>
             <CardContent>
               <CardDescription className="mb-4">
-                Create your seller profile and verify your identity
+                Share who you are and what makes your travel perspective unique
               </CardDescription>
               <Link href="/account/selling/profile">
-                <Button variant="outline" size="sm">Set Up Profile</Button>
+                <Button variant="outline" size="sm">Create Profile</Button>
               </Link>
             </CardContent>
           </Card>
@@ -141,11 +141,11 @@ function SellingOverview() {
               <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-2">
                 <DollarSign className="h-6 w-6 text-primary-foreground" />
               </div>
-              <CardTitle className="text-lg">2. Payment Setup</CardTitle>
+              <CardTitle className="text-lg">2. Set Up Payments</CardTitle>
             </CardHeader>
             <CardContent>
               <CardDescription className="mb-4">
-                Connect your payment method to receive earnings
+                Connect your account so the community can support your contributions
               </CardDescription>
               <Link href="/account/selling/payments">
                 <Button variant="outline" size="sm">Setup Payments</Button>
@@ -158,14 +158,14 @@ function SellingOverview() {
               <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-2">
                 <MapPin className="h-6 w-6 text-primary-foreground" />
               </div>
-              <CardTitle className="text-lg">3. Create Lists</CardTitle>
+              <CardTitle className="text-lg">3. Curate Your Stories</CardTitle>
             </CardHeader>
             <CardContent>
               <CardDescription className="mb-4">
-                Build your first location list with places you know
+                Transform your favorite memories into guides others can follow
               </CardDescription>
               <Link href="/account/selling/lists">
-                <Button variant="outline" size="sm">Create Lists</Button>
+                <Button variant="outline" size="sm">Share Experiences</Button>
               </Link>
             </CardContent>
           </Card>
@@ -175,14 +175,14 @@ function SellingOverview() {
               <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-2">
                 <BarChart3 className="h-6 w-6 text-primary-foreground" />
               </div>
-              <CardTitle className="text-lg">4. Track Sales</CardTitle>
+              <CardTitle className="text-lg">4. Watch the Impact</CardTitle>
             </CardHeader>
             <CardContent>
               <CardDescription className="mb-4">
-                Monitor your earnings and optimize your listings
+                See how your shared experiences inspire other travelers
               </CardDescription>
               <Link href="/account/selling/orders">
-                <Button variant="outline" size="sm">View Dashboard</Button>
+                <Button variant="outline" size="sm">View Impact</Button>
               </Link>
             </CardContent>
           </Card>
@@ -192,14 +192,14 @@ function SellingOverview() {
       <div className="text-center">
         <Card className="bg-muted">
           <CardHeader>
-            <CardTitle>Need Help Getting Started?</CardTitle>
+            <CardTitle>Ready to Inspire Fellow Travelers?</CardTitle>
             <CardDescription>
-              Our comprehensive help center has guides, tutorials, and FAQs to help you succeed as a seller.
+              Join a community of authentic travelers sharing the places and experiences that have touched their hearts. Every guide you create helps someone discover the world through your eyes.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Link href={routes.helpCentre}>
-              <Button>Visit Help Center</Button>
+              <Button>Get Started Today</Button>
             </Link>
           </CardContent>
         </Card>
@@ -220,7 +220,7 @@ function BuyingOverview() {
           <Link href="/lists">
             <Button size="lg">Browse Lists</Button>
           </Link>
-          <Link href="/">
+          <Link href={routes.helpCentre}>
             <Button variant="outline" size="lg">Learn More</Button>
           </Link>
         </div>

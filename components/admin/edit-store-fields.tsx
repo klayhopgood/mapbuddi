@@ -68,6 +68,33 @@ export const EditStoreFields = (props: {
     setIsLoading(true);
 
     try {
+      // Validate required fields
+      if (!profileImage) {
+        toast({
+          title: "Profile image required",
+          description: "You must upload a profile image to sell on MapBuddi.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Check if at least one social link or website is provided
+      const hasWebsite = website && website.trim().length > 0;
+      const hasYoutube = youtubeHandle && youtubeHandle.trim().length > 0;
+      const hasInstagram = instagramHandle && instagramHandle.trim().length > 0;
+      const hasTiktok = tiktokHandle && tiktokHandle.trim().length > 0;
+      
+      if (!hasWebsite && !hasYoutube && !hasInstagram && !hasTiktok) {
+        toast({
+          title: "Verified channel required",
+          description: "You must provide at least one website or social media link to sell on MapBuddi.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // Build social links object from individual states
       const socialLinksObject = {
         youtube: youtubeHandle,
@@ -298,13 +325,19 @@ export const EditStoreFields = (props: {
                 </div>
               </div>
               
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <h4 className="font-medium text-red-800 mb-2">Required Fields</h4>
+                <p className="text-sm text-red-700">
+                  You must have at least 1 Verified Channel (website or social link) and a profile image to sell on MapBuddi.
+                </p>
+              </div>
+              
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-medium text-blue-800 mb-2">Social Links Display</h4>
                 <ul className="text-sm text-blue-700 space-y-1">
                   <li>• Your social handles will appear on your public profile</li>
                   <li>• Use the format @username for social platforms</li>
                   <li>• Include https:// for website URLs</li>
-                  <li>• All fields are optional</li>
                 </ul>
               </div>
             </div>

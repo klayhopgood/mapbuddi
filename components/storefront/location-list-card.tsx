@@ -94,19 +94,28 @@ export const LocationListCard = (props: {
         )}
 
         <div className="mt-2">
-          <Text className="text-xs text-gray-500">
-            by{" "}
-            {props.storeAndLocationList.store.slug ? (
-              <Link 
-                href={`/profile/${props.storeAndLocationList.store.slug}`}
-                className="text-blue-600 hover:text-blue-800 hover:underline"
-              >
-                {props.storeAndLocationList.store.name || "Unknown Seller"}
-              </Link>
-            ) : (
-              <span>{props.storeAndLocationList.store.name || "Unknown Seller"}</span>
+          <div className="flex items-center gap-2">
+            <Text className="text-xs text-gray-500">
+              by{" "}
+              {props.storeAndLocationList.store.slug ? (
+                <Link 
+                  href={`/profile/${props.storeAndLocationList.store.slug}`}
+                  className="text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  {props.storeAndLocationList.store.name || "Unknown Seller"}
+                </Link>
+              ) : (
+                <span>{props.storeAndLocationList.store.name || "Unknown Seller"}</span>
+              )}
+            </Text>
+            {props.storeAndLocationList.store.profileImage && (
+              <img
+                src={props.storeAndLocationList.store.profileImage}
+                alt={`${props.storeAndLocationList.store.name} profile`}
+                className="w-4 h-4 rounded-full object-cover flex-shrink-0"
+              />
             )}
-          </Text>
+          </div>
         </div>
 
         {/* Location Tags */}

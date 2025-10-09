@@ -56,9 +56,6 @@ export const ShoppingCartHeader = async () => {
             ? `(${numberOfCartItems})`
             : ""}
         </SheetTitle>
-        <SheetDescription className="border border-border bg-secondary p-2 rounded-md flex items-center justify-center text-center py-3">
-          Free shipping on all orders over $50
-        </SheetDescription>
       </SheetHeader>
       {numberOfCartItems && numberOfCartItems > 0 ? (
         <div className="flex flex-col gap-6 mt-6">
