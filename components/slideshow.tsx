@@ -40,12 +40,12 @@ export const SlideShow = () => {
         <div className="absolute w-full h-full bg-translucentDark top-0 bottom-0 left-0 right-0">
           <div className="absolute md:top-0 bottom-0 right-0 left-0 m-auto w-fit h-fit text-center">
             <div className="bg-white md:border border-border md:rounded-md py-8 px-16 flex flex-col gap-3">
-              <p className="uppercase font-medium tracking-wide">Location Lists</p>
+              <p className="uppercase font-medium tracking-wide">WanderLists</p>
               <div className="flex flex-col gap-2 mb-2">
                 <p className="text-3xl font-bold">
-                  Personalised Lists of the best places from the best Travellers
+                  Personalised WanderLists of the best places from the best Travellers
                 </p>
-                <p>Find a list that matches your style, download, sync to Google Maps and explore with ease!</p>
+                <p>Find a WanderList that matches your style, download, sync to Google Maps and explore with ease!</p>
               </div>
               <div className="flex gap-4 justify-center flex-wrap">
                 <Link href={`${routes.helpCentre}?tab=buyers`}>
@@ -54,8 +54,8 @@ export const SlideShow = () => {
                 <Link href={`${routes.helpCentre}?tab=sellers`}>
                   <Button variant="outline">How to Sell</Button>
                 </Link>
-                <Link href={routes.lists}>
-                  <Button>Explore Lists</Button>
+                <Link href={routes.wanderlists}>
+                  <Button>Explore WanderLists</Button>
                 </Link>
               </div>
             </div>

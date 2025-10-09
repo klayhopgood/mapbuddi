@@ -212,13 +212,13 @@ function BuyingOverview() {
   return (
     <div className="max-w-4xl mx-auto space-y-12">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Discover & Integrate Location Lists</h1>
+        <h1 className="text-4xl font-bold mb-4">Discover & Integrate WanderLists</h1>
         <p className="text-lg text-muted-foreground mb-8">
-          Find curated location lists from local experts and seamlessly integrate them into Google Maps for your next adventure.
+          Find curated WanderLists from local experts and seamlessly integrate them into Google Maps for your next adventure.
         </p>
         <div className="flex gap-4 justify-center">
-          <Link href="/lists">
-            <Button size="lg">Browse Lists</Button>
+          <Link href="/wanderlists">
+            <Button size="lg">Browse WanderLists</Button>
           </Link>
           <Link href={routes.helpCentre}>
             <Button variant="outline" size="lg">Learn More</Button>
@@ -238,7 +238,7 @@ function BuyingOverview() {
             <ul className="space-y-2">
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>Expertly curated location lists</span>
+                <span>Expertly curated WanderLists</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
@@ -271,7 +271,7 @@ function BuyingOverview() {
             <ul className="space-y-2">
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                <span>Quality guarantee on all lists</span>
+                <span>Quality guarantee on all WanderLists</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
@@ -306,10 +306,10 @@ function BuyingOverview() {
             </CardHeader>
             <CardContent>
               <CardDescription className="mb-4">
-                Explore curated lists and purchase the ones that interest you
+                Explore curated WanderLists and purchase the ones that interest you
               </CardDescription>
-              <Link href="/lists">
-                <Button variant="outline" size="sm">Browse Lists</Button>
+              <Link href="/wanderlists">
+                <Button variant="outline" size="sm">Browse WanderLists</Button>
               </Link>
             </CardContent>
           </Card>
@@ -323,10 +323,10 @@ function BuyingOverview() {
             </CardHeader>
             <CardContent>
               <CardDescription className="mb-4">
-                Connect your Google account and sync lists directly to Google Maps
+                Connect your Google account and sync WanderLists directly to Google Maps
               </CardDescription>
               <Link href="/account/buying/lists">
-                <Button variant="outline" size="sm">Manage Lists</Button>
+                <Button variant="outline" size="sm">Manage WanderLists</Button>
               </Link>
             </CardContent>
           </Card>
@@ -340,7 +340,7 @@ function BuyingOverview() {
             </CardHeader>
             <CardContent>
               <CardDescription className="mb-4">
-                Use your integrated lists on any device with Google Maps
+                Use your integrated WanderLists on any device with Google Maps
               </CardDescription>
               <Link href="/account/buying/purchases">
                 <Button variant="outline" size="sm">View Purchases</Button>
@@ -355,7 +355,7 @@ function BuyingOverview() {
           <CardHeader>
             <CardTitle>Need Help with Integration?</CardTitle>
             <CardDescription>
-              Our step-by-step guides will help you get the most out of your purchased location lists.
+              Our step-by-step guides will help you get the most out of your purchased WanderLists.
             </CardDescription>
           </CardHeader>
           <CardContent>
