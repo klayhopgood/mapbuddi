@@ -101,15 +101,17 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
             {/* Profile Picture */}
             <div className="flex-shrink-0">
               {store.profileImage ? (
-                <Image
-                  src={store.profileImage}
-                  alt={`${store.name} profile`}
-                  width={120}
-                  height={120}
-                  className="rounded-full object-cover border-4 border-white shadow-lg"
-                />
+                <div className="max-w-[120px] max-h-[120px] border-4 border-white shadow-lg rounded-lg overflow-hidden">
+                  <Image
+                    src={store.profileImage}
+                    alt={`${store.name} profile`}
+                    width={120}
+                    height={120}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               ) : (
-                <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center border-4 border-white shadow-lg">
+                <div className="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center border-4 border-white shadow-lg">
                   <User size={48} className="text-gray-400" />
                 </div>
               )}
