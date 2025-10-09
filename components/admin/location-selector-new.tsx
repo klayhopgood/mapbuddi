@@ -190,7 +190,7 @@ export function LocationSelector({ selectedCountry, selectedCities = [], onLocat
             </Button>
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            Add cities that are relevant to your location list. You can add any city name.
+            Add cities that are relevant to your WanderList. You can add any city name.
           </p>
         </div>
       )}

@@ -48,7 +48,7 @@ export const LocationListForm = (props: {
         try {
           await props.addToCartAction({
             id: props.listId,
-            qty: 1, // Always quantity 1 for location lists
+            qty: 1, // Always quantity 1 for WanderLists
           });
           
           // Only update state and show success toast if the action succeeds

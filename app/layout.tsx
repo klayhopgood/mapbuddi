@@ -4,8 +4,8 @@ import React from "react";
 import { Toaster } from "@/components/ui/Toaster";
 
 export const metadata = {
-  title: "MapBuddi - Online marketplace",
-  description: "Online marketplace",
+  title: "MapBuddi - WanderList marketplace",
+  description: "Discover and share curated WanderLists from local experts. Find the best places to visit and sync them directly to Google Maps.",
 };
 
 export default async function RootLayout({

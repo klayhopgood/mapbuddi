@@ -114,7 +114,7 @@ export function SubscriptionCard({
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-blue-900">MapBuddi Seller Plan</h3>
-                <p className="text-blue-700">Everything you need to sell location lists</p>
+                <p className="text-blue-700">Everything you need to sell WanderLists</p>
                 <div className="mt-2">
                   <span className="text-3xl font-bold text-blue-900">$19</span>
                   <span className="text-blue-700"> USD/month</span>
@@ -163,7 +163,7 @@ export function SubscriptionCard({
         <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
           <div>
             <h3 className="font-semibold text-green-900">Active Subscription</h3>
-            <p className="text-green-700">You can sell location lists and earn money</p>
+            <p className="text-green-700">You can sell WanderLists and earn money</p>
             {subscriptionStatus.cancelAtPeriodEnd ? (
               <Badge variant="outline" className="mt-2 bg-yellow-50 text-yellow-800 border-yellow-200">
                 <AlertTriangle className="h-3 w-3 mr-1" />
@@ -194,7 +194,7 @@ export function SubscriptionCard({
                       </p>
                       <ul className="text-sm text-yellow-700 mt-1 space-y-1">
                         <li>• Your subscription remains active until {subscriptionStatus.currentPeriodEnd ? new Date(subscriptionStatus.currentPeriodEnd).toLocaleDateString() : 'the end of your billing period'}</li>
-                        <li>• All your active location lists will become drafts</li>
+                        <li>• All your active WanderLists will become drafts</li>
                         <li>• Customers won&apos;t be able to see or purchase your lists</li>
                         <li>• You can reactivate anytime to make your lists active again</li>
                       </ul>

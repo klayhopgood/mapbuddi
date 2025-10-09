@@ -36,14 +36,14 @@ export async function deleteLocationList(listId: number) {
 
     return {
       success: true,
-      message: "Location list deleted successfully"
+      message: "WanderList deleted successfully"
     };
 
   } catch (error) {
-    console.error("Error deleting location list:", error);
+    console.error("Error deleting WanderList:", error);
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Failed to delete location list"
+      message: error instanceof Error ? error.message : "Failed to delete WanderList"
     };
   }
 }

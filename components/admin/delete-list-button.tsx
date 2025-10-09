@@ -60,7 +60,7 @@ export function DeleteListButton({ listId, listName }: DeleteListButtonProps) {
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Location List</AlertDialogTitle>
+            <AlertDialogTitle>Delete WanderList</AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
               <p>
                 Are you sure you want to delete <strong>&ldquo;{listName}&rdquo;</strong>?

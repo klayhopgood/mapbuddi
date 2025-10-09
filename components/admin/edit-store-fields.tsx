@@ -172,7 +172,7 @@ export const EditStoreFields = (props: {
                 rows={4}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Tell customers about your store and what makes your location lists special..."
+                placeholder="Tell customers about your store and what makes your WanderLists special..."
               />
             </div>
           </CardContent>

@@ -36,7 +36,7 @@ export const ProductForm = (props: {
       try {
         await props.addToCartAction({
           id: props.productId,
-          qty: 1, // Always quantity 1 for location lists
+          qty: 1, // Always quantity 1 for WanderLists
         });
         
         toast({

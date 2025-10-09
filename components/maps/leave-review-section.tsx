@@ -151,7 +151,7 @@ export function LeaveReviewSection({ listId }: LeaveReviewSectionProps) {
         <Textarea
           value={reviewText}
           onChange={(e) => setReviewText(e.target.value)}
-          placeholder="Share your experience with this location list..."
+          placeholder="Share your experience with this WanderList..."
           className="min-h-[100px]"
           maxLength={500}
         />

@@ -95,7 +95,7 @@ export const CollectionBody = (
         </div>
       ) : (
         <EmptyStateWrapper height="h-[200px]">
-          <Heading size="h4">No location lists match your filters</Heading>
+          <Heading size="h4">No WanderLists match your filters</Heading>
           <p>Change your filters or try again later</p>
         </EmptyStateWrapper>
       )}

@@ -39,7 +39,7 @@ export function MapsConnectionStatus({ userId, mapsIntegration }: MapsConnection
       <div>
         <h2 className="text-2xl font-semibold mb-2">Maps Integration</h2>
         <p className="text-muted-foreground">
-          Connect your maps apps to sync your purchased location lists
+          Connect your maps apps to sync your purchased WanderLists
         </p>
       </div>
 
@@ -82,7 +82,7 @@ export function MapsConnectionStatus({ userId, mapsIntegration }: MapsConnection
             ) : (
               <div className="space-y-2">
                 <p className="text-sm text-green-600">
-                  ✓ Ready to sync location lists
+                  ✓ Ready to sync WanderLists
                 </p>
                 <Button variant="outline" size="sm" className="w-full">
                   Manage Connection

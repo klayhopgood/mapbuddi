@@ -30,7 +30,7 @@ export const StaticMapPreview = ({ pois, listName, mapUrl, className }: StaticMa
     );
   }
 
-  // Convert POI coordinates to numbers for the location list
+  // Convert POI coordinates to numbers for the WanderList
   const coordinates = pois.map(poi => ({
     lat: parseFloat(poi.latitude),
     lng: parseFloat(poi.longitude),

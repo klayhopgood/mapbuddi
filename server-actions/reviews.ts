@@ -66,7 +66,7 @@ export async function createOrUpdateReview(listId: number, reviewData: ReviewDat
         });
     }
 
-    // Update the location list's average rating
+    // Update the WanderList's average rating
     await updateLocationListRating(listId);
 
     revalidatePath(`/list/${listId}`);
@@ -162,7 +162,7 @@ async function updateLocationListRating(listId: number) {
 
     const stats = ratingStats[0];
     if (stats && stats.totalReviews > 0) {
-      // Update the location list with new average rating
+      // Update the WanderList with new average rating
       await db
         .update(locationLists)
         .set({

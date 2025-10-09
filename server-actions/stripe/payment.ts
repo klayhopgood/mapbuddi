@@ -111,7 +111,7 @@ export async function createPaymentIntent({
       automatic_payment_methods: {
         enabled: true,
       },
-      description: `MapBuddi purchase - ${items.length} location list(s)`,
+      description: `MapBuddi purchase - ${items.length} WanderList(s)`,
     });
     console.log("PaymentIntent created successfully:", paymentIntent.id);
 

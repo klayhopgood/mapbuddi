@@ -52,7 +52,7 @@ const menuItems: MenuItems = [
     group: "selling",
   },
   {
-    name: "Location Lists",
+    name: "WanderLists",
     href: "/account/selling/lists",
     group: "selling",
   },
@@ -72,7 +72,7 @@ const menuItems: MenuItems = [
     group: "selling",
   },
   {
-    name: "Your Lists",
+    name: "Your WanderLists",
     href: "/account/buying/lists",
     group: "buying",
   },
