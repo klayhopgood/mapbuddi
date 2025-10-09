@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { MapPin, CheckCircle, Clock, Smartphone } from "lucide-react";
 import { UserMapsIntegration, PurchasedListSync } from "@/db/schema";
-import { toggleListSync } from "@/server-actions/maps-integration";
+import { toggleListSync, retryFailedSync } from "@/server-actions/maps-integration";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -32,6 +32,23 @@ export function SyncToMapsSection({
 }: SyncToMapsSectionProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+
+  const handleRetrySync = (listId: number, orderId: number) => {
+    startTransition(async () => {
+      try {
+        const result = await retryFailedSync(userId, listId, orderId);
+        if (result.success) {
+          toast.success(result.message);
+          router.refresh();
+        } else {
+          toast.error(result.message || "Failed to retry sync");
+        }
+      } catch (error) {
+        toast.error("Failed to retry sync");
+        console.error("Retry sync error:", error);
+      }
+    });
+  };
 
   const handleToggleSync = (listId: number, orderId: number, platform: 'google' | 'apple') => {
     if (!mapsIntegration?.googleMapsConnected && platform === 'google') {
@@ -70,10 +87,21 @@ export function SyncToMapsSection({
                   Synced
                 </Badge>
               ) : syncStatus?.googleMapsSyncEnabled ? (
-                <Badge variant="secondary" className="text-xs">
-                  <Clock className="h-3 w-3 mr-1" />
-                  Pending
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="text-xs">
+                    <Clock className="h-3 w-3 mr-1" />
+                    Pending
+                  </Badge>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-xs h-6 px-2"
+                    onClick={() => handleRetrySync(list.id, list.orderId)}
+                    disabled={isPending}
+                  >
+                    Retry
+                  </Button>
+                </div>
               ) : (
                 <Badge variant="outline" className="text-xs">
                   Not Synced
@@ -85,6 +113,13 @@ export function SyncToMapsSection({
                 </span>
               )}
             </div>
+            {/* Instructions for pending sync */}
+            {syncStatus?.googleMapsSyncEnabled && !syncStatus?.googleMapsSynced && (
+              <div className="text-xs text-muted-foreground bg-yellow-50 p-2 rounded mt-2">
+                ⏳ <strong>Sync in progress...</strong><br/>
+                Your WanderList is being processed and will appear in Google Drive shortly. If it's been more than 2 minutes, click "Retry" above.
+              </div>
+            )}
             {/* Action buttons for synced maps */}
             {syncStatus?.googleMapsSynced && syncStatus?.googleMapsMapId && (
               <div className="flex flex-col gap-2 mt-2">

@@ -112,6 +112,27 @@ export async function handleGoogleCallback(code: string, state: string) {
   }
 }
 
+export async function retryFailedSync(
+  userId: string, 
+  listId: number, 
+  orderId: number
+) {
+  try {
+    console.log(`Manual retry sync for user ${userId}, list ${listId}, order ${orderId}`);
+    
+    const { syncListToGoogleMaps } = await import('@/lib/google-maps-sync');
+    const result = await syncListToGoogleMaps(userId, listId, orderId);
+    
+    return result;
+  } catch (error) {
+    console.error("Manual retry sync error:", error);
+    return { 
+      success: false, 
+      message: error instanceof Error ? error.message : "Failed to retry sync" 
+    };
+  }
+}
+
 export async function toggleListSync(
   userId: string, 
   listId: number, 
@@ -211,23 +232,22 @@ export async function toggleListSync(
 // Helper function to trigger sync without blocking the UI
 async function triggerBackgroundSync(userId: string, listId: number, orderId: number) {
   try {
-    // Call our sync API endpoint
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    console.log(`Triggering immediate sync for user ${userId}, list ${listId}, order ${orderId}`);
     
-    fetch(`${baseUrl}/api/maps/sync`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        action: 'sync_list',
-        listId,
-        orderId,
-        userId, // Pass userId for internal API call
-      }),
-    }).catch(error => {
-      console.error("Background sync trigger failed:", error);
-    });
+    // Instead of making a fetch call that lacks authentication,
+    // let's trigger the sync directly here since we have the user context
+    const { syncListToGoogleMaps } = await import('@/lib/google-maps-sync');
+    
+    // Run sync in background without blocking the response
+    setTimeout(async () => {
+      try {
+        const result = await syncListToGoogleMaps(userId, listId, orderId);
+        console.log(`Background sync result for list ${listId}:`, result);
+      } catch (error) {
+        console.error(`Background sync failed for list ${listId}:`, error);
+      }
+    }, 1000); // Small delay to ensure the response is sent first
+    
   } catch (error) {
     console.error("Failed to trigger background sync:", error);
   }
