@@ -20,7 +20,7 @@ import { LocationTags } from "@/components/ui/location-tags";
 import { ImageCarousel } from "@/components/ui/image-carousel";
 import { StaticMapPreview } from "@/components/ui/static-map-preview";
 import { generateStaticMapUrl } from "@/lib/static-map-utils";
-import { findWanderListBySlug } from "@/lib/wanderlist-utils";
+import { findWanderListBySlug } from "@/server-actions/wanderlist-lookup";
 
 // Utility function to format email for display (first 3 chars + *** until @)
 function formatEmailForDisplay(email: string): string {
