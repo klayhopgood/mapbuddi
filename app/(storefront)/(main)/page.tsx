@@ -127,14 +127,14 @@ export default async function Home() {
           </TabsContent>
           <TabsContent value="for-buyers">
             <HomePageLayout
-              heading={<Heading size="h1">Personalised Lists of the best places from the best Travellers</Heading>}
+              heading={<Heading size="h1">Personalised WanderLists of the best places from the best Travellers</Heading>}
               subheading={
                 <Heading size="h2">
-                  Find a list that matches your style, download, sync to Google Maps and explore with ease!
+                  Find a WanderList that matches your style, download, sync to Google Maps and explore with ease!
                 </Heading>
               }
             >
-              <Heading size="h3">Featured Location Lists</Heading>
+              <Heading size="h3">Featured WanderLists</Heading>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-auto mt-4">
                 {storeAndLocationList.map((item) => (
                   <LocationListCard
@@ -146,8 +146,8 @@ export default async function Home() {
                 ))}
               </div>
               <div className="mt-12 grid place-content-center">
-                <Link href="/lists">
-                  <Button variant="default">View All Location Lists</Button>
+                <Link href="/wanderlists">
+                  <Button variant="default">View All WanderLists</Button>
                 </Link>
               </div>
               <div className="bg-blue-900 text-white w-full p-12 rounded-md mt-12 flex items-center flex-col gap-2 justify-center text-center">
@@ -168,13 +168,13 @@ export default async function Home() {
               </div>
               <div className="md:grid md:grid-cols-3 gap-4 flex flex-col mt-12">
                 <FeatureBanner
-                  heading="Curated Lists"
-                  subheading="Discover expertly crafted location lists from local experts and travelers"
+                  heading="Curated WanderLists"
+                  subheading="Discover expertly crafted WanderLists from local experts and travelers"
                   icon={<MapPin size={32} />}
                 />
                 <FeatureBanner
                   heading="Map Integration"
-                  subheading="Sync your purchased lists directly to Google Maps and other mapping apps"
+                  subheading="Sync your purchased WanderLists directly to Google Maps and other mapping apps"
                   icon={<Phone size={32} />}
                 />
                 <FeatureBanner

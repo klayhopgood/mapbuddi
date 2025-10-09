@@ -18,6 +18,7 @@ import { ListImages } from "@/lib/types";
 import { ImageOff, MapPin, Store } from "lucide-react";
 import { useCurrency } from "@/hooks/use-currency";
 import { LoadingSkeleton } from "../ui/loading-skeleton";
+import { getWanderListUrl } from "@/lib/wanderlist-utils";
 import { ProductImage } from "../product-image";
 
 export function ProductSearch() {
@@ -89,9 +90,9 @@ export function ProductSearch() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Search for a list or store</DialogTitle>
+            <DialogTitle>Search WanderLists</DialogTitle>
             <DialogDescription>
-              Search our entire List and Traveller Store catalogue
+              Search our entire WanderList and Traveller Store catalogue
             </DialogDescription>
           </DialogHeader>
           <Input
@@ -106,13 +107,13 @@ export function ProductSearch() {
               !isLoadingResults &&
               confirmedHasNoResults && <p>No results found.</p>}
             
-            {/* Location Lists Results */}
+            {/* WanderLists Results */}
             {results.lists.length > 0 && (
               <div className="w-full">
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">Location Lists</h3>
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">WanderLists</h3>
                 {results.lists.map((list) => (
                   <Link
-                    href={`/list/${list.id}`}
+                    href={getWanderListUrl(list.name)}
                     onClick={() => setOpen(false)}
                     key={`list-${list.id}`}
                     className="w-full bg-secondary p-2 rounded-md mb-2 block"
@@ -159,7 +160,7 @@ export function ProductSearch() {
                 <h3 className="text-sm font-medium text-muted-foreground mb-2">Stores</h3>
                 {results.stores.map((store) => (
                   <Link
-                    href={`/lists?seller=${store.slug}`}
+                    href={`/wanderlists?seller=${store.slug}`}
                     onClick={() => setOpen(false)}
                     key={`store-${store.id}`}
                     className="w-full bg-secondary p-2 rounded-md mb-2 block"
