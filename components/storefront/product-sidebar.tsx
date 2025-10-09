@@ -105,7 +105,7 @@ export const ProductSidebar = (props: {
         </div>
         <form onSubmit={handleSearchSubmit} className="flex gap-2">
           <Input
-            placeholder="Search lists, stores, descriptions..."
+            placeholder="Search WanderLists, stores, descriptions..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1"

@@ -37,7 +37,7 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
   const socialLinks = store.socialLinks ? JSON.parse(store.socialLinks) : {};
   const verifiedSocials = store.verifiedSocials ? JSON.parse(store.verifiedSocials) : [];
 
-  // Get all active location lists from this store
+  // Get all active WanderLists from this store
   const rawData = await db
     .select({
       locationList: locationLists,
@@ -128,7 +128,7 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
               <div className="flex flex-wrap gap-3 justify-center md:justify-start mb-4">
                 <Badge variant="secondary" className="flex items-center gap-1">
                   <MapPin size={14} />
-                  {storeAndLocationList.length} location list{storeAndLocationList.length !== 1 ? 's' : ''}
+                  {storeAndLocationList.length} WanderList{storeAndLocationList.length !== 1 ? 's' : ''}
                 </Badge>
                 <Badge variant="secondary" className="flex items-center gap-1">
                   <MapPin size={14} />
@@ -233,11 +233,11 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
           </div>
         </div>
 
-        {/* Location Lists Section - Fixed Heading className issue */}
+        {/* WanderLists Section - Fixed Heading className issue */}
         <div>
           <div className="mb-6">
             <Heading size="h2">
-              Location Lists by {store.name}
+              WanderLists by {store.name}
             </Heading>
           </div>
           
@@ -255,10 +255,10 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
             <div className="text-center py-12">
               <MapPin size={48} className="mx-auto mb-4 text-gray-400" />
               <div className="mb-2">
-                <Heading size="h3">No location lists yet</Heading>
+                <Heading size="h3">No WanderLists yet</Heading>
               </div>
               <Text className="text-gray-600">
-                {store.name} hasn&apos;t published any location lists yet.
+                {store.name} hasn&apos;t published any WanderLists yet.
               </Text>
             </div>
           )}
@@ -283,7 +283,7 @@ export async function generateMetadata({ params }: SellerProfilePageProps) {
   }
 
   return {
-    title: `${store.name} - Location Lists Creator | MapBuddi`,
-    description: store.description || `Discover curated location lists from ${store.name}. Find expertly crafted lists of places worth visiting.`,
+    title: `${store.name} - WanderList Creator | MapBuddi`,
+    description: store.description || `Discover curated WanderLists from ${store.name}. Find expertly crafted lists of places worth visiting.`,
   };
 }

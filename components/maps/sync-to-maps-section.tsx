@@ -117,7 +117,7 @@ export function SyncToMapsSection({
             {syncStatus?.googleMapsSyncEnabled && !syncStatus?.googleMapsSynced && (
               <div className="text-xs text-muted-foreground bg-yellow-50 p-2 rounded mt-2">
                 ⏳ <strong>Sync in progress...</strong><br/>
-                Your WanderList is being processed and will appear in Google Drive shortly. If it's been more than 2 minutes, click "Retry" above.
+                Your WanderList is being processed and will appear in Google Drive shortly. If it&apos;s been more than 2 minutes, click &quot;Retry&quot; above.
               </div>
             )}
             {/* Action buttons for synced maps */}

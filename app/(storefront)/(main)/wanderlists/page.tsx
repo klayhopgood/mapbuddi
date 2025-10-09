@@ -176,21 +176,21 @@ export default async function WanderListsPage(context: {
 
   return (
     <div>
-      <CollectionHeaderWrapper heading="Location Lists">
+      <CollectionHeaderWrapper heading="WanderLists">
         <p>
-          Discover curated location lists from local experts and fellow travelers. 
-          Each list contains handpicked points of interest with detailed notes and 
+          Discover curated WanderLists from local experts and fellow travelers. 
+          Each WanderList contains handpicked points of interest with detailed notes and 
           categories to help you explore new places like a local.
         </p>
         <p>
           From hidden restaurants and scenic viewpoints to historic landmarks and 
-          shopping districts, our location lists make it easy to discover the best 
-          spots wherever you go. Purchase a list and sync it directly to your Google Maps 
+          shopping districts, our WanderLists make it easy to discover the best 
+          spots wherever you go. Purchase a WanderList and sync it directly to your Google Maps 
           for seamless navigation.
         </p>
         <p>
-          Browse by seller to find lists from specific creators, or explore all 
-          available location lists to find your next adventure.
+          Browse by seller to find WanderLists from specific creators, or explore all 
+          available WanderLists to find your next adventure.
         </p>
       </CollectionHeaderWrapper>
       <CollectionBody
