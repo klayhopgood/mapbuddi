@@ -33,20 +33,59 @@ export async function PUT(
       return NextResponse.json({ error: true, message: 'List not found' }, { status: 404 });
     }
 
-    // Validate required fields
-    if (!list.name || !list.name.trim()) {
-      return NextResponse.json({ 
-        error: true, 
-        message: 'List name is required' 
-      }, { status: 400 });
-    }
+         // Validate required fields
+         console.log("Validating required fields:", {
+           name: list.name,
+           description: list.description,
+           price: list.price,
+           imagesCount: list.images ? JSON.parse(list.images).length : 0,
+           categoriesCount: categories?.length || 0,
+           poisCount: pois?.length || 0
+         });
 
-    if (!list.price || list.price === "0" || parseFloat(list.price) < 5) {
-      return NextResponse.json({ 
-        error: true, 
-        message: 'List price must be at least $5.00' 
-      }, { status: 400 });
-    }
+         if (!list.name || !list.name.trim()) {
+           return NextResponse.json({ 
+             error: true, 
+             message: 'List name is required' 
+           }, { status: 400 });
+         }
+
+         if (!list.description || !list.description.trim()) {
+           return NextResponse.json({ 
+             error: true, 
+             message: 'List description is required' 
+           }, { status: 400 });
+         }
+
+         if (!list.price || list.price === "0" || parseFloat(list.price) < 5) {
+           return NextResponse.json({ 
+             error: true, 
+             message: 'List price must be at least $5.00' 
+           }, { status: 400 });
+         }
+
+         // Validate images requirement
+         const imagesList = list.images ? JSON.parse(list.images) : [];
+         if (imagesList.length < 3) {
+           return NextResponse.json({ 
+             error: true, 
+             message: 'At least 3 images from your trip are required to publish a list' 
+           }, { status: 400 });
+         }
+
+         if (!categories || categories.length === 0) {
+           return NextResponse.json({ 
+             error: true, 
+             message: 'At least one category is required' 
+           }, { status: 400 });
+         }
+
+         if (!pois || pois.length < 5) {
+           return NextResponse.json({ 
+             error: true, 
+             message: 'At least 5 locations (POIs) are required to publish a list' 
+           }, { status: 400 });
+         }
 
     // Check subscription status to determine if list can be active
     const hasActiveSubscription = await checkSubscriptionForListActivation(storeId);

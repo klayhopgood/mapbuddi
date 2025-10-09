@@ -40,45 +40,65 @@ export async function POST(request: NextRequest) {
       poisPreview: pois?.slice(0, 2).map((p: any) => p.name) || []
     });
 
-    // Validate required fields
-    console.log("Validating required fields:", {
-      name: list.name,
-      price: list.price,
-      categoriesCount: categories?.length || 0,
-      poisCount: pois?.length || 0
-    });
+         // Validate required fields
+         console.log("Validating required fields:", {
+           name: list.name,
+           description: list.description,
+           price: list.price,
+           imagesCount: list.images ? JSON.parse(list.images).length : 0,
+           categoriesCount: categories?.length || 0,
+           poisCount: pois?.length || 0
+         });
 
-    if (!list.name || !list.name.trim()) {
-      console.log("ERROR: Missing or empty list name");
-      return NextResponse.json({ 
-        error: true, 
-        message: 'List name is required' 
-      }, { status: 400 });
-    }
+         if (!list.name || !list.name.trim()) {
+           console.log("ERROR: Missing or empty list name");
+           return NextResponse.json({ 
+             error: true, 
+             message: 'List name is required' 
+           }, { status: 400 });
+         }
 
-    if (!list.price || list.price === "0" || parseFloat(list.price) < 5) {
-      console.log("ERROR: Invalid price - must be at least $5:", list.price);
-      return NextResponse.json({ 
-        error: true, 
-        message: 'List price must be at least $5.00' 
-      }, { status: 400 });
-    }
+         if (!list.description || !list.description.trim()) {
+           console.log("ERROR: Missing or empty list description");
+           return NextResponse.json({ 
+             error: true, 
+             message: 'List description is required' 
+           }, { status: 400 });
+         }
 
-    if (!categories || categories.length === 0) {
-      console.log("ERROR: No categories provided");
-      return NextResponse.json({ 
-        error: true, 
-        message: 'At least one category is required' 
-      }, { status: 400 });
-    }
+         if (!list.price || list.price === "0" || parseFloat(list.price) < 5) {
+           console.log("ERROR: Invalid price - must be at least $5:", list.price);
+           return NextResponse.json({ 
+             error: true, 
+             message: 'List price must be at least $5.00' 
+           }, { status: 400 });
+         }
 
-    if (!pois || pois.length === 0) {
-      console.log("ERROR: No POIs provided");
-      return NextResponse.json({ 
-        error: true, 
-        message: 'At least one location (POI) is required' 
-      }, { status: 400 });
-    }
+         // Validate images requirement
+         const imagesList = list.images ? JSON.parse(list.images) : [];
+         if (imagesList.length < 3) {
+           console.log("ERROR: Not enough images - need at least 3:", imagesList.length);
+           return NextResponse.json({ 
+             error: true, 
+             message: 'At least 3 images from your trip are required to publish a list' 
+           }, { status: 400 });
+         }
+
+         if (!categories || categories.length === 0) {
+           console.log("ERROR: No categories provided");
+           return NextResponse.json({ 
+             error: true, 
+             message: 'At least one category is required' 
+           }, { status: 400 });
+         }
+
+         if (!pois || pois.length < 5) {
+           console.log("ERROR: Not enough POIs - need at least 5:", pois?.length || 0);
+           return NextResponse.json({ 
+             error: true, 
+             message: 'At least 5 locations (POIs) are required to publish a list' 
+           }, { status: 400 });
+         }
 
     // Check subscription status to determine if list can be active
     const hasActiveSubscription = await checkSubscriptionForListActivation(storeId);

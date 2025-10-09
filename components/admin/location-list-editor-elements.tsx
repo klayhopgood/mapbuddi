@@ -168,54 +168,76 @@ export const LocationListEditorElements = (props: {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      // Frontend validation
-      console.log("Frontend validation:", {
-        name: formValues.name,
-        price: formValues.price,
-        categoriesCount: categories.length,
-        poisCount: pois.length
-      });
+         try {
+           // Frontend validation
+           console.log("Frontend validation:", {
+             name: formValues.name,
+             description: formValues.description,
+             price: formValues.price,
+             imagesCount: listImages.length,
+             categoriesCount: categories.length,
+             poisCount: pois.length
+           });
 
-      if (!formValues.name || !formValues.name.trim()) {
-        toast({
-          title: "Error",
-          description: "List name is required",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
+           if (!formValues.name || !formValues.name.trim()) {
+             toast({
+               title: "Error",
+               description: "List name is required",
+               variant: "destructive",
+             });
+             setIsLoading(false);
+             return;
+           }
 
-      if (!formValues.price || formValues.price === "0" || parseFloat(formValues.price) < 5) {
-        toast({
-          title: "Error", 
-          description: "List price must be at least $5.00",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
+           if (!formValues.description || !formValues.description.trim()) {
+             toast({
+               title: "Error",
+               description: "List description is required",
+               variant: "destructive",
+             });
+             setIsLoading(false);
+             return;
+           }
 
-      if (categories.length === 0) {
-        toast({
-          title: "Error",
-          description: "At least one category is required. Please add a category first.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
+           if (!formValues.price || formValues.price === "0" || parseFloat(formValues.price) < 5) {
+             toast({
+               title: "Error", 
+               description: "List price must be at least $5.00",
+               variant: "destructive",
+             });
+             setIsLoading(false);
+             return;
+           }
 
-      if (pois.length === 0) {
-        toast({
-          title: "Error",
-          description: "At least one location (POI) is required. Please add some locations to your list.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
+           if (listImages.length < 3) {
+             toast({
+               title: "Error",
+               description: "At least 3 images from your trip are required to publish a list",
+               variant: "destructive",
+             });
+             setIsLoading(false);
+             return;
+           }
+
+           if (categories.length === 0) {
+             toast({
+               title: "Error",
+               description: "At least one category is required. Please add a category first.",
+               variant: "destructive",
+             });
+             setIsLoading(false);
+             return;
+           }
+
+           if (pois.length < 5) {
+             toast({
+               title: "Error",
+               description: "At least 5 locations (POIs) are required to publish a list",
+               variant: "destructive",
+             });
+             setIsLoading(false);
+             return;
+           }
 
       const listData = {
         ...formValues,
@@ -316,7 +338,9 @@ export const LocationListEditorElements = (props: {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">List Name</label>
+                  <label className="block text-sm font-medium mb-2">
+                    List Name <span className="text-red-500">*</span>
+                  </label>
                   <Input
                     placeholder="e.g., Best of Lisbon"
                     value={formValues.name}
@@ -326,28 +350,33 @@ export const LocationListEditorElements = (props: {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Description</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Description <span className="text-red-500">*</span>
+                  </label>
                   <Textarea
                     placeholder="Describe what makes this location list special..."
                     value={formValues.description || ""}
                     onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
                     rows={3}
+                    required
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Price (USD)</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Price (USD) <span className="text-red-500">*</span>
+                    </label>
                     <Input
                       type="number"
                       step="0.01"
-                      min="0"
+                      min="5"
                       placeholder="9.99"
                       value={formValues.price}
                       onChange={(e) => setFormValues({ ...formValues, price: e.target.value })}
                       required
                     />
-                    <p className="text-xs text-gray-500 mt-1">All prices are stored in USD. Buyers will see prices in their preferred currency.</p>
+                    <p className="text-xs text-gray-500 mt-1">Minimum $5.00. All prices are stored in USD. Buyers will see prices in their preferred currency.</p>
                   </div>
                 </div>
 
@@ -360,13 +389,22 @@ export const LocationListEditorElements = (props: {
 
                 {/* List Images */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">List Images</label>
+                  <label className="block text-sm font-medium mb-2">
+                    List Images from Your Trip <span className="text-red-500">*</span>
+                  </label>
                   <ListImageUploader
                     currentImages={listImages}
                     onImagesUpdate={setListImages}
                     maxImages={10}
                   />
-                  <p className="text-xs text-gray-500 mt-1">Upload up to 10 images to showcase your location list. These will be displayed on list cards and the list detail page.</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Upload at least 3 images from your trip to showcase your location list. These will be displayed on list cards and the list detail page.
+                  </p>
+                  {listImages.length < 3 && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {3 - listImages.length} more image{3 - listImages.length !== 1 ? 's' : ''} required to publish
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex items-center space-x-2">
