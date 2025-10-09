@@ -36,8 +36,8 @@ function SuccessContent() {
                 <span className="font-semibold text-blue-900">What&apos;s Next?</span>
               </div>
               <ul className="text-sm text-blue-800 space-y-2">
-                <li>✅ All your draft lists are now active and visible to customers</li>
-                <li>✅ You can create new lists and make them active immediately</li>
+                <li>✅ You can now activate your draft lists when they&apos;re ready</li>
+                <li>✅ Create new lists and choose when to make them active</li>
                 <li>✅ Start earning money from your location expertise</li>
                 <li>✅ Access to seller analytics and insights</li>
               </ul>

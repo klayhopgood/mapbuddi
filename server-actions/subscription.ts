@@ -215,23 +215,6 @@ export async function handleSubscriptionWebhook(event: Stripe.Event) {
   }
 }
 
-async function activateAllDraftLists(storeId: number) {
-  try {
-    await db
-      .update(locationLists)
-      .set({
-        isActive: true,
-        updatedAt: new Date(),
-      })
-      .where(and(
-        eq(locationLists.storeId, storeId),
-        eq(locationLists.isActive, false)
-      ));
-  } catch (error) {
-    console.error("Error activating draft lists:", error);
-  }
-}
-
 async function deactivateAllActiveLists(storeId: number) {
   try {
     await db

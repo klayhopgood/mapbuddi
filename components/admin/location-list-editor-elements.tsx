@@ -112,15 +112,15 @@ export const LocationListEditorElements = (props: {
   const [showSubscriptionPrompt, setShowSubscriptionPrompt] = useState(false);
 
   // Handle location changes
-  const handleLocationChange = (country: string | undefined, cities: string[]) => {
+  const handleLocationChange = useCallback((country: string | undefined, cities: string[]) => {
     setSelectedCountry(country);
     setSelectedCities(cities);
-    setFormValues({
-      ...formValues,
+    setFormValues(prev => ({
+      ...prev,
       country: country || null,
       cities: cities.length > 0 ? JSON.stringify(cities) : null,
-    });
-  };
+    }));
+  }, []);
 
   const dismissModal = useCallback(() => {
     if (props.displayType === "modal") {
