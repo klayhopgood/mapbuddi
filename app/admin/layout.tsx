@@ -35,7 +35,9 @@ export default async function AdminLayout({ children }: PropsWithChildren) {
       <div>
         <div className="bg-red-50 py-2 md:px-6 border-b border-red-200">
           <ContentWrapper className="flex items-center justify-between">
-            <Heading size="h2" className="text-red-800">Admin Panel</Heading>
+            <div className="text-red-800">
+              <Heading size="h2">Admin Panel</Heading>
+            </div>
             <div className="p-[1px] bg-gray-400 rounded-full">
               <UserButton afterSignOutUrl={process.env.NEXT_PUBLIC_APP_URL} />
             </div>
