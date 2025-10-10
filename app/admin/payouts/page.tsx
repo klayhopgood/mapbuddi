@@ -27,108 +27,86 @@ interface StorePayoutSummary {
 
 async function getStorePayoutSummaries(): Promise<StorePayoutSummary[]> {
   try {
-    // Get all stores with their payout methods
-    const storesWithPayouts = await db
-      .select({
-        storeId: stores.id,
-        storeName: stores.name,
-        sellerName: sql<string>`CONCAT(${stores.firstName}, ' ', ${stores.lastName})`,
-        sellerEmail: sql<string>`''`, // We'll need to get this from Clerk or add to stores table
-        socialLinks: stores.socialLinks,
-        payoutMethod: sellerPayoutMethods.preferredMethod,
-        payoutDetails: sellerPayoutMethods.paypalEmail,
-      })
-      .from(stores)
-      .leftJoin(sellerPayoutMethods, eq(stores.id, sellerPayoutMethods.storeId));
+    // Simple query to get all stores first
+    const allStores = await db.select().from(stores);
+    
+    const summaries: StorePayoutSummary[] = [];
 
-  const summaries: StorePayoutSummary[] = [];
+    for (const store of allStores) {
+      // Get payout methods for this store
+      const payoutMethod = await db
+        .select()
+        .from(sellerPayoutMethods)
+        .where(eq(sellerPayoutMethods.storeId, store.id))
+        .limit(1);
 
-  for (const store of storesWithPayouts) {
-    // Get total sales and revenue ever
-    const totalStats = await db
-      .select({
-        totalSales: sql<number>`COUNT(*)`,
-        totalRevenue: sql<number>`COALESCE(SUM(${orders.total}), 0)`,
-      })
-      .from(orders)
-      .where(
-        and(
-          eq(orders.storeId, store.storeId),
-          eq(orders.stripePaymentIntentStatus, 'succeeded')
-        )
-      );
-
-    // Get last payout date
-    const lastPayout = await db
-      .select({
-        payoutDate: sellerPayouts.payoutDate,
-      })
-      .from(sellerPayouts)
-      .where(
-        and(
-          eq(sellerPayouts.storeId, store.storeId),
-          eq(sellerPayouts.status, 'paid')
-        )
-      )
-      .orderBy(desc(sellerPayouts.payoutDate))
-      .limit(1);
-
-    // Get sales since last payout
-    const lastPayoutDate = lastPayout[0]?.payoutDate;
-    const salesSinceLastPayoutResult = lastPayoutDate 
-      ? await db
-          .select({
-            count: sql<number>`COUNT(*)`,
-            revenue: sql<number>`COALESCE(SUM(${orders.total}), 0)`,
-          })
-          .from(orders)
-          .where(
-            and(
-              eq(orders.storeId, store.storeId),
-              eq(orders.stripePaymentIntentStatus, 'succeeded'),
-              sql`${orders.createdAt} > ${Math.floor(new Date(lastPayoutDate).getTime() / 1000)}`
-            )
+      // Get total sales and revenue ever
+      const totalStats = await db
+        .select({
+          totalSales: sql<number>`COUNT(*)`,
+          totalRevenue: sql<number>`COALESCE(SUM(${orders.total}), 0)`,
+        })
+        .from(orders)
+        .where(
+          and(
+            eq(orders.storeId, store.id),
+            eq(orders.stripePaymentIntentStatus, 'succeeded')
           )
-      : [{ count: totalStats[0]?.totalSales || 0, revenue: totalStats[0]?.totalRevenue || 0 }];
+        );
 
-    // Get pending payout amount
-    const pendingPayouts = await db
-      .select({
-        amount: sellerPayouts.amount,
-      })
-      .from(sellerPayouts)
-      .where(
-        and(
-          eq(sellerPayouts.storeId, store.storeId),
-          eq(sellerPayouts.status, 'pending')
-        )
+      // Get pending payout amount
+      const pendingPayouts = await db
+        .select({
+          amount: sellerPayouts.amount,
+        })
+        .from(sellerPayouts)
+        .where(
+          and(
+            eq(sellerPayouts.storeId, store.id),
+            eq(sellerPayouts.status, 'pending')
+          )
+        );
+
+      const pendingAmount = pendingPayouts.reduce((sum, payout) => 
+        sum + parseFloat(payout.amount), 0
       );
 
-    const pendingAmount = pendingPayouts.reduce((sum, payout) => 
-      sum + parseFloat(payout.amount), 0
-    );
+      // Get last payout date
+      const lastPayout = await db
+        .select({
+          payoutDate: sellerPayouts.payoutDate,
+        })
+        .from(sellerPayouts)
+        .where(
+          and(
+            eq(sellerPayouts.storeId, store.id),
+            eq(sellerPayouts.status, 'paid')
+          )
+        )
+        .orderBy(desc(sellerPayouts.payoutDate))
+        .limit(1);
 
-    summaries.push({
-      storeId: store.storeId,
-      storeName: store.storeName || `Store ${store.storeId}`,
-      sellerName: store.sellerName || 'Unknown',
-      sellerEmail: store.sellerEmail || 'No email',
-      socialLinks: store.socialLinks,
-      totalSalesEver: totalStats[0]?.totalSales || 0,
-      totalRevenueEver: totalStats[0]?.totalRevenue || 0,
-      salesSinceLastPayout: salesSinceLastPayoutResult[0]?.count || 0,
-      revenueSinceLastPayout: salesSinceLastPayoutResult[0]?.revenue || 0,
-      pendingPayoutAmount: pendingAmount,
-      payoutMethod: store.payoutMethod || 'Not set',
-      payoutDetails: store.payoutDetails || 'Not configured',
-      lastPayoutDate: lastPayoutDate ? new Date(lastPayoutDate).toLocaleDateString() : 'Never',
-    });
-  }
+      summaries.push({
+        storeId: store.id,
+        storeName: store.name || `Store ${store.id}`,
+        sellerName: `${store.firstName || ''} ${store.lastName || ''}`.trim() || 'Unknown',
+        sellerEmail: 'No email available',
+        socialLinks: store.socialLinks,
+        totalSalesEver: totalStats[0]?.totalSales || 0,
+        totalRevenueEver: totalStats[0]?.totalRevenue || 0,
+        salesSinceLastPayout: 0, // Simplified for now
+        revenueSinceLastPayout: 0, // Simplified for now
+        pendingPayoutAmount: pendingAmount,
+        payoutMethod: payoutMethod[0]?.preferredMethod || 'Not set',
+        payoutDetails: payoutMethod[0]?.paypalEmail || 'Not configured',
+        lastPayoutDate: lastPayout[0]?.payoutDate ? new Date(lastPayout[0].payoutDate).toLocaleDateString() : 'Never',
+      });
+    }
 
-  return summaries.sort((a, b) => b.pendingPayoutAmount - a.pendingPayoutAmount);
+    return summaries.sort((a, b) => b.pendingPayoutAmount - a.pendingPayoutAmount);
   } catch (error) {
     console.error("Error in getStorePayoutSummaries:", error);
-    throw error; // Re-throw to be caught by the page component
+    throw error;
   }
 }
 
