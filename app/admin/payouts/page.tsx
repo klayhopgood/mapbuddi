@@ -74,7 +74,7 @@ async function getStorePayoutSummaries(): Promise<StorePayoutSummary[]> {
 
     // Get sales since last payout
     const lastPayoutDate = lastPayout[0]?.payoutDate;
-    const salesSinceLastPayout = lastPayoutDate 
+    const salesSinceLastPayoutResult = lastPayoutDate 
       ? await db
           .select({
             count: sql<number>`COUNT(*)`,
@@ -88,7 +88,7 @@ async function getStorePayoutSummaries(): Promise<StorePayoutSummary[]> {
               sql`${orders.createdAt} > ${Math.floor(new Date(lastPayoutDate).getTime() / 1000)}`
             )
           )
-      : totalStats;
+      : [{ count: totalStats[0]?.totalSales || 0, revenue: totalStats[0]?.totalRevenue || 0 }];
 
     // Get pending payout amount
     const pendingPayouts = await db
@@ -115,8 +115,8 @@ async function getStorePayoutSummaries(): Promise<StorePayoutSummary[]> {
       socialLinks: store.socialLinks,
       totalSalesEver: totalStats[0]?.totalSales || 0,
       totalRevenueEver: totalStats[0]?.totalRevenue || 0,
-      salesSinceLastPayout: salesSinceLastPayout[0]?.count || 0,
-      revenueSinceLastPayout: salesSinceLastPayout[0]?.revenue || 0,
+      salesSinceLastPayout: salesSinceLastPayoutResult[0]?.count || 0,
+      revenueSinceLastPayout: salesSinceLastPayoutResult[0]?.revenue || 0,
       pendingPayoutAmount: pendingAmount,
       payoutMethod: store.payoutMethod || 'Not set',
       payoutDetails: store.payoutDetails || 'Not configured',

@@ -10,7 +10,8 @@ export async function markPayoutAsPaid(formData: FormData) {
     const storeId = Number(formData.get("storeId"));
     
     if (!storeId || isNaN(storeId)) {
-      return { success: false, message: "Invalid store ID" };
+      console.error("Invalid store ID");
+      return;
     }
 
     // Get all pending payouts for this store
@@ -25,7 +26,8 @@ export async function markPayoutAsPaid(formData: FormData) {
       );
 
     if (pendingPayouts.length === 0) {
-      return { success: false, message: "No pending payouts found for this store" };
+      console.error("No pending payouts found for this store");
+      return;
     }
 
     // Mark all pending payouts as paid
@@ -41,13 +43,9 @@ export async function markPayoutAsPaid(formData: FormData) {
     }
 
     revalidatePath("/admin/payouts");
-    return { 
-      success: true, 
-      message: `Marked ${pendingPayouts.length} payout(s) as paid for store ${storeId}` 
-    };
+    console.log(`Marked ${pendingPayouts.length} payout(s) as paid for store ${storeId}`);
   } catch (error) {
     console.error("Error marking payout as paid:", error);
-    return { success: false, message: "Failed to mark payout as paid" };
   }
 }
 
@@ -56,7 +54,8 @@ export async function undoPayout(formData: FormData) {
     const storeId = Number(formData.get("storeId"));
     
     if (!storeId || isNaN(storeId)) {
-      return { success: false, message: "Invalid store ID" };
+      console.error("Invalid store ID");
+      return;
     }
 
     // Get the most recent paid payout for this store
@@ -73,7 +72,8 @@ export async function undoPayout(formData: FormData) {
       .limit(1);
 
     if (lastPaidPayout.length === 0) {
-      return { success: false, message: "No paid payouts found to undo for this store" };
+      console.error("No paid payouts found to undo for this store");
+      return;
     }
 
     const payout = lastPaidPayout[0];
@@ -89,12 +89,8 @@ export async function undoPayout(formData: FormData) {
       .where(eq(sellerPayouts.id, payout.id));
 
     revalidatePath("/admin/payouts");
-    return { 
-      success: true, 
-      message: `Undid payout ${payout.id} for store ${storeId}. Amount: $${payout.amount}` 
-    };
+    console.log(`Undid payout ${payout.id} for store ${storeId}. Amount: $${payout.amount}`);
   } catch (error) {
     console.error("Error undoing payout:", error);
-    return { success: false, message: "Failed to undo payout" };
   }
 }
