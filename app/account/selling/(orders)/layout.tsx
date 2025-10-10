@@ -17,11 +17,7 @@ export default function OrdersLayout(props: PropsWithChildren) {
             All Orders
           </Button>
         </Link>
-        <Link href={singleLevelNestedRoutes.account["abandoned-carts"]}>
-          <Button variant="link" className="p-0">
-            Abandoned Carts
-          </Button>
-        </Link>
+        {/* Abandoned Carts tab hidden as requested */}
       </div>
       {props.children}
     </>

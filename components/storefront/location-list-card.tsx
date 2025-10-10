@@ -55,7 +55,7 @@ export const LocationListCard = (props: {
         </div>
       </Link>
       
-      <div className="mt-3">
+      <div className="mt-4 md:mt-3">
         <Link href={listPageLink}>
           <Text className="font-semibold line-clamp-1 hover:text-blue-600">
             {props.storeAndLocationList.locationList.name}

@@ -10,6 +10,7 @@ import { LocationListCard } from "@/components/storefront/location-list-card";
 import { Button } from "@/components/ui/button";
 import { routes } from "@/lib/routes";
 import Link from "next/link";
+import Image from "next/image";
 import { FeatureBanner } from "../components/feature-banner";
 import {
   AlarmClock,
@@ -91,10 +92,10 @@ export default async function Home() {
           </div>
           <TabsContent value="for-sellers">
             <HomePageLayout
-              heading={<Heading size="h1">Turn Your Local Knowledge Into Income</Heading>}
+              heading={<Heading size="h1">Share Your Travel Stories</Heading>}
               subheading={
                 <Heading size="h2">
-                  Create and sell location lists to travelers worldwide. <br /> Keep 85% of every sale with no upfront costs.
+                  You&apos;ve wandered through hidden alleyways, discovered that perfect sunset spot, and found the café locals actually visit. Turn your authentic travel knowledge into WanderLists that transform someone else&apos;s journey.
                 </Heading>
               }
             >
@@ -126,14 +127,71 @@ export default async function Home() {
             </HomePageLayout>
           </TabsContent>
           <TabsContent value="for-buyers">
-            <HomePageLayout
-              heading={<Heading size="h1">Personalised WanderLists of the best places from the best Travellers</Heading>}
-              subheading={
-                <Heading size="h2">
-                  Find a WanderList that matches your style, download, sync to Google Maps and explore with ease!
-                </Heading>
-              }
-            >
+            <div className="flex flex-col items-center justify-center gap-2 text-center mb-12 pt-2">
+              <Heading size="h1">Personalised WanderLists of the best places from the best Travellers</Heading>
+              
+              {/* Desktop layout with text and image side by side */}
+              <div className="hidden md:flex items-start gap-8 max-w-6xl mx-auto mt-8">
+                <div className="flex-1 text-left space-y-4">
+                  <p className="text-slate-600 text-lg leading-relaxed">
+                    WanderLists are collections of incredible locations for incredible moments curated by experienced travellers.
+                  </p>
+                  <p className="text-slate-600 text-lg leading-relaxed">
+                    Download a WanderList that matches your style and sync it directly to your Google Maps.
+                  </p>
+                  <p className="text-slate-600 text-lg leading-relaxed">
+                    Then, directly in the Google Maps App you&apos;ll see exactly what&apos;s around you, easily navigate to those locations and even have tailored notes on what to do when you&apos;re there!
+                  </p>
+                  <p className="text-slate-600 text-lg leading-relaxed">
+                    They&apos;re even sorted into categories to make it easier to find what you want at a glance, from a great place for a run 🏃‍➡️ to the best hamburger in town 🍔.
+                  </p>
+                  <p className="text-slate-600 text-lg leading-relaxed font-medium">
+                    It makes travelling like a pro easy, with no research needed! Less time going &quot;huh?&quot;, and more time going &quot;Wow!&quot;
+                  </p>
+                </div>
+                <div className="flex-shrink-0">
+                  <Image
+                    src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4wlGze2ZMKmx6EaTNpR09W13qUkGuiZMAgjYy"
+                    alt="WanderList experience on mobile"
+                    width={300}
+                    height={400}
+                    className="rounded-lg shadow-lg"
+                  />
+                </div>
+              </div>
+
+              {/* Mobile layout with stacked text and image */}
+              <div className="md:hidden space-y-6 mt-8">
+                <div className="text-left space-y-4">
+                  <p className="text-slate-600 text-lg leading-relaxed">
+                    WanderLists are collections of incredible locations for incredible moments curated by experienced travellers.
+                  </p>
+                  <p className="text-slate-600 text-lg leading-relaxed">
+                    Download a WanderList that matches your style and sync it directly to your Google Maps.
+                  </p>
+                  <p className="text-slate-600 text-lg leading-relaxed">
+                    Then, directly in the Google Maps App you&apos;ll see exactly what&apos;s around you, easily navigate to those locations and even have tailored notes on what to do when you&apos;re there!
+                  </p>
+                  <p className="text-slate-600 text-lg leading-relaxed">
+                    They&apos;re even sorted into categories to make it easier to find what you want at a glance, from a great place for a run 🏃‍➡️ to the best hamburger in town 🍔.
+                  </p>
+                  <p className="text-slate-600 text-lg leading-relaxed font-medium">
+                    It makes travelling like a pro easy, with no research needed! Less time going &quot;huh?&quot;, and more time going &quot;Wow!&quot;
+                  </p>
+                </div>
+                <div className="flex justify-center">
+                  <Image
+                    src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4wlGze2ZMKmx6EaTNpR09W13qUkGuiZMAgjYy"
+                    alt="WanderList experience on mobile"
+                    width={250}
+                    height={333}
+                    className="rounded-lg shadow-lg"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-12">
               <Heading size="h3">Featured WanderLists</Heading>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-auto mt-4">
                 {storeAndLocationList.map((item) => (
@@ -150,40 +208,7 @@ export default async function Home() {
                   <Button variant="default">View All WanderLists</Button>
                 </Link>
               </div>
-              <div className="bg-blue-900 text-white w-full p-12 rounded-md mt-12 flex items-center flex-col gap-2 justify-center text-center">
-                <p className="uppercase tracking-wide text-sm font-medium">
-                  Featured seller
-                </p>
-                <p className="text-3xl font-bold">Tim&apos;s Terrific Toys</p>
-                <p>
-                  Top seller of the month! Tim&apos;s Toys has been selling toys
-                  for 10 years and is a top rated seller on the platform.
-                </p>
-                <Link
-                  href={routes.products + "?seller=tims-toys"}
-                  className="mt-6"
-                >
-                  <Button variant="secondary">Explore seller</Button>
-                </Link>
-              </div>
-              <div className="md:grid md:grid-cols-3 gap-4 flex flex-col mt-12">
-                <FeatureBanner
-                  heading="Curated WanderLists"
-                  subheading="Discover expertly crafted WanderLists from local experts and travelers"
-                  icon={<MapPin size={32} />}
-                />
-                <FeatureBanner
-                  heading="Map Integration"
-                  subheading="Sync your purchased WanderLists directly to Google Maps and other mapping apps"
-                  icon={<Phone size={32} />}
-                />
-                <FeatureBanner
-                  heading="Local Insights"
-                  subheading="Get insider knowledge from people who know these places best"
-                  icon={<User size={32} />}
-                />
-              </div>
-            </HomePageLayout>
+            </div>
           </TabsContent>
         </Tabs>
       </ContentWrapper>

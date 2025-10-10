@@ -1,6 +1,6 @@
 import { HeadingAndSubheading } from "@/components/admin/heading-and-subheading";
 import { InfoCard } from "@/components/admin/info-card";
-import { DollarSign, Clock, CheckCircle, AlertCircle } from "lucide-react";
+import { DollarSign, Clock, CheckCircle, AlertCircle, Calendar } from "lucide-react";
 import { getStoreId } from "@/server-actions/store-details";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +9,7 @@ import PayoutMethodsManager from "@/components/admin/payout-methods-manager";
 import { getPayoutMethods, savePayoutMethods } from "@/server-actions/payout-methods";
 import { db } from "@/db/db";
 import { sellerPayouts } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { currencyFormatter } from "@/lib/currency";
 
 export default async function PaymentsPage() {
@@ -52,6 +52,34 @@ export default async function PaymentsPage() {
     .orderBy(sellerPayouts.createdAt)
     .limit(5);
 
+  // Get last payout date
+  const lastPayout = await db
+    .select({
+      payoutDate: sellerPayouts.payoutDate,
+    })
+    .from(sellerPayouts)
+    .where(
+      and(
+        eq(sellerPayouts.storeId, storeId),
+        eq(sellerPayouts.status, 'paid')
+      )
+    )
+    .orderBy(desc(sellerPayouts.payoutDate))
+    .limit(1);
+
+  // Calculate next payout date (next Tuesday)
+  const getNextTuesday = () => {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const daysUntilTuesday = dayOfWeek <= 2 ? (2 - dayOfWeek) : (9 - dayOfWeek);
+    const nextTuesday = new Date(today);
+    nextTuesday.setDate(today.getDate() + daysUntilTuesday);
+    return nextTuesday;
+  };
+
+  const lastPayoutDate = lastPayout[0]?.payoutDate;
+  const nextPayoutDate = getNextTuesday();
+
   // Server actions need to be imported, not defined inline
 
   return (
@@ -61,8 +89,29 @@ export default async function PaymentsPage() {
         subheading="Manage how you receive payments from your location list sales"
       />
 
+      {/* Payout Schedule Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="h-5 w-5" />
+            Payout Schedule
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <h3 className="font-medium text-blue-900 mb-2">Weekly Payouts</h3>
+            <p className="text-blue-800">
+              Payouts are processed weekly on <strong>Tuesdays</strong>. Any sales made during the week will be included in the next Tuesday's payout.
+            </p>
+            <p className="text-sm text-blue-700 mt-2">
+              Pending payouts below will be processed on the next scheduled payout date.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Payout Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending Payouts</CardTitle>
@@ -116,6 +165,36 @@ export default async function PaymentsPage() {
             </div>
             <p className="text-xs text-muted-foreground">
               All time earnings
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Last Payout</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-lg font-bold">
+              {lastPayoutDate ? new Date(lastPayoutDate).toLocaleDateString() : 'Never'}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {lastPayoutDate ? new Date(lastPayoutDate).toLocaleTimeString() : 'No payouts yet'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Next Payout</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-lg font-bold text-green-600">
+              {nextPayoutDate.toLocaleDateString()}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Tuesday • {nextPayoutDate.toLocaleTimeString()}
             </p>
           </CardContent>
         </Card>

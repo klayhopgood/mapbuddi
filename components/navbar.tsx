@@ -41,7 +41,9 @@ export const NavBar = async ({
               <ProductSearch />
             </li>
             <li className="flex items-center gap-6">
-              <CurrencySelector />
+              {/* Currency selector temporarily hidden - defaulting to USD */}
+              {/* <CurrencySelector /> */}
+              <span className="text-xs text-gray-500">Prices in USD</span>
               <div className="relative group">
                 <Link
                   href={routes.account}
