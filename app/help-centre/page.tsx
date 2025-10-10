@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin, ShoppingCart, CreditCard, Map, Download, Smartphone, Users, DollarSign, BarChart3 } from "lucide-react";
 
 export default function HelpCentre({
@@ -108,15 +109,90 @@ export default function HelpCentre({
                   <AccordionItem value="google-maps">
                     <AccordionTrigger>Google Maps Integration</AccordionTrigger>
                     <AccordionContent>
-                      <div className="space-y-4">
-                        <p>Sync your purchased lists directly to Google Maps:</p>
-                        <ul className="list-disc list-inside space-y-2">
-                          <li>Connect your Google account in your account settings</li>
-                          <li>Select which lists to sync to your Google Maps</li>
-                          <li>Lists appear as custom maps in your Google Maps app</li>
-                          <li>Access your lists offline for travel convenience</li>
-                          <li>Get directions and navigation to any location</li>
-                        </ul>
+                      <div className="space-y-8">
+                        <p className="text-lg">Follow these steps to connect your Google Maps account and sync your WanderLists:</p>
+                        
+                        {/* Step 1 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 1 - Click Connect Google Maps</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4Yu8SICOBkjdTX8bK6FQmIEH7ApJ0fBNlRiU5"
+                              alt="Click Connect Google Maps button"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                          <p>This will open the Google Authentication window</p>
+                        </div>
+
+                        {/* Step 2 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 2 - Select Google Account</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4IfUdEuLYSMyNDWUOFPVqJl0Q76tg2vXdHxEs"
+                              alt="Select Google Account"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                          <p>Make sure you select the Google Account that you use for Google Maps on your computer or Smart Phone</p>
+                        </div>
+
+                        {/* Step 3 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 3 - Click Continue</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4MW2qLuEUQ2dlcnrYIWBE4sSmk7TDHCgRw0bq"
+                              alt="Click Continue on privacy policy"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                          <p>You can read our privacy policy <Link href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline">located here</Link></p>
+                        </div>
+
+                        {/* Step 4 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 4 - Click Continue</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4C30dZNP2rD74LbQVCPavoyKW1UulpGIN8TMH"
+                              alt="Click Continue to approve permissions"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                          <p>Approving this gives us the limited access we need for the KML File (Google Maps File) to be added to your Google Drive/Google Maps account</p>
+                        </div>
+
+                        {/* Step 5 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 5 - Completed!</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR47jF3Fy68dXcjU5BZx4qGIHpo6Er9A0sDwyMn"
+                              alt="Google Maps connection completed"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                          <p>You should now see that your Google Maps is now connected!</p>
+                        </div>
+
+                        <div className="bg-green-50 p-4 rounded-lg mt-6">
+                          <p className="text-sm text-green-800">
+                            <strong>🎉 Success!</strong> Your Google Maps account is now connected. You can now sync your purchased WanderLists directly to your Google Maps for easy navigation.
+                          </p>
+                        </div>
+
                         <Link href="/account/buying/lists">
                           <Button variant="outline" className="mt-4">Manage Your Lists</Button>
                         </Link>

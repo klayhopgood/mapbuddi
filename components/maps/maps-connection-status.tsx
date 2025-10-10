@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Smartphone, CheckCircle, AlertCircle, ExternalLink } from "lucide-react";
 import { UserMapsIntegration } from "@/db/schema";
-import { connectGoogleMaps } from "@/server-actions/maps-integration";
+import { connectGoogleMaps, disconnectGoogleMaps } from "@/server-actions/maps-integration";
 import { toast } from "sonner";
 import Link from "next/link";
 import { routes } from "@/lib/routes";
@@ -32,6 +32,24 @@ export function MapsConnectionStatus({ userId, mapsIntegration }: MapsConnection
       } catch (error) {
         toast.error("Failed to connect Google Maps");
         console.error("Google Maps connection error:", error);
+      }
+    });
+  };
+
+  const handleGoogleMapsDisconnect = () => {
+    startTransition(async () => {
+      try {
+        const result = await disconnectGoogleMaps(userId);
+        if (result.success) {
+          toast.success(result.message);
+          // Refresh the page to update the UI
+          window.location.reload();
+        } else {
+          toast.error(result.message || "Failed to disconnect Google Maps");
+        }
+      } catch (error) {
+        toast.error("Failed to disconnect Google Maps");
+        console.error("Google Maps disconnect error:", error);
       }
     });
   };
@@ -98,8 +116,14 @@ export function MapsConnectionStatus({ userId, mapsIntegration }: MapsConnection
                 <p className="text-sm text-green-600">
                   ✓ Ready to sync WanderLists
                 </p>
-                <Button variant="outline" size="sm" className="w-full">
-                  Manage Connection
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
+                  onClick={handleGoogleMapsDisconnect}
+                  disabled={isPending}
+                >
+                  Disconnect Account
                 </Button>
               </div>
             )}

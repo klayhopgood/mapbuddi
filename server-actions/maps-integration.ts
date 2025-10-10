@@ -10,6 +10,44 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const GOOGLE_REDIRECT_URI = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/callback`;
 
+export async function disconnectGoogleMaps(userId: string) {
+  try {
+    const user = await currentUser();
+    if (!user || user.id !== userId) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    // Disable all syncs for this user first
+    await db
+      .update(purchasedListSync)
+      .set({
+        googleMapsSyncEnabled: false,
+        googleMapsSynced: false,
+        googleMapsMapId: null,
+        googleMapsLastSync: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(purchasedListSync.userId, userId));
+
+    // Remove Google Maps integration
+    await db
+      .update(userMapsIntegration)
+      .set({
+        googleMapsConnected: false,
+        googleAccessToken: null,
+        googleRefreshToken: null,
+        googleTokenExpiry: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(userMapsIntegration.userId, userId));
+
+    return { success: true, message: "Google Maps disconnected successfully" };
+  } catch (error) {
+    console.error("Disconnect Google Maps error:", error);
+    return { success: false, message: "Failed to disconnect Google Maps" };
+  }
+}
+
 export async function connectGoogleMaps(userId: string) {
   try {
     const user = await currentUser();
