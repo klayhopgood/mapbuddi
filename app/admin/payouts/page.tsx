@@ -26,8 +26,9 @@ interface StorePayoutSummary {
 }
 
 async function getStorePayoutSummaries(): Promise<StorePayoutSummary[]> {
-  // Get all stores with their payout methods
-  const storesWithPayouts = await db
+  try {
+    // Get all stores with their payout methods
+    const storesWithPayouts = await db
     .select({
       storeId: stores.id,
       storeName: stores.name,
@@ -125,10 +126,15 @@ async function getStorePayoutSummaries(): Promise<StorePayoutSummary[]> {
   }
 
   return summaries.sort((a, b) => b.pendingPayoutAmount - a.pendingPayoutAmount);
+  } catch (error) {
+    console.error("Error in getStorePayoutSummaries:", error);
+    throw error; // Re-throw to be caught by the page component
+  }
 }
 
 export default async function AdminPayoutsPage() {
-  const storeSummaries = await getStorePayoutSummaries();
+  try {
+    const storeSummaries = await getStorePayoutSummaries();
 
   return (
     <div className="space-y-6">
@@ -316,4 +322,24 @@ export default async function AdminPayoutsPage() {
       </Card>
     </div>
   );
+  } catch (error) {
+    console.error("Error loading admin payouts page:", error);
+    return (
+      <div className="space-y-6">
+        <HeadingAndSubheading
+          heading="Admin Payout Management"
+          subheading="Track and manage seller payouts manually"
+        />
+        <div className="p-8 text-center">
+          <h2 className="text-xl font-semibold text-red-600 mb-2">Error Loading Data</h2>
+          <p className="text-gray-600 mb-4">
+            There was an error loading the payout data. Please try refreshing the page.
+          </p>
+          <p className="text-sm text-gray-500">
+            If the issue persists, check the server logs for more details.
+          </p>
+        </div>
+      </div>
+    );
+  }
 }
