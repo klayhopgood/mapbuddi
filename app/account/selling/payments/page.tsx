@@ -101,7 +101,7 @@ export default async function PaymentsPage() {
           <div className="p-4 bg-blue-50 rounded-lg">
             <h3 className="font-medium text-blue-900 mb-2">Weekly Payouts</h3>
             <p className="text-blue-800">
-              Payouts are processed weekly on <strong>Tuesdays</strong>. Any sales made during the week will be included in the next Tuesday's payout.
+              Payouts are processed weekly on <strong>Tuesdays</strong>. Any sales made during the week will be included in the next Tuesday&apos;s payout.
             </p>
             <p className="text-sm text-blue-700 mt-2">
               Pending payouts below will be processed on the next scheduled payout date.
