@@ -68,7 +68,7 @@ async function getStorePayoutSummaries(): Promise<StorePayoutSummary[]> {
         );
 
       const pendingAmount = pendingPayouts.reduce((sum, payout) => 
-        sum + parseFloat(payout.amount), 0
+        sum + (parseFloat(payout.amount) || 0), 0
       );
 
       // Get last payout date
@@ -92,8 +92,8 @@ async function getStorePayoutSummaries(): Promise<StorePayoutSummary[]> {
         sellerName: `${store.firstName || ''} ${store.lastName || ''}`.trim() || 'Unknown',
         sellerEmail: 'No email available',
         socialLinks: store.socialLinks,
-        totalSalesEver: totalStats[0]?.totalSales || 0,
-        totalRevenueEver: totalStats[0]?.totalRevenue || 0,
+        totalSalesEver: Number(totalStats[0]?.totalSales) || 0,
+        totalRevenueEver: Number(totalStats[0]?.totalRevenue) || 0,
         salesSinceLastPayout: 0, // Simplified for now
         revenueSinceLastPayout: 0, // Simplified for now
         pendingPayoutAmount: pendingAmount,
