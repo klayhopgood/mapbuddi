@@ -437,7 +437,7 @@ export default function HelpCentre({
                             <h4 className="text-lg font-semibold">Step 16 - Mobile: Open Google Maps on Mobile</h4>
                             <div className="flex justify-center">
                               <Image
-                                src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4R42zgThs0kJKWq8n4MoliBUvdGHbrwzj325E"
+                                src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR42VmopV0x6uxGRFX4QgLKioIzbscE8wreVZBD"
                                 alt="Google Maps mobile - You tab"
                                 width={400}
                                 height={600}
@@ -452,7 +452,7 @@ export default function HelpCentre({
                             <h4 className="text-lg font-semibold">Step 17 - Mobile: Click &apos;Maps&apos;</h4>
                             <div className="flex justify-center">
                               <Image
-                                src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4EP5RqylBIqSC7gPm1jOynLNDQbHVRJzMfieW"
+                                src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR42VmopV0x6uxGRFX4QgLKioIzbscE8wreVZBD"
                                 alt="Google Maps mobile - Maps section"
                                 width={400}
                                 height={600}
@@ -466,7 +466,7 @@ export default function HelpCentre({
                             <h4 className="text-lg font-semibold">Step 18 - Mobile: Select your WanderList</h4>
                             <div className="flex justify-center">
                               <Image
-                                src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4Mz2Y09EUQ2dlcnrYIWBE4sSmk7TDHCgRw0bq"
+                                src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4io2myO4lYi1zhLy3oEOjNG9tcPVkm2xv5n0D"
                                 alt="Select WanderList on mobile"
                                 width={400}
                                 height={600}
@@ -476,12 +476,26 @@ export default function HelpCentre({
                           </div>
 
                           {/* Step 19 */}
-                          <div className="space-y-4">
+                          <div className="space-y-4 mb-6">
                             <h4 className="text-lg font-semibold">Step 19 - Mobile: Complete!</h4>
                             <div className="flex justify-center">
                               <Image
-                                src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4fejcIBueZ7pX8QhwM9zHUN0cuV4vYWm3dDgK"
+                                src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4EDoheQlBIqSC7gPm1jOynLNDQbHVRJzMfieW"
                                 alt="Mobile Google Maps with WanderList POIs"
+                                width={400}
+                                height={600}
+                                className="rounded-lg border shadow-sm"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Step 20 */}
+                          <div className="space-y-4">
+                            <h4 className="text-lg font-semibold">Step 20 - Mobile: View POI details</h4>
+                            <div className="flex justify-center">
+                              <Image
+                                src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4ULVvKXOxOKFeWt6LY7AsdmMkclSfJnqw2vEo"
+                                alt="View POI details on mobile"
                                 width={400}
                                 height={600}
                                 className="rounded-lg border shadow-sm"
@@ -490,12 +504,14 @@ export default function HelpCentre({
                           </div>
                         </div>
 
+
+
                         {/* Final Step */}
                         <div className="space-y-4">
-                          <h4 className="text-lg font-semibold">Step 20 - Enjoy!</h4>
+                          <h4 className="text-lg font-semibold">Step 21 - Enjoy!</h4>
                           <div className="flex justify-center">
                             <Image
-                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR42VmopV0x6uxGRFX4QgLKioIzbscE8wreVZBD"
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4fejcIBueZ7pX8QhwM9zHUN0cuV4vYWm3dDgK"
                               alt="Enjoy navigation to locations"
                               width={600}
                               height={400}
