@@ -29,17 +29,17 @@ async function getStorePayoutSummaries(): Promise<StorePayoutSummary[]> {
   try {
     // Get all stores with their payout methods
     const storesWithPayouts = await db
-    .select({
-      storeId: stores.id,
-      storeName: stores.name,
-      sellerName: sql<string>`CONCAT(${stores.firstName}, ' ', ${stores.lastName})`,
-      sellerEmail: sql<string>`''`, // We'll need to get this from Clerk or add to stores table
-      socialLinks: stores.socialLinks,
-      payoutMethod: sellerPayoutMethods.preferredMethod,
-      payoutDetails: sellerPayoutMethods.paypalEmail,
-    })
-    .from(stores)
-    .leftJoin(sellerPayoutMethods, eq(stores.id, sellerPayoutMethods.storeId));
+      .select({
+        storeId: stores.id,
+        storeName: stores.name,
+        sellerName: sql<string>`CONCAT(${stores.firstName}, ' ', ${stores.lastName})`,
+        sellerEmail: sql<string>`''`, // We'll need to get this from Clerk or add to stores table
+        socialLinks: stores.socialLinks,
+        payoutMethod: sellerPayoutMethods.preferredMethod,
+        payoutDetails: sellerPayoutMethods.paypalEmail,
+      })
+      .from(stores)
+      .leftJoin(sellerPayoutMethods, eq(stores.id, sellerPayoutMethods.storeId));
 
   const summaries: StorePayoutSummary[] = [];
 

@@ -753,7 +753,9 @@ export default function HelpCentre({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button>Contact Support</Button>
+            <a href="mailto:contact@mapbuddi.com">
+              <Button>Contact Support</Button>
+            </a>
           </CardContent>
         </Card>
       </ContentWrapper>

@@ -197,8 +197,9 @@ export default function PrivacyPolicyPage() {
               If you have any questions about this Privacy Policy or our privacy practices, please contact us at:
             </Text>
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <Text><strong>Email:</strong> privacy@mapbuddi.com</Text>
-              <Text><strong>Address:</strong> [Your Business Address]</Text>
+              <Text><strong>Email:</strong> <a href="mailto:contact@mapbuddi.com" className="text-blue-600 hover:underline">contact@mapbuddi.com</a></Text>
+              <Text><strong>Company:</strong> Khop Media Pty Ltd</Text>
+              <Text><strong>ABN:</strong> 77 673 029 117</Text>
             </div>
           </section>
         </div>
