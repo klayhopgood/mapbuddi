@@ -200,6 +200,324 @@ export default function HelpCentre({
                     </AccordionContent>
                   </AccordionItem>
 
+                  <AccordionItem value="how-to-sync-wanderlists">
+                    <AccordionTrigger>How To Sync and View WanderLists to Google Maps</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-8">
+                        <p className="text-lg">Once you&apos;ve connected Google Maps, follow these detailed steps to sync and view your WanderLists:</p>
+                        
+                        {/* Step 1 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 1 - Click to expand the &quot;Sync to Maps&quot; box</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4pR46IxoSUMDvfJBTZwskA8ahIzdWnqLtuEr3"
+                              alt="Click to expand Sync to Maps box"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Step 2 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 2 - Click the toggle to sync your selected WanderList</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4wxYsEdMKmx6EaTNpR09W13qUkGuiZMAgjYyd"
+                              alt="Click toggle to sync WanderList"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Step 3 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 3 - You will see sync in progress</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4p9wNDpoSUMDvfJBTZwskA8ahIzdWnqLtuEr3"
+                              alt="Sync in progress"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Step 4 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 4 - Syncing confirmed</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4BTUQKFNfK2pdtxLWj67oSY5uBlVGa1enzs0X"
+                              alt="Syncing confirmed"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                          <p>This can take 5 to 30 seconds. If you are stuck in &quot;Pending&quot; try reconnecting your Google Maps above</p>
+                        </div>
+
+                        {/* Step 5 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 5 - Optional confirmation</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4sNxkQfWQ3S0KXLZoWV1lP2NR9TEbfUvjHOuM"
+                              alt="MapBuddi folder in Google Drive"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                          <p>You can go to your Google Drive and you will see a new MapBuddi Folder</p>
+                        </div>
+
+                        {/* Step 6 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 6 - Optional confirmation</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4aOYAH9QTNejhU8CyHxtXIwLO2G73B9SPmckf"
+                              alt="KML file in MapBuddi folder"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                          <p>In that folder you will see the KML file associated with the WanderList you synced</p>
+                        </div>
+
+                        {/* Step 7 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 7 - Click &quot;Open My Maps&quot;</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4tC7K2ca6Pgaz5Qsoi24xOH9LtbAeJpZq3G1k"
+                              alt="Click Open My Maps button"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                          <p>Back in MapBuddi, click the &quot;Open My Maps&quot; button...</p>
+                        </div>
+
+                        {/* Step 8 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 8 - You&apos;ll be taken to the Google My Maps window</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4OOCDKNFSw1zR3Z5FU2Wla7ghVNrJCAvtjXfL"
+                              alt="Google My Maps window"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                          <p>Click the &quot;Create A New Map&quot; button</p>
+                        </div>
+
+                        {/* Step 9 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 9 - Click &quot;Create&quot;</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4wCwk60MKmx6EaTNpR09W13qUkGuiZMAgjYyd"
+                              alt="Click Create button"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Step 10 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 10 - Add a Title</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4Lk2xCjciJrbYxq7h8j1SIykV24uHszna6Oep"
+                              alt="Add map title"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Step 11 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 11 - Click &apos;Import&apos;</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4rO1v9bjwveNfUkbqC1A6H7lKucoPm9si4BSn"
+                              alt="Click Import button"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Step 12 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 12 - Select the WanderList from your Google Drive</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4bykGafIvTqFgfnPOR7L6tEMWwpGCzKydhBZY"
+                              alt="Select WanderList from Google Drive"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Step 13 */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 13 - You&apos;ll now see the POI&apos;s have been added</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4AO64xbzvGwMqkLIWes9EzhlOPTcixyQSfrJD"
+                              alt="POIs added to map"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Desktop Section */}
+                        <div className="bg-blue-50 p-4 rounded-lg">
+                          <h3 className="text-xl font-semibold mb-4 text-blue-800">🖥️ Desktop Instructions</h3>
+                          
+                          {/* Step 14 */}
+                          <div className="space-y-4 mb-6">
+                            <h4 className="text-lg font-semibold">Step 14 - Desktop: Go to Google Maps</h4>
+                            <div className="flex justify-center">
+                              <Image
+                                src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4h5WkCi2qaCdxcRoflpQGNmyHwYsgkuMr163j"
+                                alt="Google Maps desktop - Saved Maps"
+                                width={600}
+                                height={400}
+                                className="rounded-lg border shadow-sm"
+                              />
+                            </div>
+                            <p>Open Google Maps, click &apos;Saved&apos;, then &apos;Maps&apos;, then select the WanderList</p>
+                          </div>
+
+                          {/* Step 15 */}
+                          <div className="space-y-4">
+                            <h4 className="text-lg font-semibold">Step 15 - Desktop: Complete!</h4>
+                            <div className="flex justify-center">
+                              <Image
+                                src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4veWYDbgUMP9yHBqcdgzFWIbS0REx7wK215mC"
+                                alt="Desktop Google Maps with WanderList POIs"
+                                width={600}
+                                height={400}
+                                className="rounded-lg border shadow-sm"
+                              />
+                            </div>
+                            <p>You&apos;ll now see your WanderList POI&apos;s showing up in your Google Maps! You can click on them to see more details, and route to them. Enjoy the treasures that await!</p>
+                          </div>
+                        </div>
+
+                        {/* Mobile Section */}
+                        <div className="bg-green-50 p-4 rounded-lg">
+                          <h3 className="text-xl font-semibold mb-4 text-green-800">📱 Mobile Instructions</h3>
+                          
+                          {/* Step 16 */}
+                          <div className="space-y-4 mb-6">
+                            <h4 className="text-lg font-semibold">Step 16 - Mobile: Open Google Maps on Mobile</h4>
+                            <div className="flex justify-center">
+                              <Image
+                                src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4R42zgThs0kJKWq8n4MoliBUvdGHbrwzj325E"
+                                alt="Google Maps mobile - You tab"
+                                width={400}
+                                height={600}
+                                className="rounded-lg border shadow-sm"
+                              />
+                            </div>
+                            <p>Open Google Maps, click &apos;You&apos;.</p>
+                          </div>
+
+                          {/* Step 17 */}
+                          <div className="space-y-4 mb-6">
+                            <h4 className="text-lg font-semibold">Step 17 - Mobile: Click &apos;Maps&apos;</h4>
+                            <div className="flex justify-center">
+                              <Image
+                                src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4EP5RqylBIqSC7gPm1jOynLNDQbHVRJzMfieW"
+                                alt="Google Maps mobile - Maps section"
+                                width={400}
+                                height={600}
+                                className="rounded-lg border shadow-sm"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Step 18 */}
+                          <div className="space-y-4 mb-6">
+                            <h4 className="text-lg font-semibold">Step 18 - Mobile: Select your WanderList</h4>
+                            <div className="flex justify-center">
+                              <Image
+                                src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4Mz2Y09EUQ2dlcnrYIWBE4sSmk7TDHCgRw0bq"
+                                alt="Select WanderList on mobile"
+                                width={400}
+                                height={600}
+                                className="rounded-lg border shadow-sm"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Step 19 */}
+                          <div className="space-y-4">
+                            <h4 className="text-lg font-semibold">Step 19 - Mobile: Complete!</h4>
+                            <div className="flex justify-center">
+                              <Image
+                                src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR4fejcIBueZ7pX8QhwM9zHUN0cuV4vYWm3dDgK"
+                                alt="Mobile Google Maps with WanderList POIs"
+                                width={400}
+                                height={600}
+                                className="rounded-lg border shadow-sm"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Final Step */}
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-semibold">Step 20 - Enjoy!</h4>
+                          <div className="flex justify-center">
+                            <Image
+                              src="https://52cbfztl89.ufs.sh/f/VxEv67daUjR42VmopV0x6uxGRFX4QgLKioIzbscE8wreVZBD"
+                              alt="Enjoy navigation to locations"
+                              width={600}
+                              height={400}
+                              className="rounded-lg border shadow-sm"
+                            />
+                          </div>
+                          <p>Enjoy easy navigation to all the best locations!</p>
+                        </div>
+
+                        <div className="bg-purple-50 p-4 rounded-lg mt-6">
+                          <p className="text-sm text-purple-800">
+                            <strong>🗺️ Pro Tip:</strong> Your WanderLists are now accessible both on desktop and mobile Google Maps for seamless navigation wherever you go!
+                          </p>
+                        </div>
+
+                        <Link href="/account/buying/lists">
+                          <Button variant="outline" className="mt-4">Sync Your WanderLists</Button>
+                        </Link>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
                   <AccordionItem value="account-management">
                     <AccordionTrigger>Managing Your Account</AccordionTrigger>
                     <AccordionContent>
