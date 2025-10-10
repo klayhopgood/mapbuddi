@@ -22,6 +22,7 @@ interface PurchasedList {
   description: string | null;
   totalPois: number | null;
   sellerName: string | null;
+  sellerSlug: string | null;
   orderId: number;
   purchaseDate: number | null;
   price: number;

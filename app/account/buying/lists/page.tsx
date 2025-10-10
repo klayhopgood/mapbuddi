@@ -38,6 +38,7 @@ async function getUserListsData(userId: string, userEmail: string) {
                 description: locationLists.description,
                 totalPois: locationLists.totalPois,
                 sellerName: stores.name,
+                sellerSlug: stores.slug,
               })
               .from(locationLists)
               .leftJoin(stores, eq(locationLists.storeId, stores.id))
