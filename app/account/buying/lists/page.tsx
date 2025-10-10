@@ -1,5 +1,5 @@
 import { InfoCard } from "@/components/admin/info-card";
-import { Box, MapPin } from "lucide-react";
+import { Box, MapPin, ExternalLink } from "lucide-react";
 import { HeadingAndSubheading } from "@/components/admin/heading-and-subheading";
 import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/db/db";
@@ -7,6 +7,9 @@ import { orders, stores, locationLists, userMapsIntegration, purchasedListSync }
 import { eq } from "drizzle-orm";
 import { MapsConnectionStatus } from "@/components/maps/maps-connection-status";
 import { PurchasedListsManager } from "@/components/maps/purchased-lists-manager-new";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { routes } from "@/lib/routes";
 
 async function getUserListsData(userId: string, userEmail: string) {
   try {
@@ -132,9 +135,21 @@ export default async function YourWanderListsPage() {
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-semibold mb-2">Your WanderLists</h2>
-            <p className="text-muted-foreground">
-              Toggle sync for each WanderList to add them to your connected maps apps
-            </p>
+            <div className="flex items-start justify-between gap-4">
+              <p className="text-muted-foreground">
+                Toggle sync for each WanderList to add them to your connected maps apps
+              </p>
+              <Link 
+                href={`${routes.helpCentre}?tab=buyers&section=how-to-sync-wanderlists`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="outline" size="sm" className="flex items-center gap-2 whitespace-nowrap">
+                  <ExternalLink size={16} />
+                  How To Sync WanderLists Help
+                </Button>
+              </Link>
+            </div>
           </div>
           
           <PurchasedListsManager

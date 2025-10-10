@@ -342,9 +342,8 @@ export default function HelpCentre({
               Can&apos;t find what you&apos;re looking for? Get in touch with our support team.
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex gap-4">
+          <CardContent>
             <Button>Contact Support</Button>
-            <Button variant="outline">Community Forum</Button>
           </CardContent>
         </Card>
       </ContentWrapper>

@@ -4,12 +4,13 @@ import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { MapPin, CheckCircle, Clock, Smartphone } from "lucide-react";
+import { MapPin, CheckCircle, Clock, Smartphone, ExternalLink } from "lucide-react";
 import { UserMapsIntegration, PurchasedListSync } from "@/db/schema";
 import { toggleListSync, retryFailedSync } from "@/server-actions/maps-integration";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { routes } from "@/lib/routes";
 
 interface PurchasedList {
   id: number;
@@ -123,24 +124,34 @@ export function SyncToMapsSection({
             {/* Action buttons for synced maps */}
             {syncStatus?.googleMapsSynced && syncStatus?.googleMapsMapId && (
               <div className="flex flex-col gap-2 mt-2">
-                <div className="flex gap-2">
-                  <Link 
-                    href="https://mymaps.google.com/" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
-                    <Button variant="default" size="sm" className="text-xs bg-blue-600 hover:bg-blue-700">
-                      🗺️ Open My Maps
-                    </Button>
-                  </Link>
-                  <Link 
-                    href={`https://drive.google.com/file/d/${syncStatus.googleMapsMapId}/view`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
-                    <Button variant="outline" size="sm" className="text-xs">View KML</Button>
-                  </Link>
-                </div>
+                       <div className="flex gap-2">
+                         <Link 
+                           href="https://mymaps.google.com/" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                         >
+                           <Button variant="default" size="sm" className="text-xs bg-blue-600 hover:bg-blue-700">
+                             🗺️ Open My Maps
+                           </Button>
+                         </Link>
+                         <Link 
+                           href={`https://drive.google.com/file/d/${syncStatus.googleMapsMapId}/view`} 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                         >
+                           <Button variant="outline" size="sm" className="text-xs">View KML</Button>
+                         </Link>
+                         <Link 
+                           href={`${routes.helpCentre}?tab=buyers&section=google-maps-integration`}
+                           target="_blank"
+                           rel="noopener noreferrer"
+                         >
+                           <Button variant="outline" size="sm" className="text-xs flex items-center gap-1">
+                             <ExternalLink size={12} />
+                             How To View In Google Maps Guide
+                           </Button>
+                         </Link>
+                       </div>
                 <div className="text-xs text-muted-foreground bg-blue-50 p-2 rounded">
                   💡 <strong>Step 1:</strong> Click &quot;Open My Maps&quot; → &quot;Create a New Map&quot; → &quot;Import&quot; → Select your KML file<br/>
                   💡 <strong>Step 2:</strong> Open Google Maps app → Tap &quot;You&quot; (bottom) → Tap &quot;Maps&quot; → Find your imported map

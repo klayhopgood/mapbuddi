@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { MapPin, Calendar, Users, ChevronDown, ChevronUp, Star, MessageSquare } from "lucide-react";
+import { MapPin, Calendar, Users, ChevronDown, ChevronUp, Star, MessageSquare, ExternalLink } from "lucide-react";
 import { UserMapsIntegration, PurchasedListSync } from "@/db/schema";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,8 @@ import { currencyFormatter } from "@/lib/currency";
 import { SyncToMapsSection } from "./sync-to-maps-section";
 import { ViewPoisSection } from "./view-pois-section";
 import { LeaveReviewSection } from "./leave-review-section";
+import Link from "next/link";
+import { getWanderListUrl } from "@/lib/wanderlist-utils";
 
 interface PurchasedList {
   id: number;
@@ -79,9 +81,21 @@ export function PurchasedListsManager({
                     {list.description || "A curated collection of points of interest"}
                   </p>
                 </div>
-                <Badge variant="outline">
-                  ${list.price}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Link 
+                    href={getWanderListUrl(list.name)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button variant="outline" size="sm" className="flex items-center gap-1">
+                      <ExternalLink size={14} />
+                      View List
+                    </Button>
+                  </Link>
+                  <Badge variant="outline">
+                    ${list.price}
+                  </Badge>
+                </div>
               </div>
               
               {/* List Details */}
@@ -92,7 +106,15 @@ export function PurchasedListsManager({
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-muted-foreground" />
-                  <span>by {list.sellerName}</span>
+                  <span>by </span>
+                  <Link 
+                    href={`/profile/${list.sellerSlug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 hover:underline"
+                  >
+                    {list.sellerName}
+                  </Link>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -113,12 +135,14 @@ export function PurchasedListsManager({
                 onOpenChange={() => toggleSection(list.id, 'sync')}
               >
                 <CollapsibleTrigger asChild>
-                  <Button variant="ghost" className="w-full justify-between p-0 h-auto">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      <span className="font-medium">Sync to Maps</span>
+                  <Button variant="ghost" className="w-full justify-start p-3 h-auto border rounded-lg hover:bg-gray-50">
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        <span className="font-medium">Sync to Maps</span>
+                      </div>
+                      {sections.sync ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </div>
-                    {sections.sync ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-3">
@@ -137,12 +161,14 @@ export function PurchasedListsManager({
                 onOpenChange={() => toggleSection(list.id, 'pois')}
               >
                 <CollapsibleTrigger asChild>
-                  <Button variant="ghost" className="w-full justify-between p-0 h-auto">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      <span className="font-medium">View POIs</span>
+                  <Button variant="ghost" className="w-full justify-start p-3 h-auto border rounded-lg hover:bg-gray-50">
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        <span className="font-medium">View POIs</span>
+                      </div>
+                      {sections.pois ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </div>
-                    {sections.pois ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-3">
@@ -156,12 +182,14 @@ export function PurchasedListsManager({
                 onOpenChange={() => toggleSection(list.id, 'review')}
               >
                 <CollapsibleTrigger asChild>
-                  <Button variant="ghost" className="w-full justify-between p-0 h-auto">
-                    <div className="flex items-center gap-2">
-                      <Star className="h-4 w-4" />
-                      <span className="font-medium">Leave a Review</span>
+                  <Button variant="ghost" className="w-full justify-start p-3 h-auto border rounded-lg hover:bg-gray-50">
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2">
+                        <Star className="h-4 w-4" />
+                        <span className="font-medium">Leave a Review</span>
+                      </div>
+                      {sections.review ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </div>
-                    {sections.review ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-3">

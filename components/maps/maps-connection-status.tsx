@@ -4,10 +4,12 @@ import { useState, useTransition } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Smartphone, CheckCircle, AlertCircle } from "lucide-react";
+import { MapPin, Smartphone, CheckCircle, AlertCircle, ExternalLink } from "lucide-react";
 import { UserMapsIntegration } from "@/db/schema";
 import { connectGoogleMaps } from "@/server-actions/maps-integration";
 import { toast } from "sonner";
+import Link from "next/link";
+import { routes } from "@/lib/routes";
 
 interface MapsConnectionStatusProps {
   userId: string;
@@ -38,9 +40,21 @@ export function MapsConnectionStatus({ userId, mapsIntegration }: MapsConnection
     <div className="space-y-4">
       <div>
         <h2 className="text-2xl font-semibold mb-2">Maps Integration</h2>
-        <p className="text-muted-foreground">
-          Connect your maps apps to sync your purchased WanderLists
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <p className="text-muted-foreground">
+            Connect your maps apps to sync your purchased WanderLists
+          </p>
+          <Link 
+            href={`${routes.helpCentre}?tab=buyers&section=google-maps-integration`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button variant="outline" size="sm" className="flex items-center gap-2 whitespace-nowrap">
+              <ExternalLink size={16} />
+              How To Sync Google Maps
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -2,7 +2,7 @@
 
 import { db } from "@/db/db";
 import { listPois, listCategories } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 export async function getListPois(listId: number) {
   try {
@@ -17,6 +17,7 @@ export async function getListPois(listId: number) {
     }
 
     // Get POIs for all categories
+    const categoryIds = categories.map(cat => cat.id);
     const pois = await db
       .select({
         id: listPois.id,
@@ -30,7 +31,7 @@ export async function getListPois(listId: number) {
         createdAt: listPois.createdAt,
       })
       .from(listPois)
-      .where(eq(listPois.categoryId, categories[0].id)); // For now, just get POIs from first category
+      .where(inArray(listPois.categoryId, categoryIds)); // Get POIs from ALL categories
 
     // Group POIs by category
     const poisWithCategories = pois.map(poi => {

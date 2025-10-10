@@ -66,7 +66,12 @@ export const NavBar = async ({
                   </div>
                 </div>
               </div>
-              <Link href={routes.helpCentre} className="uppercase text-gray-700 text-sm hover:text-primary transition-colors">
+              <Link 
+                href={routes.helpCentre} 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="uppercase text-gray-700 text-sm hover:text-primary transition-colors"
+              >
                 Help Centre
               </Link>
             </li>

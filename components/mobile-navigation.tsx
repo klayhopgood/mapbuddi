@@ -99,6 +99,7 @@ export const MobileNavigation = () => {
               href={routes.helpCentre}
               name="Help Centre"
               setIsMobileNavOpen={setIsMobileNavOpen}
+              external={true}
             />
           </div>
         </SheetContent>
@@ -112,6 +113,7 @@ const NavBarLink = (props: {
   name: string;
   image: string;
   setIsMobileNavOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  external?: boolean;
 }) => {
   const router = useRouter();
   return (
@@ -127,7 +129,11 @@ const NavBarLink = (props: {
         <Button
           variant="link"
           onClick={() => {
-            router.push(props.href);
+            if (props.external) {
+              window.open(props.href, '_blank', 'noopener,noreferrer');
+            } else {
+              router.push(props.href);
+            }
             props.setIsMobileNavOpen(false);
           }}
         >
