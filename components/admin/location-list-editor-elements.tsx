@@ -69,7 +69,7 @@ export const LocationListEditorElements = (props: {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const [formValues, setFormValues] = useState<Omit<LocationList, "id" | "storeId" | "totalPois" | "avgRating" | "createdAt" | "updatedAt">>(
+  const [formValues, setFormValues] = useState<Omit<LocationList, "id" | "storeId" | "totalPois" | "avgRating" | "createdAt" | "updatedAt" | "deletedAt">>(
     props.initialValues ?? defaultValues
   );
 
