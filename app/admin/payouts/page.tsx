@@ -90,7 +90,7 @@ async function getStorePayoutSummaries(): Promise<StorePayoutSummary[]> {
         storeId: store.id,
         storeName: store.name || `Store ${store.id}`,
         sellerName: `${store.firstName || ''} ${store.lastName || ''}`.trim() || 'Unknown',
-        sellerEmail: 'No email available',
+        sellerEmail: store.userId || 'No email available',
         socialLinks: store.socialLinks,
         totalSalesEver: Number(totalStats[0]?.totalSales) || 0,
         totalRevenueEver: Number(totalStats[0]?.totalRevenue) || 0,
@@ -98,7 +98,19 @@ async function getStorePayoutSummaries(): Promise<StorePayoutSummary[]> {
         revenueSinceLastPayout: 0, // Simplified for now
         pendingPayoutAmount: pendingAmount,
         payoutMethod: payoutMethod[0]?.preferredMethod || 'Not set',
-        payoutDetails: payoutMethod[0]?.paypalEmail || 'Not configured',
+        payoutDetails: payoutMethod[0] ? JSON.stringify({
+          paypalEmail: payoutMethod[0].paypalEmail,
+          usRoutingNumber: payoutMethod[0].usRoutingNumber,
+          usAccountNumber: payoutMethod[0].usAccountNumber,
+          usAccountType: payoutMethod[0].usAccountType,
+          ukSortCode: payoutMethod[0].ukSortCode,
+          ukAccountNumber: payoutMethod[0].ukAccountNumber,
+          euIban: payoutMethod[0].euIban,
+          euBic: payoutMethod[0].euBic,
+          auBsb: payoutMethod[0].auBsb,
+          auAccountNumber: payoutMethod[0].auAccountNumber,
+          accountHolderName: payoutMethod[0].accountHolderName,
+        }) : 'Not configured',
         lastPayoutDate: lastPayout[0]?.payoutDate ? new Date(lastPayout[0].payoutDate).toLocaleDateString() : 'Never',
       });
     }
@@ -207,17 +219,17 @@ export default async function AdminPayoutsPage() {
                     <td className="p-3">
                       <div className="font-medium">{store.sellerName}</div>
                       {store.socialLinks && (
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-500 space-x-2">
                           {(() => {
                             try {
                               const socials = JSON.parse(store.socialLinks);
-                              return [
-                                socials.youtube && 'YouTube',
-                                socials.tiktok && 'TikTok',
-                                socials.instagram && 'Instagram'
-                              ].filter(Boolean).join(' ');
+                              const links = [];
+                              if (socials.youtube) links.push(<a key="yt" href={socials.youtube} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">YouTube</a>);
+                              if (socials.tiktok) links.push(<a key="tt" href={socials.tiktok} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">TikTok</a>);
+                              if (socials.instagram) links.push(<a key="ig" href={socials.instagram} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Instagram</a>);
+                              return links.length > 0 ? links : null;
                             } catch {
-                              return '';
+                              return null;
                             }
                           })()}
                         </div>
@@ -256,7 +268,27 @@ export default async function AdminPayoutsPage() {
                           {store.payoutMethod === 'bank_au' && 'AU Bank'}
                           {!store.payoutMethod && 'Not set'}
                         </div>
-                        <div className="text-gray-500 text-xs">{store.payoutDetails}</div>
+                        <div className="text-gray-500 text-xs">
+                          {(() => {
+                            try {
+                              const details = JSON.parse(store.payoutDetails);
+                              if (store.payoutMethod === 'paypal') {
+                                return details.paypalEmail || 'No email';
+                              } else if (store.payoutMethod === 'bank_au') {
+                                return `BSB: ${details.auBsb || 'N/A'} • Account: ${details.auAccountNumber || 'N/A'}`;
+                              } else if (store.payoutMethod === 'bank_us') {
+                                return `Routing: ${details.usRoutingNumber || 'N/A'} • Account: ${details.usAccountNumber || 'N/A'}`;
+                              } else if (store.payoutMethod === 'bank_uk') {
+                                return `Sort: ${details.ukSortCode || 'N/A'} • Account: ${details.ukAccountNumber || 'N/A'}`;
+                              } else if (store.payoutMethod === 'bank_eu') {
+                                return `IBAN: ${details.euIban || 'N/A'}`;
+                              }
+                              return 'No details';
+                            } catch {
+                              return store.payoutDetails;
+                            }
+                          })()}
+                        </div>
                       </div>
                     </td>
                     <td className="p-3 text-sm text-gray-500">
