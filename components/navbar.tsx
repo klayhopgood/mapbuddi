@@ -24,7 +24,9 @@ export const NavBar = async ({
         )}
       >
         <ContentWrapper className="flex justify-between items-center md:hidden flex-wrap gap-4">
-          <Logo />
+          <Link href="/">
+            <Logo />
+          </Link>
           <div className="ml-auto flex items-center gap-8">
             <ShoppingCartHeader />
             <MobileNavigation />
