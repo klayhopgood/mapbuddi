@@ -56,12 +56,19 @@ async function checkGooglePlaces() {
 
 async function checkUploadThing() {
   try {
+    // Check if both required UploadThing env vars are set
+    if (!process.env.UPLOADTHING_SECRET || !process.env.UPLOADTHING_TOKEN) {
+      return { status: "error", message: "UploadThing env vars missing" };
+    }
+    
+    // Simple check - try to make a request to UploadThing API
     const response = await fetch("https://api.uploadthing.com/api/health", {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${process.env.UPLOADTHING_SECRET}`,
       },
     });
+    
     if (response.ok) {
       return { status: "success", message: "UploadThing connected" };
     } else {

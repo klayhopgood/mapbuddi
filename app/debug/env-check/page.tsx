@@ -12,11 +12,10 @@ const requiredEnvVars = [
   { key: "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", required: true, sensitive: false },
   { key: "GOOGLE_PLACES_API_KEY", required: true, sensitive: true },
   { key: "NEXT_PUBLIC_GOOGLE_PLACES_API_KEY", required: true, sensitive: false },
-  { key: "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY", required: true, sensitive: false },
   { key: "GOOGLE_CLIENT_ID", required: true, sensitive: true },
   { key: "GOOGLE_CLIENT_SECRET", required: true, sensitive: true },
   { key: "UPLOADTHING_SECRET", required: true, sensitive: true },
-  { key: "UPLOADTHING_APP_ID", required: true, sensitive: false },
+  { key: "UPLOADTHING_TOKEN", required: true, sensitive: true },
   { key: "NEXT_PUBLIC_APP_URL", required: true, sensitive: false },
 ];
 
