@@ -198,7 +198,7 @@ function SellingOverview() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href={routes.helpCentre}>
+            <Link href="/account/selling/lists/new">
               <Button>Get Started Today</Button>
             </Link>
           </CardContent>

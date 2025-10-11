@@ -27,7 +27,8 @@ export const NavBar = async ({
           <Link href="/">
             <Logo />
           </Link>
-          <div className="ml-auto flex items-center gap-8">
+          <div className="ml-auto flex items-center gap-2">
+            <span className="text-[10px] text-gray-500 font-medium px-2 py-1 bg-gray-100 rounded">USD</span>
             <ShoppingCartHeader />
             <MobileNavigation />
           </div>

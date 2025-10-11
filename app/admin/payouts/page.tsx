@@ -144,7 +144,7 @@ export default async function AdminPayoutsPage() {
     <div className="space-y-6">
       <HeadingAndSubheading
         heading="Admin Payout Management"
-        subheading="Track and manage seller payouts manually"
+        subheading="Track and manage seller payouts manually. Payouts are processed twice monthly on the 1st Tuesday and 3rd Tuesday."
       />
 
       {/* Summary Stats */}

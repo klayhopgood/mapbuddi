@@ -67,18 +67,42 @@ export default async function PaymentsPage() {
     .orderBy(desc(sellerPayouts.payoutDate))
     .limit(1);
 
-  // Calculate next payout date (next Tuesday)
-  const getNextTuesday = () => {
+  // Calculate next payout date (1st or 3rd Tuesday of the month)
+  const getNextPayoutTuesday = () => {
     const today = new Date();
-    const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-    const daysUntilTuesday = dayOfWeek <= 2 ? (2 - dayOfWeek) : (9 - dayOfWeek);
-    const nextTuesday = new Date(today);
-    nextTuesday.setDate(today.getDate() + daysUntilTuesday);
-    return nextTuesday;
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    // Helper to find the Nth Tuesday of a month
+    const getNthTuesday = (year: number, month: number, n: number) => {
+      const firstDay = new Date(year, month, 1);
+      const firstDayOfWeek = firstDay.getDay();
+      // Days until first Tuesday (2 = Tuesday)
+      const daysUntilFirstTuesday = firstDayOfWeek <= 2 ? (2 - firstDayOfWeek) : (9 - firstDayOfWeek);
+      const firstTuesday = 1 + daysUntilFirstTuesday;
+      return new Date(year, month, firstTuesday + (n - 1) * 7);
+    };
+    
+    // Get 1st and 3rd Tuesday of current month
+    const firstTuesday = getNthTuesday(currentYear, currentMonth, 1);
+    const thirdTuesday = getNthTuesday(currentYear, currentMonth, 3);
+    
+    // If today is before or on 1st Tuesday, next payout is 1st Tuesday
+    if (today <= firstTuesday) {
+      return firstTuesday;
+    }
+    // If today is after 1st Tuesday but before or on 3rd Tuesday, next payout is 3rd Tuesday
+    if (today <= thirdTuesday) {
+      return thirdTuesday;
+    }
+    // Otherwise, next payout is 1st Tuesday of next month
+    const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1;
+    const nextYear = currentMonth === 11 ? currentYear + 1 : currentYear;
+    return getNthTuesday(nextYear, nextMonth, 1);
   };
 
   const lastPayoutDate = lastPayout[0]?.payoutDate;
-  const nextPayoutDate = getNextTuesday();
+  const nextPayoutDate = getNextPayoutTuesday();
 
   // Server actions need to be imported, not defined inline
 
@@ -99,13 +123,13 @@ export default async function PaymentsPage() {
         </CardHeader>
         <CardContent>
           <div className="p-4 bg-blue-50 rounded-lg">
-            <h3 className="font-medium text-blue-900 mb-2">Weekly Payouts</h3>
-            <p className="text-blue-800">
-              Payouts are processed weekly on <strong>Tuesdays</strong>. Any sales made during the week will be included in the next Tuesday&apos;s payout.
-            </p>
-            <p className="text-sm text-blue-700 mt-2">
-              Pending payouts below will be processed on the next scheduled payout date.
-            </p>
+              <h3 className="font-medium text-blue-900 mb-2">Twice-Monthly Payouts</h3>
+              <p className="text-blue-800">
+                Payouts are processed twice monthly on the <strong>1st Tuesday</strong> and <strong>3rd Tuesday</strong> of each month. Any sales made during the period will be included in the next scheduled payout.
+              </p>
+              <p className="text-sm text-blue-700 mt-2">
+                Pending payouts below will be processed on the next scheduled payout date.
+              </p>
           </div>
         </CardContent>
       </Card>

@@ -33,13 +33,13 @@ export const SecondaryMenu = (props: { menuItems: MenuItems }) => {
       </TabsList>
       <TabsContent
         value="selling"
-        className="overflow-x-auto flex justify-start items-center flex-nowrap scrollbar-hide"
+        className="overflow-x-auto flex justify-start items-center flex-nowrap scrollbar-hide max-w-[calc(100vw-200px)] md:max-w-none"
       >
         {menuNames(props.menuItems, "selling")}
       </TabsContent>
       <TabsContent
         value="buying"
-        className="overflow-x-auto flex justify-start items-center flex-nowrap scrollbar-hide"
+        className="overflow-x-auto flex justify-start items-center flex-nowrap scrollbar-hide max-w-[calc(100vw-200px)] md:max-w-none"
       >
         {menuNames(props.menuItems, "buying")}
       </TabsContent>
