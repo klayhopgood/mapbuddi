@@ -1,5 +1,9 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useState } from "react";
 
 interface LocationTagsProps {
   country?: string | null;
@@ -9,13 +13,15 @@ interface LocationTagsProps {
 }
 
 export function LocationTags({ country, cities, variant = "card", className = "" }: LocationTagsProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  
   if (!country && !cities) return null;
 
   const citiesArray = cities ? JSON.parse(cities) : [];
   const isCard = variant === "card";
 
   if (isCard) {
-    // Compact display for cards
+    // Compact display for cards with popover for multiple cities
     return (
       <div className={`flex items-center gap-1 ${className}`}>
         <MapPin size={12} className="text-gray-400" />
@@ -26,12 +32,35 @@ export function LocationTags({ country, cities, variant = "card", className = ""
             </Badge>
           )}
           {citiesArray.length > 0 && (
-            <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
-              {citiesArray.length === 1 
-                ? citiesArray[0]
-                : `${citiesArray.length} cities`
-              }
-            </Badge>
+            citiesArray.length === 1 ? (
+              <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+                {citiesArray[0]}
+              </Badge>
+            ) : (
+              <Popover open={isOpen} onOpenChange={setIsOpen}>
+                <PopoverTrigger asChild>
+                  <Badge 
+                    variant="secondary" 
+                    className="text-xs px-1.5 py-0.5 cursor-pointer hover:bg-secondary/80 transition-colors"
+                    title={`Cities: ${citiesArray.join(', ')}`}
+                  >
+                    {citiesArray.length} cities
+                  </Badge>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-3" align="start">
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-gray-700 mb-2">Cities included:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {citiesArray.map((city: string, index: number) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          🏙️ {city}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )
           )}
         </div>
       </div>

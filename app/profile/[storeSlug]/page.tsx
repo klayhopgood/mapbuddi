@@ -1,6 +1,6 @@
 import { db } from "@/db/db";
 import { stores, locationLists, listReviews } from "@/db/schema";
-import { eq, count, inArray, desc, sql } from "drizzle-orm";
+import { eq, count, inArray, desc, sql, and } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -49,7 +49,10 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
     })
     .from(locationLists)
     .leftJoin(stores, eq(locationLists.storeId, stores.id))
-    .where(eq(locationLists.storeId, store.id))
+    .where(and(
+      eq(locationLists.storeId, store.id),
+      eq(locationLists.isActive, true) // Only show active lists
+    ))
     .orderBy(
       desc(sql`(
         SELECT COUNT(*)::int 

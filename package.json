@@ -43,6 +43,7 @@
     "clsx": "^1.2.1",
     "cmdk": "^0.2.0",
     "date-fns": "^2.30.0",
+    "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.5",
     "eslint": "8.38.0",
     "eslint-config-next": "13.3.0",
@@ -74,6 +75,7 @@
     "drizzle-kit": "^0.31.5",
     "eslint-plugin-storybook": "^0.6.11",
     "storybook": "^7.0.6",
-    "tailwindcss-animate": "^1.0.5"
+    "tailwindcss-animate": "^1.0.5",
+    "tsx": "^4.20.6"
   }
 }

@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { db } from "@/db/db";
 import { LocationList, locationLists, stores, listCategories, listPois, listReviews } from "@/db/schema";
 import { formatPrice } from "@/lib/currency";
-import { eq, and, count } from "drizzle-orm";
+import { eq, and, count, inArray } from "drizzle-orm";
 import Link from "next/link";
 import Image from "next/image";
 import { routes } from "@/lib/routes";
@@ -116,17 +116,23 @@ export default async function StorefrontListDetails(props: {
     .limit(3);
 
   // Get all POIs for map preview
-  const allPois = await db
-    .select({
-      id: listPois.id,
-      name: listPois.name,
-      latitude: listPois.latitude,
-      longitude: listPois.longitude,
-      address: listPois.address,
-    })
-    .from(listPois)
-    .innerJoin(listCategories, eq(listPois.categoryId, listCategories.id))
-    .where(eq(listCategories.listId, list.id));
+  // First get all category IDs for this list
+  const categoryIds = categories.map(c => c.id);
+  
+  const allPoisResult = categoryIds.length > 0 
+    ? await db
+        .select({
+          id: listPois.id,
+          name: listPois.name,
+          latitude: listPois.latitude,
+          longitude: listPois.longitude,
+          address: listPois.address,
+        })
+        .from(listPois)
+        .where(inArray(listPois.categoryId, categoryIds))
+    : [];
+  
+  const allPois = allPoisResult;
 
   // Get review count for this list
   const reviewCountResult = await db

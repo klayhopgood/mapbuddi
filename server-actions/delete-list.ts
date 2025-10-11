@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db/db";
-import { locationLists } from "@/db/schema";
+import { locationLists, stores } from "@/db/schema";
 import { currentUser } from "@clerk/nextjs/server";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -18,6 +18,12 @@ export async function deleteLocationList(listId: number) {
       throw new Error("No store found");
     }
 
+    // Get store details for revalidation
+    const [storeInfo] = await db
+      .select({ slug: stores.slug })
+      .from(stores)
+      .where(eq(stores.id, storeId));
+
     // Soft delete: Set isActive to false instead of actually deleting
     // This preserves analytics and order history
     await db
@@ -31,8 +37,11 @@ export async function deleteLocationList(listId: number) {
         eq(locationLists.storeId, storeId) // Ensure user owns this list
       ));
 
-    // Revalidate the lists page to show updated data
+    // Revalidate the lists management page and profile page to show updated data
     revalidatePath("/account/selling/lists");
+    if (storeInfo?.slug) {
+      revalidatePath(`/profile/${storeInfo.slug}`);
+    }
 
     return {
       success: true,
