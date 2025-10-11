@@ -10,7 +10,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-08-27.basil",
 });
 
-const STRIPE_PRICE_ID = "price_1SFTH4BfpP8VYbV6Sk7Y2Jui";
+const STRIPE_PRICE_ID = "price_1SGsXkAhkad6PFAJ6xwyMtNr";
 const STRIPE_PRODUCT_ID = "prod_TBqzJQuZY7HuBP";
 
 export async function getSubscriptionStatus(storeId: number) {
