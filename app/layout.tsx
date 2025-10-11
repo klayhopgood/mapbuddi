@@ -18,6 +18,18 @@ export default async function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <head>
+          {/* Google Analytics */}
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-78X0XMB9JS"></script>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-78X0XMB9JS');
+              `,
+            }}
+          />
           <script
             defer
             data-domain="mapbuddi.com"
@@ -48,20 +60,6 @@ export default async function RootLayout({
           j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
           })(window,document,'script','dataLayer','GTM-PDHQNPVR');
-        `}
-      </Script>
-      
-      {/* Google Analytics */}
-      <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-78X0XMB9JS"
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-78X0XMB9JS');
         `}
       </Script>
     </ClerkProvider>
