@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { db } from "@/db/db";
 import { LocationList, locationLists, stores, listCategories, listPois, listReviews } from "@/db/schema";
 import { formatPrice } from "@/lib/currency";
-import { eq, and, count, inArray } from "drizzle-orm";
+import { eq, and, count, inArray, isNull } from "drizzle-orm";
 import Link from "next/link";
 import Image from "next/image";
 import { routes } from "@/lib/routes";
@@ -42,7 +42,8 @@ export default async function StorefrontListDetails(props: {
     .where(
       and(
         eq(locationLists.id, Number(props.params.listId)),
-        eq(locationLists.isActive, true)
+        eq(locationLists.isActive, true),
+        isNull(locationLists.deletedAt) // Exclude deleted lists
       )
     )
     .then((res) => {

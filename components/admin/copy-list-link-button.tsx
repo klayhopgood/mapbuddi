@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
+import { generateWanderListSlug } from "@/lib/wanderlist-utils";
 
 interface ListActionButtonsProps {
   listId: number;
@@ -18,7 +19,9 @@ export const ListActionButtons = ({ listId, listName, isActive }: ListActionButt
     return null;
   }
 
-  const listUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/list/${listId}`;
+  // Generate the slug-based URL for wanderlists
+  const slug = generateWanderListSlug(listName);
+  const listUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/wanderlists/${slug}`;
 
   const handleCopyLink = async (e: React.MouseEvent) => {
     e.preventDefault();

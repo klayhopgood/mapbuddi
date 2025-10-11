@@ -137,11 +137,12 @@ export const locationLists = pgTable("location_lists", {
   coverImage: text("cover_image"),
   images: text("images"), // JSON array of image URLs
   storeId: integer("store_id").notNull(),
-  isActive: boolean("is_active").default(true),
+  isActive: boolean("is_active").default(true), // Draft/Published status
   totalPois: integer("total_pois").default(0),
   avgRating: decimal("avg_rating", { precision: 3, scale: 2 }),
   country: varchar("country", { length: 100 }), // Country name
   cities: text("cities"), // JSON array of city names
+  deletedAt: timestamp("deleted_at"), // Soft delete tracking - if set, list is deleted
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -4,7 +4,7 @@ import { Plus, MapPin } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/db/db";
 import { locationLists } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import { currentUser } from "@clerk/nextjs/server";
 import { InfoCard } from "@/components/admin/info-card";
 import { DataTable } from "./data-table";
@@ -26,7 +26,10 @@ async function getData(): Promise<LocationListData[]> {
           createdAt: locationLists.createdAt,
         })
         .from(locationLists)
-        .where(eq(locationLists.storeId, Number(user?.privateMetadata.storeId)))
+        .where(and(
+          eq(locationLists.storeId, Number(user?.privateMetadata.storeId)),
+          isNull(locationLists.deletedAt) // Only show non-deleted lists
+        ))
         .catch((err) => {
           console.log(err);
           return [];

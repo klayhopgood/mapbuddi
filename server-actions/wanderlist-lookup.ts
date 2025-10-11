@@ -1,6 +1,6 @@
 import { db } from "@/db/db";
 import { locationLists } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import { generateWanderListSlug } from "@/lib/wanderlist-utils";
 
 /**
@@ -14,7 +14,10 @@ export async function findWanderListBySlug(slug: string) {
     const allLists = await db
       .select()
       .from(locationLists)
-      .where(eq(locationLists.isActive, true));
+      .where(and(
+        eq(locationLists.isActive, true),
+        isNull(locationLists.deletedAt) // Exclude deleted lists
+      ));
     
     // Find the list whose generated slug matches the requested slug
     for (const list of allLists) {

@@ -1,6 +1,6 @@
 import { db } from "@/db/db";
 import { stores, locationLists, listReviews } from "@/db/schema";
-import { eq, count, inArray, desc, sql, and } from "drizzle-orm";
+import { eq, count, inArray, desc, sql, and, isNull } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -37,7 +37,7 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
   const socialLinks = store.socialLinks ? JSON.parse(store.socialLinks) : {};
   const verifiedSocials = store.verifiedSocials ? JSON.parse(store.verifiedSocials) : [];
 
-  // Get all active WanderLists from this store
+  // Get all active WanderLists from this store (not deleted, and published)
   const rawData = await db
     .select({
       locationList: locationLists,
@@ -51,7 +51,8 @@ export default async function SellerProfilePage({ params }: SellerProfilePagePro
     .leftJoin(stores, eq(locationLists.storeId, stores.id))
     .where(and(
       eq(locationLists.storeId, store.id),
-      eq(locationLists.isActive, true) // Only show active lists
+      eq(locationLists.isActive, true), // Only show published lists
+      isNull(locationLists.deletedAt) // Exclude deleted lists
     ))
     .orderBy(
       desc(sql`(

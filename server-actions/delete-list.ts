@@ -24,12 +24,13 @@ export async function deleteLocationList(listId: number) {
       .from(stores)
       .where(eq(stores.id, storeId));
 
-    // Soft delete: Set isActive to false instead of actually deleting
-    // This preserves analytics and order history
+    // Soft delete: Set deletedAt timestamp instead of actually deleting
+    // This preserves analytics, order history, and purchased list data
+    // The list stays in database but is hidden from seller dashboard and public views
     await db
       .update(locationLists)
       .set({ 
-        isActive: false,
+        deletedAt: new Date(),
         updatedAt: new Date()
       })
       .where(and(
