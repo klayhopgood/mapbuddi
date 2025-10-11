@@ -76,7 +76,7 @@ export async function createAccountLink() {
       stripeAccountId = id;
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://staging.mapbuddi.com";
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://mapbuddi.com";
     
     const accountLink = await stripe.accountLinks.create({
       account: stripeAccountId,
