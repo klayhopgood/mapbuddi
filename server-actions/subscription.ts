@@ -58,7 +58,7 @@ export async function getSubscriptionStatus(storeId: number) {
   }
 }
 
-export async function createSubscription(storeId: number) {
+export async function createSubscription(storeId: number, discountCode?: string) {
   try {
     const user = await currentUser();
     if (!user) {
@@ -103,7 +103,7 @@ export async function createSubscription(storeId: number) {
     }
 
     // Create Stripe Checkout Session
-    const session = await stripe.checkout.sessions.create({
+    const sessionConfig: any = {
       customer: customerId,
       payment_method_types: ["card"],
       line_items: [
@@ -125,7 +125,18 @@ export async function createSubscription(storeId: number) {
           userId: user.id,
         },
       },
-    });
+    };
+
+    // Add discount code if provided
+    if (discountCode) {
+      sessionConfig.discounts = [
+        {
+          coupon: discountCode,
+        },
+      ];
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     // Don't create any database record here - let webhooks handle everything
     // This prevents orphaned pending records and race conditions

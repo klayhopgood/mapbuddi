@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { toast } from "../ui/use-toast";
 import { CreditCard, Calendar, Loader2, AlertTriangle } from "lucide-react";
+import { DiscountCodeInput } from "./discount-code-input";
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -28,7 +29,7 @@ interface SubscriptionStatus {
 interface SubscriptionCardProps {
   storeId: number;
   subscriptionStatus: SubscriptionStatus | null;
-  onCreateSubscription: (storeId: number) => Promise<{ url?: string | null; error?: string }>;
+  onCreateSubscription: (storeId: number, discountCode?: string) => Promise<{ url?: string | null; error?: string }>;
   onCancelSubscription: (storeId: number) => Promise<{ success?: boolean; error?: string }>;
 }
 
@@ -40,11 +41,12 @@ export function SubscriptionCard({
 }: SubscriptionCardProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [discountCode, setDiscountCode] = useState<string | null>(null);
 
   const handleSubscribe = async () => {
     setIsLoading(true);
     try {
-      const result = await onCreateSubscription(storeId);
+      const result = await onCreateSubscription(storeId, discountCode || undefined);
       
       if (result.error) {
         toast({
@@ -140,6 +142,12 @@ export function SubscriptionCard({
               </Button>
             </div>
           </div>
+          
+          {/* Discount Code Input */}
+          <DiscountCodeInput 
+            onDiscountCodeChange={setDiscountCode}
+            disabled={isLoading}
+          />
           
           <div className="text-sm text-gray-600 space-y-1">
             <p>• Cancel anytime</p>
