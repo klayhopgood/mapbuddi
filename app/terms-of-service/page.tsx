@@ -104,9 +104,17 @@ export default function TermsOfServicePage() {
             <Heading size="h2">Purchases and Payments</Heading>
             <div className="mt-4 space-y-4">
               <div>
-                <Heading size="h3">Purchasing Location Lists</Heading>
+                <Heading size="h3">Platform as Payment Facilitator</Heading>
                 <Text className="mt-2">
-                  When you purchase a location list, you receive a personal, non-transferable license to access and use that content for your personal use. You do not acquire ownership of the content itself.
+                  MapBuddi operates as a payment facilitator and agent on behalf of sellers. When you purchase a location list, the full payment is collected by MapBuddi, which then:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>Retains a 10% platform commission as our service fee</li>
+                  <li>Remits the remaining 90% to the seller</li>
+                  <li>Acts as an intermediary in the transaction</li>
+                </ul>
+                <Text className="mt-2">
+                  You receive a personal, non-transferable license to access and use the purchased content for your personal use. You do not acquire ownership of the content itself.
                 </Text>
               </div>
 
@@ -118,9 +126,35 @@ export default function TermsOfServicePage() {
               </div>
 
               <div>
-                <Heading size="h3">Refunds</Heading>
+                <Heading size="h3">Refunds and Australian Consumer Law</Heading>
                 <Text className="mt-2">
-                  Due to the digital nature of our products, all sales are final. We do not offer refunds except as required by law or in cases of technical issues that prevent access to purchased content.
+                  Under Australian Consumer Law, you have certain rights regarding refunds and guarantees. We will provide refunds in the following circumstances:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>If the product is not as described or has a major fault</li>
+                  <li>If the product is not fit for its intended purpose</li>
+                  <li>If technical issues prevent access to purchased content</li>
+                  <li>As otherwise required by Australian Consumer Law</li>
+                </ul>
+                <Text className="mt-2">
+                  To request a refund, please contact us at contact@mapbuddi.com with your order details and reason for the refund request.
+                </Text>
+              </div>
+
+              <div>
+                <Heading size="h3">Seller Tax Obligations</Heading>
+                <Text className="mt-2">
+                  <strong>Important:</strong> Sellers are responsible for their own tax obligations, including:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>Declaring and paying income tax on their earnings (90% of sale price)</li>
+                  <li>Registering for and paying Goods and Services Tax (GST) if applicable</li>
+                  <li>Obtaining an Australian Business Number (ABN) if required</li>
+                  <li>Maintaining proper business records for tax purposes</li>
+                  <li>Complying with all applicable Australian tax laws</li>
+                </ul>
+                <Text className="mt-2">
+                  MapBuddi&apos;s taxable income is limited to our 10% platform commission. We do not provide tax advice, and sellers should consult with a qualified tax professional regarding their specific obligations.
                 </Text>
               </div>
 
@@ -132,8 +166,9 @@ export default function TermsOfServicePage() {
                 <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
                   <li>Provide accurate and high-quality content</li>
                   <li>Ensure you have the right to sell the content</li>
-                  <li>Comply with applicable tax obligations</li>
+                  <li>Comply with all applicable tax obligations as outlined above</li>
                   <li>Respond to customer inquiries in a timely manner</li>
+                  <li>Maintain accurate business records</li>
                 </ul>
               </div>
             </div>
@@ -239,7 +274,7 @@ export default function TermsOfServicePage() {
           <section>
             <Heading size="h2">Governing Law</Heading>
             <Text className="mt-4">
-              These Terms shall be interpreted and governed by the laws of [Your Jurisdiction], without regard to its conflict of law provisions. Any disputes arising from these Terms will be resolved in the courts of [Your Jurisdiction].
+              These Terms shall be interpreted and governed by the laws of Australia, without regard to its conflict of law provisions. Any disputes arising from these Terms will be resolved in the courts of Australia. These Terms are subject to Australian Consumer Law and other applicable Australian legislation.
             </Text>
           </section>
 

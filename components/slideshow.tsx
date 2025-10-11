@@ -38,7 +38,7 @@ export const SlideShow = () => {
           />
         </div>
         <div className="absolute w-full h-full bg-translucentDark top-0 bottom-0 left-0 right-0">
-          <div className="absolute md:top-0 bottom-0 right-0 left-0 m-auto w-fit h-fit text-center">
+          <div className="absolute md:top-0 bottom-4 md:bottom-0 right-0 left-0 m-auto w-fit h-fit text-center">
             <div className="bg-white md:border border-border md:rounded-md py-4 md:py-8 px-4 md:px-16 flex flex-col gap-3 max-w-[90vw] md:max-w-none">
               <p className="uppercase font-medium tracking-wide">WanderLists</p>
               <div className="flex flex-col gap-2 mb-2">

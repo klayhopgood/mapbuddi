@@ -39,7 +39,24 @@ export default function PrivacyPolicyPage() {
                   <li>Participate in surveys or promotions</li>
                 </ul>
                 <Text className="mt-2">
-                  This may include your name, email address, phone number, payment information, and any other information you choose to provide.
+                  This may include your name, email address, phone number, and any other information you choose to provide. We do not store payment information on our servers - all payment processing is handled securely by Stripe and other third-party payment processors.
+                </Text>
+              </div>
+
+              <div>
+                <Heading size="h3">Payment and Compliance Information</Heading>
+                <Text className="mt-2">
+                  For payment processing and compliance purposes, we collect limited information including:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>Transaction details (amount, date, seller information)</li>
+                  <li>Payment method information (processed by Stripe, not stored by us)</li>
+                  <li>Seller identification for tax compliance purposes</li>
+                  <li>Business registration details (ABN, business name) for sellers</li>
+                  <li>Contact information for dispute resolution</li>
+                </ul>
+                <Text className="mt-2">
+                  This information is collected to facilitate payments, comply with Australian tax laws, and resolve any disputes that may arise.
                 </Text>
               </div>
 
