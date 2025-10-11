@@ -61,18 +61,15 @@ async function checkUploadThing() {
       return { status: "error", message: "UploadThing env vars missing" };
     }
     
-    // Simple check - try to make a request to UploadThing API
-    const response = await fetch("https://api.uploadthing.com/api/health", {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${process.env.UPLOADTHING_SECRET}`,
-      },
-    });
+    // UploadThing doesn't have a health endpoint, so we'll just verify the env vars are set
+    // and have reasonable lengths (they should be long strings)
+    const secretValid = process.env.UPLOADTHING_SECRET.length > 20;
+    const tokenValid = process.env.UPLOADTHING_TOKEN.length > 20;
     
-    if (response.ok) {
-      return { status: "success", message: "UploadThing connected" };
+    if (secretValid && tokenValid) {
+      return { status: "success", message: "UploadThing configured (env vars valid)" };
     } else {
-      return { status: "error", message: `UploadThing error: ${response.status}` };
+      return { status: "error", message: "UploadThing env vars appear invalid" };
     }
   } catch (error) {
     return { status: "error", message: `UploadThing error: ${error}` };
