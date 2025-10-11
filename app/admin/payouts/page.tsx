@@ -8,6 +8,20 @@ import { eq, and, desc, sql } from "drizzle-orm";
 import { currencyFormatter } from "@/lib/currency";
 import { CheckCircle, XCircle, DollarSign, User, Mail, CreditCard } from "lucide-react";
 import { markPayoutAsPaid, undoPayout } from "@/server-actions/admin-payouts";
+import { clerkClient } from "@clerk/nextjs/server";
+
+async function getSellerEmail(userId: string | null): Promise<string> {
+  if (!userId) return "No email available";
+  
+  try {
+    const clerk = await clerkClient();
+    const clerkUser = await clerk.users.getUser(userId);
+    return clerkUser.emailAddresses[0]?.emailAddress || "No email available";
+  } catch (error) {
+    console.error(`Error fetching email for user ${userId}:`, error);
+    return "Error fetching email";
+  }
+}
 
 interface StorePayoutSummary {
   storeId: number;
@@ -90,7 +104,7 @@ async function getStorePayoutSummaries(): Promise<StorePayoutSummary[]> {
         storeId: store.id,
         storeName: store.name || `Store ${store.id}`,
         sellerName: `${store.firstName || ''} ${store.lastName || ''}`.trim() || 'Unknown',
-        sellerEmail: store.userId || 'No email available',
+        sellerEmail: await getSellerEmail(store.userId),
         socialLinks: store.socialLinks,
         totalSalesEver: Number(totalStats[0]?.totalSales) || 0,
         totalRevenueEver: Number(totalStats[0]?.totalRevenue) || 0,
@@ -318,7 +332,7 @@ export default async function AdminPayoutsPage() {
                             className="text-red-600 border-red-600 hover:bg-red-50"
                           >
                             <XCircle className="h-3 w-3 mr-1" />
-                            Undo Last
+                            Undo Last Payout
                           </Button>
                         </form>
                       </div>
