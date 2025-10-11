@@ -22,6 +22,18 @@ export default async function RootLayout({
             data-domain="mapbuddi.com"
             src="https://plausible.io/js/script.tagged-events.js"
           ></script>
+          {/* Google Analytics */}
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-78X0XMB9JS"></script>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-78X0XMB9JS');
+              `,
+            }}
+          />
         </head>
         <body>
           <main>{children}</main>
