@@ -4,8 +4,8 @@ import { Footer } from "@/components/footer";
 import React from "react";
 
 export const metadata = {
-  title: "MapBuddi - Online marketplace",
-  description: "Online marketplace",
+  title: "MapBuddi - Travel like the pros",
+  description: "Travel like the pros",
 };
 
 export default async function StorefrontLayout({
