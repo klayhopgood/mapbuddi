@@ -99,6 +99,123 @@ export default function TermsOfServicePage() {
             </div>
           </section>
 
+          {/* Google Drive Integration */}
+          <section>
+            <Heading size="h2">Google Drive Integration</Heading>
+            <div className="mt-4 space-y-4">
+              <div>
+                <Heading size="h3">Service Description</Heading>
+                <Text className="mt-2">
+                  MapBuddi offers optional integration with Google Drive to create KML files of your purchased location lists. This feature requires you to authorize MapBuddi to access your Google Drive using OAuth 2.0 authentication.
+                </Text>
+              </div>
+
+              <div>
+                <Heading size="h3">Your Rights and Our Rights</Heading>
+                <Text className="mt-2">
+                  <strong>Your Rights:</strong>
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>You retain full ownership of all files created in your Google Drive</li>
+                  <li>You can revoke MapBuddi&apos;s access to your Google Drive at any time</li>
+                  <li>You can delete, move, or modify any KML files we create</li>
+                  <li>You can disconnect the integration from your MapBuddi account settings</li>
+                </ul>
+                <Text className="mt-2">
+                  <strong>Our Rights:</strong>
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>We may suspend or terminate Google Drive integration features for violations of these Terms</li>
+                  <li>We may discontinue Google Drive integration with reasonable notice</li>
+                  <li>We may impose reasonable limits on file creation to prevent abuse</li>
+                </ul>
+              </div>
+
+              <div>
+                <Heading size="h3">User Responsibilities</Heading>
+                <Text className="mt-2">
+                  When using Google Drive integration, you agree to:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li><strong>Maintain adequate Google Drive storage:</strong> Ensure you have sufficient Google Drive storage space for KML files</li>
+                  <li><strong>Comply with Google&apos;s Terms:</strong> Abide by Google&apos;s Terms of Service and Acceptable Use Policy</li>
+                  <li><strong>No malicious files:</strong> Do not attempt to use our service to create or upload malicious files, viruses, or harmful code</li>
+                  <li><strong>No copyright infringement:</strong> Ensure you have the right to sync and store location data you purchase</li>
+                  <li><strong>Respect file limits:</strong> Do not abuse the sync feature by creating excessive files or attempting to circumvent rate limits</li>
+                  <li><strong>Maintain Google account access:</strong> You are responsible for maintaining access to your Google account and Google Drive</li>
+                  <li><strong>Backup important data:</strong> While we make reasonable efforts to create files correctly, you should maintain backups of any critical data</li>
+                </ul>
+              </div>
+
+              <div>
+                <Heading size="h3">Data Ownership and License</Heading>
+                <Text className="mt-2">
+                  <strong>Ownership:</strong>
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>You own all KML files created in your Google Drive</li>
+                  <li>The underlying location data is owned by the original content creator (seller)</li>
+                  <li>Your purchase grants you a personal, non-transferable license to use the location data</li>
+                  <li>You may not redistribute or resell the KML files or location data</li>
+                </ul>
+                <Text className="mt-2">
+                  <strong>License to MapBuddi:</strong>
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>By using Google Drive integration, you grant us permission to create files in your Drive</li>
+                  <li>We only access files that we create; we cannot access your other Google Drive files</li>
+                  <li>This license terminates when you disconnect Google Drive integration or delete your account</li>
+                </ul>
+              </div>
+
+              <div>
+                <Heading size="h3">Service Availability</Heading>
+                <Text className="mt-2">
+                  Google Drive integration is provided &ldquo;as is&rdquo; and depends on:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>Google Drive API availability and functionality</li>
+                  <li>Your Google account remaining in good standing</li>
+                  <li>Sufficient storage space in your Google Drive</li>
+                  <li>Valid OAuth tokens and authentication</li>
+                </ul>
+                <Text className="mt-2">
+                  We do not guarantee uninterrupted access to Google Drive integration and may experience downtime due to factors beyond our control, including Google API changes or outages.
+                </Text>
+              </div>
+
+              <div>
+                <Heading size="h3">Limitations and Restrictions</Heading>
+                <Text className="mt-2">
+                  The following limitations apply to Google Drive integration:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>File sync may be delayed or queued during high traffic periods</li>
+                  <li>Very large location lists may be subject to file size limitations</li>
+                  <li>Sync attempts may fail if your Google Drive is full or if Google APIs are unavailable</li>
+                  <li>We reserve the right to impose rate limits to prevent abuse</li>
+                  <li>Synced files remain in your Drive even after disconnecting (you must manually delete them)</li>
+                </ul>
+              </div>
+
+              <div>
+                <Heading size="h3">Troubleshooting and Support</Heading>
+                <Text className="mt-2">
+                  If you experience issues with Google Drive integration:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>Check that your Google account is connected and authorized</li>
+                  <li>Verify you have sufficient Google Drive storage space</li>
+                  <li>Try disconnecting and reconnecting your Google account</li>
+                  <li>Contact our support team at contact@mapbuddi.com if issues persist</li>
+                </ul>
+                <Text className="mt-2">
+                  While we provide reasonable support, we cannot guarantee resolution of issues caused by Google API changes, Google account problems, or third-party factors beyond our control.
+                </Text>
+              </div>
+            </div>
+          </section>
+
           {/* Purchases and Payments */}
           <section>
             <Heading size="h2">Purchases and Payments</Heading>
@@ -248,7 +365,28 @@ export default function TermsOfServicePage() {
               <div>
                 <Heading size="h3">Third-Party Services</Heading>
                 <Text className="mt-2">
-                  Our service integrates with third-party services including Google Maps, Stripe, and social media platforms. We are not responsible for the availability or functionality of these third-party services.
+                  Our service integrates with third-party services including Google Maps, Google Drive, Stripe, and social media platforms. We are not responsible for the availability or functionality of these third-party services.
+                </Text>
+              </div>
+
+              <div>
+                <Heading size="h3">Google Drive Integration Disclaimers</Heading>
+                <Text className="mt-2">
+                  With respect to Google Drive integration, we specifically disclaim:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li><strong>No guarantee of file integrity:</strong> While we make reasonable efforts, we cannot guarantee that KML files will be created perfectly or without errors</li>
+                  <li><strong>No guarantee of sync success:</strong> File synchronization may fail due to network issues, API limitations, Google account problems, or other factors</li>
+                  <li><strong>No responsibility for Google actions:</strong> We are not responsible if Google suspends your account, changes APIs, or modifies Drive functionality</li>
+                  <li><strong>No guarantee of data preservation:</strong> You are responsible for backing up any critical data; we do not guarantee permanent retention of files in your Drive</li>
+                  <li><strong>No guarantee of compatibility:</strong> KML files are created in good faith but may not be compatible with all mapping applications or future Google My Maps versions</li>
+                </ul>
+              </div>
+
+              <div>
+                <Heading size="h3">No Warranty</Heading>
+                <Text className="mt-2">
+                  OUR SERVICES, INCLUDING GOOGLE DRIVE INTEGRATION, ARE PROVIDED &ldquo;AS IS&rdquo; AND &ldquo;AS AVAILABLE&rdquo; WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMITTED BY LAW, WE DISCLAIM ALL WARRANTIES, INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
                 </Text>
               </div>
             </div>
@@ -257,9 +395,71 @@ export default function TermsOfServicePage() {
           {/* Limitation of Liability */}
           <section>
             <Heading size="h2">Limitation of Liability</Heading>
-            <Text className="mt-4">
-              To the fullest extent permitted by applicable law, MapBuddi shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses.
-            </Text>
+            <div className="mt-4 space-y-4">
+              <Text>
+                TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, INCLUDING AUSTRALIAN CONSUMER LAW WHERE APPLICABLE, MAPBUDDI SHALL NOT BE LIABLE FOR:
+              </Text>
+              <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                <li>Any indirect, incidental, special, consequential, or punitive damages</li>
+                <li>Any loss of profits or revenues, whether incurred directly or indirectly</li>
+                <li>Any loss of data, use, goodwill, or other intangible losses</li>
+                <li>Any damages resulting from your use of or inability to use our services</li>
+                <li>Any damages resulting from unauthorized access to or alteration of your transmissions or data</li>
+              </ul>
+
+              <div>
+                <Heading size="h3">Data Loss and Google Drive Integration</Heading>
+                <Text className="mt-2">
+                  Without limiting the generality of the above, we specifically disclaim liability for:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li><strong>Data loss:</strong> Loss or corruption of data stored in your Google Drive, including KML files we create</li>
+                  <li><strong>Sync failures:</strong> Failed synchronizations, incomplete file transfers, or partial data uploads</li>
+                  <li><strong>File deletion:</strong> Accidental or unintended deletion of files from your Google Drive</li>
+                  <li><strong>Access loss:</strong> Loss of access to your Google account or Drive files for any reason</li>
+                  <li><strong>Google API changes:</strong> Changes to Google APIs that affect functionality or data access</li>
+                  <li><strong>Third-party actions:</strong> Actions taken by Google, including account suspension, API rate limiting, or service termination</li>
+                  <li><strong>File format issues:</strong> Incompatibility of KML files with Google My Maps or other applications</li>
+                  <li><strong>Storage limitations:</strong> Issues arising from insufficient Google Drive storage space</li>
+                </ul>
+              </div>
+
+              <div>
+                <Heading size="h3">Australian Consumer Law</Heading>
+                <Text className="mt-2">
+                  Nothing in these Terms excludes, restricts, or modifies any consumer guarantee, right, or remedy conferred by the Australian Consumer Law or any other applicable law that cannot be excluded, restricted, or modified by agreement. Subject to the foregoing, our liability for breach of any consumer guarantee that cannot be excluded is limited, at our option, to:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>In the case of goods: replacement or repair of the goods, or payment of the cost of replacement or repair</li>
+                  <li>In the case of services: supply of the services again, or payment of the cost of having the services supplied again</li>
+                </ul>
+              </div>
+
+              <div>
+                <Heading size="h3">Maximum Liability</Heading>
+                <Text className="mt-2">
+                  To the extent permitted by law, our total liability to you for all claims arising out of or related to your use of our services, including Google Drive integration, shall not exceed the greater of:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>The amount you paid to MapBuddi in the 12 months prior to the event giving rise to liability; or</li>
+                  <li>One hundred Australian dollars (AUD $100)</li>
+                </ul>
+              </div>
+
+              <div>
+                <Heading size="h3">Your Responsibility</Heading>
+                <Text className="mt-2">
+                  You acknowledge and agree that:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>You are solely responsible for maintaining backups of any important data</li>
+                  <li>You assume all risk associated with using Google Drive integration</li>
+                  <li>You should verify the integrity and accuracy of synced files</li>
+                  <li>You are responsible for monitoring your Google Drive storage and account status</li>
+                  <li>We strongly recommend backing up any critical location data independently</li>
+                </ul>
+              </div>
+            </div>
           </section>
 
           {/* Indemnification */}

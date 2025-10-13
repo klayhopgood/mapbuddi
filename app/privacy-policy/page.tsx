@@ -174,6 +174,131 @@ export default function PrivacyPolicyPage() {
             </Text>
           </section>
 
+          {/* Google Drive Integration */}
+          <section>
+            <Heading size="h2">Google Drive Integration</Heading>
+            <div className="mt-4 space-y-4">
+              <div>
+                <Heading size="h3">What Data We Access</Heading>
+                <Text className="mt-2">
+                  When you connect your Google account to MapBuddi, we request access to the following Google API scopes:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li><strong>drive.file scope</strong> (https://www.googleapis.com/auth/drive.file) - Limited access to only create and manage files that MapBuddi creates in your Google Drive</li>
+                  <li><strong>userinfo.email</strong> - Your email address for account association</li>
+                  <li><strong>userinfo.profile</strong> - Your basic profile information</li>
+                </ul>
+                <Text className="mt-2">
+                  <strong>Important:</strong> We use the most restrictive &ldquo;drive.file&rdquo; scope, which means we can only access files that our application creates. We cannot see, access, or modify any other files in your Google Drive.
+                </Text>
+              </div>
+
+              <div>
+                <Heading size="h3">Why We Access Your Google Drive</Heading>
+                <Text className="mt-2">
+                  We access your Google Drive solely to:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>Create KML (Keyhole Markup Language) files containing your purchased location lists</li>
+                  <li>Organize these files in a &ldquo;MapBuddi&rdquo; folder in your Google Drive</li>
+                  <li>Allow you to import these KML files into Google My Maps for navigation</li>
+                  <li>Verify that synced files exist and delete them when you request removal</li>
+                </ul>
+              </div>
+
+              <div>
+                <Heading size="h3">Data Storage and Retention</Heading>
+                <Text className="mt-2">
+                  <strong>In Your Google Drive:</strong>
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>KML files remain in your Google Drive indefinitely until you manually delete them</li>
+                  <li>Files are stored in a folder called &ldquo;MapBuddi&rdquo; in your Drive</li>
+                  <li>You have full control to move, rename, or delete these files at any time</li>
+                </ul>
+                <Text className="mt-2">
+                  <strong>In Our Database:</strong>
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>Google access tokens are stored securely and encrypted in our database</li>
+                  <li>We store file IDs of created KML files to enable deletion functionality</li>
+                  <li>Sync status information (whether a list has been synced, last sync date)</li>
+                  <li>Connection metadata (token expiry dates, refresh tokens)</li>
+                  <li>This data is retained as long as your account is active or until you disconnect Google integration</li>
+                </ul>
+              </div>
+
+              <div>
+                <Heading size="h3">Who Can See Your Files</Heading>
+                <Text className="mt-2">
+                  <strong>Privacy guarantee:</strong> Only you can see the KML files created in your Google Drive. These files are:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>Private to your Google account by default</li>
+                  <li>Not shared with MapBuddi staff or other users</li>
+                  <li>Not publicly accessible unless you explicitly share them via Google Drive</li>
+                  <li>Subject to your Google Drive sharing settings and controls</li>
+                </ul>
+              </div>
+
+              <div>
+                <Heading size="h3">Data Sharing and Usage</Heading>
+                <Text className="mt-2">
+                  We make the following commitments regarding your Google data:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li><strong>We do not sell your Google data</strong> - Your Google Drive data and access tokens will never be sold to third parties</li>
+                  <li><strong>We do not share your Google data</strong> - We never share your Google Drive files or access tokens with other users or third-party services</li>
+                  <li><strong>We do not use data for advertising</strong> - Your Google Drive data is never used for targeted advertising or marketing purposes</li>
+                  <li><strong>We do not aggregate or analyze your Drive content</strong> - We do not read, analyze, or create aggregated datasets from your KML files or Drive content</li>
+                  <li><strong>No data transfer to third parties</strong> - Your Google access tokens and Drive data remain within our secure systems and are not transferred to any third parties</li>
+                </ul>
+              </div>
+
+              <div>
+                <Heading size="h3">Security Measures</Heading>
+                <Text className="mt-2">
+                  We implement industry-standard security measures to protect your Google access credentials:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>All Google access tokens are encrypted at rest in our database</li>
+                  <li>API communications use HTTPS/TLS encryption</li>
+                  <li>Access tokens are stored separately from user-facing data</li>
+                  <li>We use OAuth 2.0 refresh tokens to minimize long-term token exposure</li>
+                  <li>Tokens expire and are automatically refreshed using secure processes</li>
+                </ul>
+              </div>
+
+              <div>
+                <Heading size="h3">Revoking Access and Data Deletion</Heading>
+                <Text className="mt-2">
+                  You have complete control over your Google Drive integration:
+                </Text>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li><strong>Disconnect anytime:</strong> You can disconnect Google Drive integration from your MapBuddi account settings at any time</li>
+                  <li><strong>Revoke via Google:</strong> You can revoke MapBuddi&apos;s access to your Google account directly through your <a href="https://myaccount.google.com/permissions" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">Google Account Permissions page</a></li>
+                  <li><strong>What happens when you disconnect:</strong>
+                    <ul className="list-disc list-inside ml-6 mt-2 space-y-1">
+                      <li>We immediately delete your Google access and refresh tokens from our database</li>
+                      <li>We can no longer create new files in your Drive or access existing ones</li>
+                      <li>KML files remain in your Google Drive (you can manually delete them)</li>
+                      <li>You can re-connect at any time to restore functionality</li>
+                    </ul>
+                  </li>
+                  <li><strong>Account deletion:</strong> If you delete your MapBuddi account, all Google integration data is permanently deleted within 30 days</li>
+                  <li><strong>Manual file deletion:</strong> You can delete individual KML files through your MapBuddi interface or directly in Google Drive</li>
+                </ul>
+              </div>
+
+              <div>
+                <Heading size="h3">Google API Services User Data Policy Compliance</Heading>
+                <Text className="mt-2">
+                  MapBuddi&apos;s use of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">Google API Services User Data Policy</a>, including the Limited Use requirements. We only use your Google data for the specific purposes outlined above and do not use it for any other purpose.
+                </Text>
+              </div>
+            </div>
+          </section>
+
           {/* Third-Party Services */}
           <section>
             <Heading size="h2">Third-Party Services</Heading>
@@ -181,13 +306,14 @@ export default function PrivacyPolicyPage() {
               Our website may contain links to third-party services, including:
             </Text>
             <ul className="list-disc list-inside mt-4 space-y-1 text-sm">
-              <li>Google Maps for location services</li>
+              <li>Google Maps for location services and mapping</li>
+              <li>Google Drive for file storage and syncing</li>
               <li>Stripe for payment processing</li>
               <li>Social media platforms for account verification</li>
               <li>Analytics services</li>
             </ul>
             <Text className="mt-4">
-              These third-party services have their own privacy policies, and we are not responsible for their practices.
+              These third-party services have their own privacy policies, and we are not responsible for their practices. When you use Google Drive integration, you are also subject to Google&apos;s <a href="https://policies.google.com/privacy" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://policies.google.com/terms" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">Terms of Service</a>.
             </Text>
           </section>
 
