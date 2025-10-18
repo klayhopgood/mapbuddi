@@ -2,9 +2,32 @@ import { HeadingAndSubheading } from "@/components/admin/heading-and-subheading"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { DollarSign, Users, BarChart3, Settings } from "lucide-react";
+import { DollarSign, Users, BarChart3, Settings, Upload } from "lucide-react";
+import { CSVImport } from "@/components/admin/csv-import";
+import { db } from "@/db/db";
+import { stores } from "@/db/schema";
 
-export default function AdminPage() {
+async function getStores() {
+  try {
+    const allStores = await db
+      .select({
+        id: stores.id,
+        name: stores.name,
+        slug: stores.slug,
+        userId: stores.userId,
+      })
+      .from(stores)
+      .orderBy(stores.name);
+    
+    return allStores;
+  } catch (error) {
+    console.error("Error fetching stores:", error);
+    return [];
+  }
+}
+
+export default async function AdminPage() {
+  const stores = await getStores();
   return (
     <div className="space-y-6">
       <HeadingAndSubheading
@@ -67,6 +90,23 @@ export default function AdminPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
+              <Upload className="h-5 w-5" />
+              CSV Import
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-600 mb-4">
+              Import location data from CSV files and create draft lists for users.
+            </p>
+            <Button className="w-full" asChild>
+              <Link href="#csv-import">Import CSV</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
               <Settings className="h-5 w-5" />
               System Settings
             </CardTitle>
@@ -112,6 +152,11 @@ export default function AdminPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* CSV Import Section */}
+      <div id="csv-import">
+        <CSVImport stores={stores} />
+      </div>
     </div>
   );
 }

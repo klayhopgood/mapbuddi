@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { MapPin, Calendar, DollarSign, Users, CheckCircle, AlertCircle, Clock, Smartphone } from "lucide-react";
+import { MapPin, Calendar, DollarSign, Users, CheckCircle, AlertCircle, Clock, Smartphone, Download } from "lucide-react";
 import { UserMapsIntegration, PurchasedListSync } from "@/db/schema";
 import { toggleListSync } from "@/server-actions/maps-integration";
 import { toast } from "sonner";
@@ -67,6 +67,42 @@ export function PurchasedListsManager({
     });
   };
 
+  const handleDownloadKML = async (listId: number, listName: string) => {
+    try {
+      toast.loading("Generating KML file...");
+      const response = await fetch(`/api/location-lists/${listId}/kml`);
+      
+      if (!response.ok) {
+        const error = await response.json();
+        toast.dismiss();
+        toast.error(error.error || "Failed to download KML file");
+        return;
+      }
+
+      // Create a blob from the response
+      const blob = await response.blob();
+      
+      // Create a download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${listName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.kml`;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast.dismiss();
+      toast.success("KML file downloaded successfully!");
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Failed to download KML file");
+      console.error("Download error:", error);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {purchasedLists.map((list) => {
@@ -111,6 +147,22 @@ export function PurchasedListsManager({
                     }
                   </span>
                 </div>
+              </div>
+
+              {/* Download KML Button */}
+              <div className="border-t pt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDownloadKML(list.id, list.name)}
+                  className="w-full sm:w-auto"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download KML File
+                </Button>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Download this list as a KML file to import into any map application
+                </p>
               </div>
 
               {/* Sync Controls */}
