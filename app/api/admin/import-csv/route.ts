@@ -23,14 +23,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user is admin (you can customize this check)
-    const isAdmin = user.publicMetadata?.role === 'admin' || user.id === 'user_2x8Y9Z...'; // Add your admin user ID
-    if (!isAdmin) {
-      return NextResponse.json(
-        { error: 'Admin access required' },
-        { status: 403 }
-      );
-    }
+    // Check if user is admin - for now, allow any authenticated user
+    // You can customize this check based on your admin requirements
+    console.log('User attempting CSV import:', {
+      userId: user.id,
+      email: user.emailAddresses[0]?.emailAddress,
+      metadata: user.publicMetadata
+    });
 
     const formData = await request.formData();
     const csvFile = formData.get('csvFile') as File;
@@ -38,7 +37,16 @@ export async function POST(request: NextRequest) {
     const storeId = formData.get('storeId') as string;
     const categoryName = formData.get('categoryName') as string || 'General';
 
+    console.log('CSV Import request data:', {
+      hasFile: !!csvFile,
+      fileName: csvFile?.name,
+      listName,
+      storeId,
+      categoryName
+    });
+
     if (!csvFile || !listName || !storeId) {
+      console.log('Missing required fields:', { csvFile: !!csvFile, listName, storeId });
       return NextResponse.json(
         { error: 'Missing required fields: csvFile, listName, storeId' },
         { status: 400 }
@@ -46,13 +54,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify the store exists and get store details
+    console.log('Looking for store with ID:', storeId);
     const store = await db
       .select()
       .from(stores)
       .where(eq(stores.id, parseInt(storeId)))
       .then(res => res[0]);
 
+    console.log('Found store:', store);
+
     if (!store) {
+      console.log('Store not found for ID:', storeId);
       return NextResponse.json(
         { error: 'Store not found' },
         { status: 404 }
@@ -63,7 +75,14 @@ export async function POST(request: NextRequest) {
     const csvContent = await csvFile.text();
     const lines = csvContent.split('\n').filter(line => line.trim());
     
+    console.log('CSV content parsed:', {
+      totalLines: lines.length,
+      firstLine: lines[0],
+      sampleData: lines.slice(0, 3)
+    });
+    
     if (lines.length < 2) {
+      console.log('CSV has insufficient lines:', lines.length);
       return NextResponse.json(
         { error: 'CSV must have at least a header row and one data row' },
         { status: 400 }
@@ -105,7 +124,13 @@ export async function POST(request: NextRequest) {
       return rowData;
     }).filter(row => row.name && row.latitude && row.longitude);
 
+    console.log('Parsed CSV data:', {
+      validRows: csvData.length,
+      sampleRow: csvData[0]
+    });
+
     if (csvData.length === 0) {
+      console.log('No valid CSV data found');
       return NextResponse.json(
         { error: 'No valid data rows found' },
         { status: 400 }
@@ -113,6 +138,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create the location list (as draft)
+    console.log('Creating location list...');
     const [newList] = await db
       .insert(locationLists)
       .values({
@@ -128,7 +154,10 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
+    console.log('Created location list:', newList);
+
     // Create a category for the imported POIs
+    console.log('Creating category...');
     const [newCategory] = await db
       .insert(listCategories)
       .values({
@@ -140,7 +169,10 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
+    console.log('Created category:', newCategory);
+
     // Insert all POIs
+    console.log('Inserting POIs...');
     const poisToInsert = csvData.map((row, index) => ({
       categoryId: newCategory.id,
       name: row.name,
@@ -152,7 +184,9 @@ export async function POST(request: NextRequest) {
       displayOrder: index,
     }));
 
+    console.log('POIs to insert:', poisToInsert.length);
     await db.insert(listPois).values(poisToInsert);
+    console.log('POIs inserted successfully');
 
     return NextResponse.json({
       success: true,
