@@ -11,9 +11,9 @@ import { toast } from "sonner";
 
 interface Store {
   id: number;
-  name: string;
-  slug: string;
-  userId: string;
+  name: string | null;
+  slug: string | null;
+  userId: string | null;
 }
 
 interface CSVImportProps {
@@ -161,7 +161,7 @@ export function CSVImport({ stores }: CSVImportProps) {
                 <SelectItem key={store.id} value={store.id.toString()}>
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
-                    {store.name}
+                    {store.name || `Store ${store.id}`}
                   </div>
                 </SelectItem>
               ))}
