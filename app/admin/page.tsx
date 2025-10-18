@@ -98,9 +98,9 @@ export default async function AdminPage() {
             <p className="text-sm text-gray-600 mb-4">
               Import location data from CSV files and create draft lists for users.
             </p>
-            <Button className="w-full" asChild>
-              <Link href="#csv-import">Import CSV</Link>
-            </Button>
+            <Link href="#csv-import">
+              <Button className="w-full">Import CSV</Button>
+            </Link>
           </CardContent>
         </Card>
 
