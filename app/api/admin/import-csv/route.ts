@@ -93,20 +93,40 @@ export async function POST(request: NextRequest) {
     const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
     const dataRows = lines.slice(1);
 
+    console.log('Headers found:', headers);
+
     // Validate headers
     const requiredHeaders = ['name', 'address', 'latitude', 'longitude'];
     const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
     
     if (missingHeaders.length > 0) {
+      console.log('Missing headers:', missingHeaders);
       return NextResponse.json(
         { error: `Missing required headers: ${missingHeaders.join(', ')}` },
         { status: 400 }
       );
     }
 
-    // Parse CSV data
-    const csvData: CSVRow[] = dataRows.map(row => {
-      const values = row.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+    // Parse CSV data with proper CSV parsing (handles quoted fields with commas)
+    const csvData: CSVRow[] = dataRows.map((row, rowIndex) => {
+      // Simple CSV parser that handles quoted fields
+      const values: string[] = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < row.length; i++) {
+        const char = row[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          values.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      values.push(current.trim()); // Add the last field
+      
       const rowData: CSVRow = {
         name: '',
         address: '',
@@ -117,12 +137,27 @@ export async function POST(request: NextRequest) {
 
       headers.forEach((header, index) => {
         if (values[index]) {
-          rowData[header as keyof CSVRow] = values[index];
+          // Remove surrounding quotes
+          const value = values[index].replace(/^"|"$/g, '');
+          rowData[header as keyof CSVRow] = value;
         }
       });
 
+      console.log(`Row ${rowIndex + 1}:`, {
+        name: rowData.name,
+        lat: rowData.latitude,
+        lng: rowData.longitude,
+        hasAddress: !!rowData.address
+      });
+
       return rowData;
-    }).filter(row => row.name && row.latitude && row.longitude);
+    }).filter(row => {
+      const isValid = row.name && row.latitude && row.longitude;
+      if (!isValid) {
+        console.log('Filtering out invalid row:', row);
+      }
+      return isValid;
+    });
 
     console.log('Parsed CSV data:', {
       validRows: csvData.length,
@@ -149,8 +184,8 @@ export async function POST(request: NextRequest) {
         storeId: parseInt(storeId),
         isActive: false, // Save as draft
         totalPois: csvData.length,
-        country: 'Vietnam', // You might want to make this configurable
-        cities: JSON.stringify(['Da Nang']), // You might want to make this configurable
+        country: null, // Let it be null for now
+        cities: null, // Let it be null for now
       })
       .returning();
 
@@ -185,8 +220,33 @@ export async function POST(request: NextRequest) {
     }));
 
     console.log('POIs to insert:', poisToInsert.length);
-    await db.insert(listPois).values(poisToInsert);
-    console.log('POIs inserted successfully');
+    console.log('Sample POI data:', poisToInsert[0]);
+    
+    try {
+      // Insert POIs in batches to avoid potential issues
+      const batchSize = 50;
+      let totalInserted = 0;
+      
+      for (let i = 0; i < poisToInsert.length; i += batchSize) {
+        const batch = poisToInsert.slice(i, i + batchSize);
+        console.log(`Inserting batch ${Math.floor(i/batchSize) + 1}: ${batch.length} POIs`);
+        
+        const insertedPois = await db.insert(listPois).values(batch).returning();
+        totalInserted += insertedPois.length;
+        console.log(`Batch inserted: ${insertedPois.length} POIs`);
+      }
+      
+      console.log(`Total POIs inserted successfully: ${totalInserted}`);
+      
+      if (totalInserted !== poisToInsert.length) {
+        console.warn(`Warning: Expected ${poisToInsert.length} POIs, but inserted ${totalInserted}`);
+      }
+      
+    } catch (poiError) {
+      console.error('Error inserting POIs:', poiError);
+      console.error('Error details:', poiError.message);
+      throw poiError;
+    }
 
     return NextResponse.json({
       success: true,

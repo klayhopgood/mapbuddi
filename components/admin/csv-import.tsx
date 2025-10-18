@@ -77,12 +77,15 @@ export function CSVImport({ stores }: CSVImportProps) {
         });
 
         const result = await response.json();
+        console.log('CSV import response:', result);
 
         if (!response.ok) {
+          console.error('CSV import failed:', result);
           toast.error(result.error || "Failed to import CSV");
           return;
         }
 
+        console.log('CSV import successful:', result);
         toast.success(result.message);
         
         // Reset form
@@ -96,8 +99,8 @@ export function CSVImport({ stores }: CSVImportProps) {
         if (fileInput) fileInput.value = '';
 
       } catch (error) {
-        toast.error("Failed to import CSV");
         console.error("Import error:", error);
+        toast.error("Failed to import CSV - check console for details");
       }
     });
   };
