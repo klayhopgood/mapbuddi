@@ -6,10 +6,10 @@ import { currentUser } from '@clerk/nextjs/server';
 
 interface CSVRow {
   name: string;
-  address: string;
+  address?: string;
   latitude: string;
   longitude: string;
-  notes: string;
+  notes?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     console.log('Headers found:', headers);
 
     // Validate headers
-    const requiredHeaders = ['name', 'address', 'latitude', 'longitude'];
+    const requiredHeaders = ['name', 'latitude', 'longitude'];
     const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
     
     if (missingHeaders.length > 0) {
@@ -129,17 +129,17 @@ export async function POST(request: NextRequest) {
       
       const rowData: CSVRow = {
         name: '',
-        address: '',
         latitude: '',
-        longitude: '',
-        notes: ''
+        longitude: ''
       };
 
       headers.forEach((header, index) => {
-        if (values[index]) {
-          // Remove surrounding quotes
-          const value = values[index].replace(/^"|"$/g, '');
-          rowData[header as keyof CSVRow] = value;
+        if (values[index] !== undefined) {
+          // Remove surrounding quotes and carriage returns
+          const value = values[index].replace(/^"|"$/g, '').replace(/\r/g, '').trim();
+          if (value) {
+            rowData[header as keyof CSVRow] = value;
+          }
         }
       });
 
@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
       sellerNotes: row.notes || null, // Notes from CSV go to sellerNotes
       latitude: parseFloat(row.latitude).toString(),
       longitude: parseFloat(row.longitude).toString(),
-      address: `${parseFloat(row.latitude).toFixed(6)}, ${parseFloat(row.longitude).toFixed(6)}`, // Format as "lat, lng"
+      address: row.address || `${parseFloat(row.latitude).toFixed(6)}, ${parseFloat(row.longitude).toFixed(6)}`, // Use CSV address or format as "lat, lng"
       displayOrder: index,
     }));
 
