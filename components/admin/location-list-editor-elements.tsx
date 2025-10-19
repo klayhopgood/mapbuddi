@@ -398,7 +398,7 @@ export const LocationListEditorElements = (props: {
                     maxImages={30}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Upload at least 3 images from your trip to showcase your WanderList. Maximum 30 images, 10MB each. These will be displayed on WanderList cards and the WanderList detail page.
+                    Upload at least 3 images from your trip to showcase your WanderList. Maximum 30 images, 16MB each. These will be displayed on WanderList cards and the WanderList detail page.
                   </p>
                   {listImages.length < 3 && (
                     <p className="text-xs text-red-500 mt-1">

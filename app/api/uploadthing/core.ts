@@ -28,10 +28,10 @@ export const ourFileRouter = {
       return { uploadedBy: metadata.userId };
     }),
 
-  // List images uploader - multiple images, up to 10MB each, max 30 images
+  // List images uploader - multiple images, up to 16MB each, max 30 images
   listImageUploader: f({ 
     image: { 
-      maxFileSize: "10MB", 
+      maxFileSize: "16MB", 
       maxFileCount: 30 
     } 
   })
