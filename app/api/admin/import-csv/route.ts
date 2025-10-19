@@ -211,11 +211,11 @@ export async function POST(request: NextRequest) {
     const poisToInsert = csvData.map((row, index) => ({
       categoryId: newCategory.id,
       name: row.name,
-      description: row.notes || null,
-      sellerNotes: null,
+      description: null, // Keep description null
+      sellerNotes: row.notes || null, // Notes from CSV go to sellerNotes
       latitude: parseFloat(row.latitude).toString(),
       longitude: parseFloat(row.longitude).toString(),
-      address: row.address || null,
+      address: `${parseFloat(row.latitude).toFixed(6)}, ${parseFloat(row.longitude).toFixed(6)}`, // Format as "lat, lng"
       displayOrder: index,
     }));
 
@@ -244,7 +244,7 @@ export async function POST(request: NextRequest) {
       
     } catch (poiError) {
       console.error('Error inserting POIs:', poiError);
-      console.error('Error details:', poiError.message);
+      console.error('Error details:', poiError instanceof Error ? poiError.message : String(poiError));
       throw poiError;
     }
 
