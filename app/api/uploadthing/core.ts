@@ -28,11 +28,11 @@ export const ourFileRouter = {
       return { uploadedBy: metadata.userId };
     }),
 
-  // List images uploader - multiple images, up to 4MB each, max 10 images
+  // List images uploader - multiple images, up to 10MB each, max 30 images
   listImageUploader: f({ 
     image: { 
-      maxFileSize: "4MB", 
-      maxFileCount: 10 
+      maxFileSize: "10MB", 
+      maxFileCount: 30 
     } 
   })
     .middleware(async (req) => {

@@ -60,11 +60,11 @@ export const ListImageUploader = ({
 
     // Validate each file
     for (const file of files) {
-      // Validate file size (4MB limit)
-      if (file.size > 4 * 1024 * 1024) {
+      // Validate file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
         toast({
           title: "File too large",
-          description: `${file.name} is over 4MB. Please select smaller images.`,
+          description: `${file.name} is over 10MB. Please select smaller images.`,
           variant: "destructive",
         });
         return;
