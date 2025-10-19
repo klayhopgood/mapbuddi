@@ -37,7 +37,7 @@ async function testSinglePOI() {
 
   } catch (error) {
     console.error("Error inserting test POI:", error);
-    console.error("Error details:", error.message);
+    console.error("Error details:", error instanceof Error ? error.message : String(error));
   }
 }
 
