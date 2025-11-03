@@ -95,10 +95,15 @@ export const LocationListEditorElements = (props: {
       displayOrder: cat.displayOrder || 0
     })) ?? defaultCategories
   );
-  const [pois, setPois] = useState<ListPOI[]>(
-    props.initialPois?.map(poi => ({
+  
+  // CRITICAL FIX: Map POI categoryIds from database IDs to category array indices
+  // The frontend uses categoryId as array index, but database stores actual category IDs
+  const initialPois = props.initialPois ? props.initialPois.map(poi => {
+    // Find the index of the category that matches this POI's categoryId
+    const categoryIndex = props.initialCategories?.findIndex(cat => cat.id === poi.categoryId) ?? -1;
+    return {
       id: poi.id,
-      categoryId: poi.categoryId,
+      categoryId: categoryIndex >= 0 ? categoryIndex : 0, // Use array index, fallback to 0
       name: poi.name,
       description: poi.description || "",
       sellerNotes: poi.sellerNotes || "",
@@ -106,8 +111,10 @@ export const LocationListEditorElements = (props: {
       longitude: parseFloat(poi.longitude),
       googlePlaceId: poi.googlePlaceId || undefined,
       address: poi.address || ""
-    })) ?? []
-  );
+    };
+  }) : [];
+  
+  const [pois, setPois] = useState<ListPOI[]>(initialPois);
   const [activeTab, setActiveTab] = useState("basic");
   const [showSubscriptionPrompt, setShowSubscriptionPrompt] = useState(false);
 

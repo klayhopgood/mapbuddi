@@ -30,7 +30,7 @@ export const ListImageUploader = ({
         onImagesUpdate(updatedImages);
         toast({
           title: "Images uploaded",
-          description: `${res.length} image${res.length > 1 ? 's' : ''} uploaded successfully.`,
+          description: `${res.length} image${res.length > 1 ? 's' : ''} uploaded successfully. Don't forget to save your WanderList to keep them!`,
         });
       }
     },
@@ -127,6 +127,7 @@ export const ListImageUploader = ({
               alt={`List image ${currentImageIndex + 1}`}
               fill
               className="object-cover"
+              unoptimized
             />
             
             {/* Navigation Arrows */}
@@ -191,6 +192,7 @@ export const ListImageUploader = ({
                 alt={`Thumbnail ${index + 1}`}
                 fill
                 className="object-cover"
+                unoptimized
               />
             </button>
           ))}
@@ -204,7 +206,7 @@ export const ListImageUploader = ({
             {currentImages.length} / {maxImages} images
           </p>
           <p className="text-xs text-muted-foreground">
-            Max 4MB per image • JPG, PNG, WebP supported
+            Max 16MB per image • JPG, PNG, WebP supported
           </p>
         </div>
 
